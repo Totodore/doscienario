@@ -2,13 +2,17 @@ import { ProgressService } from './../../services/progress.service';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-progress',
-  templateUrl: './progress.component.html',
-  styleUrls: ['./progress.component.scss']
+  selector: 'app-header',
+  templateUrl: './header.component.html',
+  styleUrls: ['./header.component.scss']
 })
-export class ProgressComponent {
+export class HeaderComponent implements OnInit {
 
   constructor(
     public readonly progress: ProgressService
   ) { }
+
+  ngOnInit(): void {
+  }
+
 }

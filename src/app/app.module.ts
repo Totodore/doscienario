@@ -5,14 +5,12 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ProgressComponent } from './components/progress/progress.component';
-import { TabBarComponent } from './components/tab-bar/tab-bar.component';
+import { HeaderComponent } from './components/header/header.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ProgressComponent,
-    TabBarComponent
+    HeaderComponent
   ],
   imports: [
     BrowserModule,

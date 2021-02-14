@@ -28,10 +28,11 @@ export class MenuComponent implements OnInit {
     this.progress.show();
     try {
       this.data = await this.api.get<UserDetailsRes>("user/me");
+      localStorage.setItem("me", JSON.stringify(this.data));
+      this.progress.hide();
     } catch (e) {
       this.snackbar.snack("Impossible de charger les projets !");
       console.error(e);
-    } finally {
       this.progress.hide();
     }
   }
@@ -48,10 +49,10 @@ export class MenuComponent implements OnInit {
           id: res.id,
           name: res.name
         });
+        this.progress.hide();
       } catch (e) {
         console.error(e);
         this.snackbar.snack("Une erreur est apparue lors de la création du projet");
-      } finally {
         this.progress.hide();
       }
     });
@@ -61,11 +62,11 @@ export class MenuComponent implements OnInit {
     this.progress.show();
     try {
       await this.api.openProject(project.id);
+      this.progress.hide();
       this.router.navigateByUrl("/");
     } catch (e) {
       console.error(e);
       this.snackbar.snack("Impossible de charger le projet");
-    } finally {
       this.progress.hide();
     }
   }

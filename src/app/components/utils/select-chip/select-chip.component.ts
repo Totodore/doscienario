@@ -9,38 +9,48 @@ import { MatChipInputEvent } from '@angular/material/chips';
 })
 export class SelectChipComponent {
 
-  public allUsers: string[] = ['thpr60710', 'moba56512', 'gebu32132'];
-  public readonly addUserAction = [COMMA, ENTER, SPACE];
-  public addedUsers: string[] = [];
+  public readonly addElAction = [COMMA, ENTER, SPACE];
+
+  @Input()
+  public addedEls: string[] = [];
 
   @Output()
-  public users: EventEmitter<string[]> = new EventEmitter<string[]>();
+  public els: EventEmitter<string[]> = new EventEmitter<string[]>();
 
-  @ViewChild("userInput")
-  public userInput: ElementRef<HTMLInputElement>;
+  @Input()
+  public label: string;
 
-  public filterUsers(value: string): string[] {
-    return this.allUsers.filter(user => user.toLowerCase().includes(value.toLowerCase()));
+  @Input()
+  public placeholder: string;
+
+  @Input()
+  public data: string[];
+
+  @ViewChild("elInput")
+  public elInput: ElementRef<HTMLInputElement>;
+
+  public filterEls(value: string): string[] {
+    return this.data.filter(el => el.toLowerCase().includes(value.toLowerCase()));
   }
 
-  public addUser(event: MatAutocompleteSelectedEvent | MatChipInputEvent) {
+  public addEl(event: MatAutocompleteSelectedEvent | MatChipInputEvent) {
     const value = event instanceof MatAutocompleteSelectedEvent ? event.option.viewValue : event.value;
 
-    if (this.allUsers.includes(value) && !this.addedUsers.includes(value)) {
-      this.addedUsers.push(value);
-      this.allUsers.splice(this.allUsers.indexOf(value), 1);
+    if (this.data.includes(value) && !this.addedEls.includes(value)) {
+      this.addedEls.push(value);
+      this.data.splice(this.data.indexOf(value), 1);
     }
-    this.userInput.nativeElement.value = '';
-    this.sendUsers();
+    this.elInput.nativeElement.value = '';
+    this.sendEls();
   }
 
-  public removeUser(event: string) {
-    this.addedUsers.splice(this.addedUsers.indexOf(event), 1);
-    this.allUsers.push(event);
-    this.sendUsers();
+  public removeEl(event: string) {
+    this.addedEls.splice(this.addedEls.indexOf(event), 1);
+    this.data.push(event);
+    this.sendEls();
   }
 
-  private sendUsers() {
-    this.users.emit(this.addedUsers);
+  private sendEls() {
+    this.els.emit(this.addedEls);
   }
 }

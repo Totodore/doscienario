@@ -30,6 +30,7 @@ import { WelcomeTabComponent } from './components/tabs/welcome-tab/welcome-tab.c
 import { TabViewComponent } from './components/views/board/tab-view/tab-view.component';
 import { ProjectOptionsComponent } from './components/tabs/project-options/project-options.component';
 import { SelectChipComponent } from './components/utils/select-chip/select-chip.component';
+import { UserAddComponent } from './components/tabs/project-options/user-add/user-add.component';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import { SelectChipComponent } from './components/utils/select-chip/select-chip.
     WelcomeTabComponent,
     TabViewComponent,
     ProjectOptionsComponent,
-    SelectChipComponent
+    SelectChipComponent,
+    UserAddComponent
   ],
   imports: [
     BrowserModule,

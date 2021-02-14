@@ -1,0 +1,3 @@
+<section *ngIf="allUsers">
+  <app-select-chip [data]="userNames" [addedEls]="selectedUserNames" (els)="setUsers($event)" placeholder="Pseudo" label="Ajouter des utilisateurs" class="chip-selector"></app-select-chip>
+</section>

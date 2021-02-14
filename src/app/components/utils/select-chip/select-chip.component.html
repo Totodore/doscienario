@@ -1,0 +1,15 @@
+<mat-form-field color="accent" appearance="outline" style="display: block; width: 100%;">
+  <mat-label>Ajouter d'autres utilisateurs</mat-label>
+  <mat-chip-list #chipList aria-label="Fruit selection">
+    <mat-chip *ngFor="let user of addedUsers" (removed)="removeUser(user)">
+      {{ user }}
+      <mat-icon matChipRemove>cancel</mat-icon>
+    </mat-chip>
+    <input #userInput placeholder="Code étudiant" [matAutocomplete]="auto" [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="addUserAction" (matChipInputTokenEnd)="addUser($event)">
+  </mat-chip-list>
+  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addUser($event)">
+    <mat-option *ngFor="let user of filterUsers(userInput.value)" [value]="user">
+      {{ user }}
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>

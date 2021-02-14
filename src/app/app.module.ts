@@ -12,6 +12,9 @@ import { MatFormFieldModule, MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/mat
 import { MatInputModule } from "@angular/material/input";
 import { MatTabsModule } from '@angular/material/tabs';
 import { AppComponent } from './app.component';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatSelectModule } from '@angular/material/select';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HeaderComponent } from './components/views/board/header/header.component';
 import { LoginComponent } from './components/views/login/login.component';
@@ -26,7 +29,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { WelcomeTabComponent } from './components/tabs/welcome-tab/welcome-tab.component';
 import { TabViewComponent } from './components/views/board/tab-view/tab-view.component';
 import { ProjectOptionsComponent } from './components/tabs/project-options/project-options.component';
-import { AddUserComponent } from './components/utils/add-user/add-user.component';
+import { SelectChipComponent } from './components/utils/select-chip/select-chip.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +44,7 @@ import { AddUserComponent } from './components/utils/add-user/add-user.component
     WelcomeTabComponent,
     TabViewComponent,
     ProjectOptionsComponent,
-    AddUserComponent
+    SelectChipComponent
   ],
   imports: [
     BrowserModule,
@@ -58,7 +61,10 @@ import { AddUserComponent } from './components/utils/add-user/add-user.component
     MatSnackBarModule,
     MatButtonModule,
     MatDividerModule,
-    MatTabsModule
+    MatTabsModule,
+    MatChipsModule,
+    MatAutocompleteModule,
+    MatSelectModule
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: appearance }

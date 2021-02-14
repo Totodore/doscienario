@@ -1,13 +1,12 @@
-.wrapper {
+.nav-bar {
   display: flex;
-  width: 100%;
   min-height: 100vh;
-  .body {
+  mat-divider {
+    height: 100vh;
+  }
+  .wrapper {
     display: flex;
     flex-direction: column;
-    width: 75%;
-  }
-  app-nav-bar {
-    width: 25%;
+    padding: 8px;
   }
 }

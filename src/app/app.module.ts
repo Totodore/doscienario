@@ -10,6 +10,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule, MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { MatInputModule } from "@angular/material/input";
+import { MatTabsModule } from '@angular/material/tabs';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HeaderComponent } from './components/header/header.component';
@@ -20,6 +21,10 @@ import { BoardComponent } from './components/board/board.component';
 import { appearance } from './style/default';
 import { MenuComponent } from './components/menu/menu.component';
 import { CreateProjectComponent } from './components/utils/create-project/create-project.component';
+import { NavBarComponent } from './components/nav-bar/nav-bar.component';
+import { MatDividerModule } from '@angular/material/divider';
+import { WelcomeTabComponent } from './components/welcome-tab/welcome-tab.component';
+import { TabViewComponent } from './components/tab-view/tab-view.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +34,10 @@ import { CreateProjectComponent } from './components/utils/create-project/create
     ConfirmPasswordComponent,
     BoardComponent,
     MenuComponent,
-    CreateProjectComponent
+    CreateProjectComponent,
+    NavBarComponent,
+    WelcomeTabComponent,
+    TabViewComponent
   ],
   imports: [
     BrowserModule,
@@ -44,7 +52,9 @@ import { CreateProjectComponent } from './components/utils/create-project/create
     MatDialogModule,
     MatInputModule,
     MatSnackBarModule,
-    MatButtonModule
+    MatButtonModule,
+    MatDividerModule,
+    MatTabsModule
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: appearance }

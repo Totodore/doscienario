@@ -1,3 +1,4 @@
+import { TabService } from './../../services/tab.service';
 import { ApiService } from './../../services/api.service';
 import { ProgressService } from './../../services/progress.service';
 import { Component, OnInit } from '@angular/core';
@@ -7,14 +8,20 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
 
   constructor(
     public readonly progress: ProgressService,
-    public readonly api: ApiService
+    public readonly tabService: TabService,
   ) { }
 
-  ngOnInit(): void {
+  public tabChanged(index: number) {
+
+  }
+
+  public tabClosed(index: number) {
+    console.log(index);
+    this.tabService.removeTab(index);
   }
 
 }

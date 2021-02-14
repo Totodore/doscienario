@@ -1,4 +1,58 @@
-/* You can add global styles to this file, and also import other style files */
+@import '@angular/material/prebuilt-themes/pink-bluegrey.css';
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+$grey-light-color: #424242;
+$grey-dark-color: #212121;
+
+* {
+  [contenteditable] {
+    outline: 0px solid transparent;
+  }
+}
+
+html,
+body {
+  // height: 100%;
+  overscroll-behavior: contain;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: $grey-dark-color;
+}
+
+li {
+  list-style: none;
+}
+
+button {
+  background: transparent;
+  box-shadow: 0px 0px 0px transparent;
+  border: 0px solid transparent;
+  text-shadow: 0px 0px 0px transparent;
+}
+
+button:hover {
+  background: transparent;
+  box-shadow: 0px 0px 0px transparent;
+  border: 0px solid transparent;
+  text-shadow: 0px 0px 0px transparent;
+}
+
+button:active {
+  outline: none;
+  border: none;
+}
+
+button:focus {
+  outline: 0;
+}

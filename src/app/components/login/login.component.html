@@ -1,0 +1,20 @@
+<div class="auth-view">
+  <div class="wrapper">
+    <h1>Connexion à Doscienario</h1>
+    <form #form>
+      <mat-form-field color="accent">
+        <mat-label>Pseudo</mat-label>
+        <input type="text" [(ngModel)]="name" matInput minlength="5" maxlength="40" [ngModelOptions]="{standalone: true}">
+        <mat-error>Le pseudo doit être compris entre 5 et 40 caractères</mat-error>
+      </mat-form-field>
+      <mat-form-field color="accent">
+        <mat-label>Mot de passe</mat-label>
+        <input type="password" [(ngModel)]="password" matInput minlength="4" maxlength="40"  [ngModelOptions]="{standalone: true}">
+        <mat-error>Le mot de passe doit être compris entre 5 et 40 caractères</mat-error>
+      </mat-form-field>
+      <button type="submit" mat-stroked-button color="accent" (click)="submit(form)">Me connecter</button>
+    </form>
+    <button mat-stroked-button color="accent" (click)="register(form)">Créer un compte</button>
+  </div>
+
+</div>

@@ -1,0 +1,27 @@
+@import '~@angular/material/theming';
+
+.mat-toolbar {
+  background-color: #383838;
+  color: white !important;
+  @include mat-elevation(1);
+
+}
+
+mat-progress-bar {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  transition: opacity 250ms;
+
+  ::ng-deep .mat-progress-bar-fill::after {
+    background-color: #d1d1d1 !important;
+  }
+
+  ::ng-deep .mat-progress-bar-buffer {
+    background: #383838 !important;
+  }
+
+  ::ng-deep .mat-progress-bar {
+    border-radius: 2px;
+  }
+}

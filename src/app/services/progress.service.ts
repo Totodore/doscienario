@@ -13,6 +13,9 @@ export class ProgressService {
     this._mode = determinate ? "determinate" : "indeterminate";
     this._showing = true;
   }
+  public hide() {
+    this._showing = false;
+  }
   public updateValue(val: number) {
     this._value = val;
   }

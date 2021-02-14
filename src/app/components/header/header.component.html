@@ -1,1 +1,3 @@
-<mat-progress-bar [name]="" [value]="progressService.value" [style.opacity]="progressService.display ? 1 : 0"></mat-progress-bar>
+<mat-progress-bar [mode]="progress.mode" [value]="progress.value" [style.opacity]="progress.showing ? 1 : 0"></mat-progress-bar>
+<mat-toolbar *ngIf="api.inProject">
+</mat-toolbar>

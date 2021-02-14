@@ -1,0 +1,10 @@
+<h1>Mes projets</h1>
+<div class="wrapper" *ngIf="data?.projects?.length != null">
+  <button mat-stroked-button class="project" *ngFor="let project of data.projects" (click)="openProject(project)">
+    {{ project.name }}
+  </button>
+  <button mat-stroked-button color="accent" class="project" (click)="createProject()">
+    <mat-icon color="accent">add</mat-icon>
+    Créer un nouveau project
+  </button>
+</div>

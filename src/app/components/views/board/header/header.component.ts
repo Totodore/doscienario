@@ -1,6 +1,6 @@
-import { TabService } from './../../services/tab.service';
-import { ApiService } from './../../services/api.service';
-import { ProgressService } from './../../services/progress.service';
+import { TabService } from '../../../../services/tab.service';
+import { ApiService } from '../../../../services/api.service';
+import { ProgressService } from '../../../../services/progress.service';
 import { Component, OnInit } from '@angular/core';
 
 @Component({

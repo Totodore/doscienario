@@ -1,5 +1,5 @@
-import { ProjectService } from './../../services/project.service';
-import { ITabElement } from './../../models/tab-element.model';
+import { ProjectService } from '../../../services/project.service';
+import { ITabElement } from '../../../models/tab-element.model';
 import { ChangeDetectionStrategy, Component, OnInit, Provider, Type, ViewEncapsulation } from '@angular/core';
 
 @Component({

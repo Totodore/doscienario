@@ -1,4 +1,4 @@
-import { ProjectOptionsComponent } from './../components/project-options/project-options.component';
+import { ProjectOptionsComponent } from '../components/tabs/project-options/project-options.component';
 import { ComponentFactoryResolver, Inject, Injectable, Type, ViewContainerRef } from '@angular/core';
 import { ITabElement } from '../models/tab-element.model';
 

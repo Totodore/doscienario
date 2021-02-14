@@ -1,5 +1,5 @@
-import { WelcomeTabComponent } from './../welcome-tab/welcome-tab.component';
-import { TabService } from './../../services/tab.service';
+import { WelcomeTabComponent } from '../../../tabs/welcome-tab/welcome-tab.component';
+import { TabService } from '../../../../services/tab.service';
 import { AfterViewInit, Component, Inject, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 
 @Component({

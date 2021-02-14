@@ -1,8 +1,8 @@
-import { ProgressService } from './../../services/progress.service';
-import { ConfirmPasswordComponent } from './../utils/confirm-password/confirm-password.component';
-import { SnackbarService } from './../../services/snackbar.service';
+import { ProgressService } from '../../../services/progress.service';
+import { ConfirmPasswordComponent } from '../../utils/confirm-password/confirm-password.component';
+import { SnackbarService } from '../../../services/snackbar.service';
 import { Router } from '@angular/router';
-import { ApiService } from './../../services/api.service';
+import { ApiService } from '../../../services/api.service';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 

@@ -13,19 +13,20 @@ import { MatInputModule } from "@angular/material/input";
 import { MatTabsModule } from '@angular/material/tabs';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HeaderComponent } from './components/header/header.component';
-import { LoginComponent } from './components/login/login.component';
+import { HeaderComponent } from './components/views/board/header/header.component';
+import { LoginComponent } from './components/views/login/login.component';
 import { ConfirmPasswordComponent } from './components/utils/confirm-password/confirm-password.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { BoardComponent } from './components/board/board.component';
+import { BoardComponent } from './components/views/board/board.component';
 import { appearance } from './style/default';
-import { MenuComponent } from './components/menu/menu.component';
+import { MenuComponent } from './components/views/menu/menu.component';
 import { CreateProjectComponent } from './components/utils/create-project/create-project.component';
-import { NavBarComponent } from './components/nav-bar/nav-bar.component';
+import { NavBarComponent } from './components/views/board/nav-bar/nav-bar.component';
 import { MatDividerModule } from '@angular/material/divider';
-import { WelcomeTabComponent } from './components/welcome-tab/welcome-tab.component';
-import { TabViewComponent } from './components/tab-view/tab-view.component';
-import { ProjectOptionsComponent } from './components/project-options/project-options.component';
+import { WelcomeTabComponent } from './components/tabs/welcome-tab/welcome-tab.component';
+import { TabViewComponent } from './components/views/board/tab-view/tab-view.component';
+import { ProjectOptionsComponent } from './components/tabs/project-options/project-options.component';
+import { AddUserComponent } from './components/utils/add-user/add-user.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { ProjectOptionsComponent } from './components/project-options/project-op
     NavBarComponent,
     WelcomeTabComponent,
     TabViewComponent,
-    ProjectOptionsComponent
+    ProjectOptionsComponent,
+    AddUserComponent
   ],
   imports: [
     BrowserModule,

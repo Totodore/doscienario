@@ -1,7 +1,7 @@
-import { ProjectOptionsComponent } from './../project-options/project-options.component';
-import { TabService } from './../../services/tab.service';
-import { ITabElement } from './../../models/tab-element.model';
-import { ProjectService } from './../../services/project.service';
+import { ProjectOptionsComponent } from '../project-options/project-options.component';
+import { TabService } from '../../../services/tab.service';
+import { ITabElement } from '../../../models/tab-element.model';
+import { ProjectService } from '../../../services/project.service';
 import { Component, OnInit } from '@angular/core';
 
 @Component({

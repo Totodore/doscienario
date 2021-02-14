@@ -1,11 +1,11 @@
 import { Router } from '@angular/router';
-import { CreateProjectReq, CreateProjectRes } from './../../models/api/project.model';
-import { CreateProjectComponent } from './../utils/create-project/create-project.component';
+import { CreateProjectReq, CreateProjectRes } from '../../../models/api/project.model';
+import { CreateProjectComponent } from '../../utils/create-project/create-project.component';
 import { MatDialog } from '@angular/material/dialog';
-import { SnackbarService } from './../../services/snackbar.service';
-import { UserDetailsRes, UserProjectsRes } from './../../models/api/user.model';
-import { ProgressService } from './../../services/progress.service';
-import { ApiService } from './../../services/api.service';
+import { SnackbarService } from '../../../services/snackbar.service';
+import { UserDetailsRes, UserProjectsRes } from '../../../models/api/user.model';
+import { ProgressService } from '../../../services/progress.service';
+import { ApiService } from '../../../services/api.service';
 import { Component, OnInit } from '@angular/core';
 
 @Component({

@@ -1,4 +1,10 @@
 <div class="wrapper" *ngIf="show">
   <h1>Configuration de {{ project.name }}</h1>
   <app-user-add></app-user-add>
+  <section>
+    <mat-form-field color="accent">
+      <mat-label>Nom du projet</mat-label>
+      <input type="text" [(ngModel)]="project.name" matInput>
+    </mat-form-field>
+  </section>
 </div>

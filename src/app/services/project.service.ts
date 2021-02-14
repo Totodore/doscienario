@@ -11,6 +11,11 @@ export class ProjectService {
   public get name(): string {
     return this.data.name;
   }
+  public set name(name: string) {
+    const data = this.data;
+    data.name = name;
+    this.data = data;
+  }
 
   public get projectUsers(): ProjectUserRes[] {
     return this.data.users;

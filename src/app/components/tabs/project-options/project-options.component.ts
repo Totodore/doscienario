@@ -17,5 +17,4 @@ export class ProjectOptionsComponent implements ITabElement {
 
   public title: string = "Options";
   public show: boolean = true;
-
 }

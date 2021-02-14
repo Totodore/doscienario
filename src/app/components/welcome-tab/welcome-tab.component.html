@@ -1,4 +1,4 @@
 <div class="wrapper">
   <h1>Bienvenue sur le projet {{ project.name }} ! </h1>
-  <h3>Tu peux configurer le projet via le bouton paramètre dans la barre latérale</h3>
+  <button mat-stroked-button color="accent" (click)="openSettings()">Configurer le projet <mat-icon matSuffix>settings</mat-icon></button>
 </div>

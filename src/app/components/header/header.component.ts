@@ -16,11 +16,10 @@ export class HeaderComponent {
   ) { }
 
   public tabChanged(index: number) {
-
+    this.tabService.showTab(index);
   }
 
   public tabClosed(index: number) {
-    console.log(index);
     this.tabService.removeTab(index);
   }
 

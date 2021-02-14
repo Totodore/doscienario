@@ -1,3 +1,5 @@
+import { ProjectOptionsComponent } from './../project-options/project-options.component';
+import { TabService } from './../../services/tab.service';
 import { ITabElement } from './../../models/tab-element.model';
 import { ProjectService } from './../../services/project.service';
 import { Component, OnInit } from '@angular/core';
@@ -10,6 +12,11 @@ import { Component, OnInit } from '@angular/core';
 export class WelcomeTabComponent {
 
   constructor(
-    public readonly project: ProjectService
+    public readonly project: ProjectService,
+    public readonly tabService: TabService
   ) { }
+
+  public openSettings() {
+    this.tabService.pushTab(ProjectOptionsComponent);
+  }
 }

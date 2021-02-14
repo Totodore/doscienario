@@ -25,6 +25,7 @@ import { NavBarComponent } from './components/nav-bar/nav-bar.component';
 import { MatDividerModule } from '@angular/material/divider';
 import { WelcomeTabComponent } from './components/welcome-tab/welcome-tab.component';
 import { TabViewComponent } from './components/tab-view/tab-view.component';
+import { ProjectOptionsComponent } from './components/project-options/project-options.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import { TabViewComponent } from './components/tab-view/tab-view.component';
     CreateProjectComponent,
     NavBarComponent,
     WelcomeTabComponent,
-    TabViewComponent
+    TabViewComponent,
+    ProjectOptionsComponent
   ],
   imports: [
     BrowserModule,

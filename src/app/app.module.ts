@@ -31,7 +31,6 @@ import { TabViewComponent } from './components/views/board/tab-view/tab-view.com
 import { ProjectOptionsComponent } from './components/tabs/project-options/project-options.component';
 import { SelectChipComponent } from './components/utils/select-chip/select-chip.component';
 import { UserAddComponent } from './components/tabs/project-options/user-add/user-add.component';
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -66,7 +65,7 @@ import { UserAddComponent } from './components/tabs/project-options/user-add/use
     MatTabsModule,
     MatChipsModule,
     MatAutocompleteModule,
-    MatSelectModule
+    MatSelectModule,
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: appearance }
@@ -74,3 +73,4 @@ import { UserAddComponent } from './components/tabs/project-options/user-add/use
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+

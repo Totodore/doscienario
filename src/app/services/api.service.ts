@@ -1,3 +1,4 @@
+import { Socket } from 'socket.io-client';
 import { GetProjectRes } from './../models/api/project.model';
 import { FileRes, ImageRes } from './../models/api/res.model';
 import { UserLoginReq } from './../models/api/user.model';
@@ -12,7 +13,7 @@ import { Observable } from 'rxjs';
 export class ApiService {
 
   private readonly root: string = `http://${environment.apiUrl}`;
-
+  public socket: typeof Socket;
   constructor(
     private readonly http: HttpClient
   ) { }
@@ -129,7 +130,7 @@ export class ApiService {
     return localStorage.getItem("project") != null;
   }
 
-  private get jwt(): string {
+  public get jwt(): string {
     return localStorage.getItem("jwt");
   }
 

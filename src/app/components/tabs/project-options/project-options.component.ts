@@ -1,3 +1,4 @@
+import { SocketService } from './../../../services/socket.service';
 import { SnackbarService } from './../../../services/snackbar.service';
 import { ApiService } from './../../../services/api.service';
 import { ProjectService } from '../../../services/project.service';
@@ -13,8 +14,15 @@ export class ProjectOptionsComponent implements ITabElement {
 
   constructor(
     public readonly project: ProjectService,
+    public readonly socket: SocketService
   ) { }
 
   public title: string = "Options";
   public show: boolean = true;
+
+  public name: string = this.project.name;
+
+  public updateName() {
+    this.socket.updateProject(this.name);
+  }
 }

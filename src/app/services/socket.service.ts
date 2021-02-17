@@ -6,6 +6,7 @@ import { Socket, connect } from 'socket.io-client';
 import { EventHandler, registerHandler } from '../decorators/subscribe-event.decorator';
 import { Injectable } from '@angular/core';
 import { UserDetailsRes } from '../models/api/user.model';
+import { ProjectUserRes } from '../models/api/project.model';
 @Injectable({
   providedIn: 'root'
 })
@@ -43,21 +44,22 @@ export class SocketService {
     this.socket.emit(Flags.RENAME_PROJECT, name);
   }
 
+  updateUserProject(users: ProjectUserRes[]) {
+    const addedUser = users.filter(el => !this.project.projectUsers.find(value => el.id === value.id))?.[0];
+    const removedUser = this.project.projectUsers.filter(el => !users.find(value => el.id === value.id))?.[0];
+    if (addedUser)
+      this.socket.emit(Flags.ADD_USER_PROJECT, addedUser);
+    else if (removedUser)
+      this.socket.emit(Flags.REMOVE_USER_PROJECT, removedUser);
+  }
+
   @EventHandler(Flags.ADD_USER_PROJECT)
   onAddUserProject(user: UserDetailsRes) {
     this.project.addProjectUser(user);
   }
 
-  addUserProject(user: UserDetailsRes) {
-    this.socket.emit(Flags.ADD_USER_PROJECT, user);
-  }
-
   @EventHandler(Flags.REMOVE_USER_PROJECT)
   onRemoveUserProject(user: UserDetailsRes) {
     this.project.removeProjectUser(user);
-  }
-
-  removeUserProject(user: UserDetailsRes) {
-    this.socket.emit(Flags.REMOVE_USER_PROJECT, user);
   }
 }

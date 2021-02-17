@@ -1,3 +1,4 @@
+import { SocketService } from './../../../../services/socket.service';
 import { Component, OnInit } from '@angular/core';
 import { ProjectUserRes } from 'src/app/models/api/project.model';
 import { ApiService } from 'src/app/services/api.service';
@@ -17,6 +18,7 @@ export class UserAddComponent implements OnInit {
     public readonly project: ProjectService,
     public readonly api: ApiService,
     public readonly progress: ProgressService,
+    public readonly socket: SocketService,
     public readonly snackbar: SnackbarService
   ) { }
 
@@ -40,20 +42,22 @@ export class UserAddComponent implements OnInit {
   }
 
   public setUsers(userNames: string[]) {
-    const addedUsers: ProjectUserRes[] = [];
+    const newUsers: ProjectUserRes[] = []; //Co
     for (const userName of userNames) {
-      addedUsers.push(this.allUsers.find(el => el.name == userName));
+      newUsers.push(this.allUsers.find(el => el.name == userName));
     }
-    addedUsers.push(this.me);
-    console.log(addedUsers);
-    this.project.projectUsers = addedUsers;
+    newUsers.push(this.me);
+    if (this.me.id != this.project.owner.id)
+      newUsers.push(this.project.owner);
+    console.log("Set user", newUsers);
+    this.socket.updateUserProject(newUsers);
   }
 
   public get userNames(): string[] {
-    return this.allUsers.map(el => el.name);
+    return this.allUsers.map(el => el.name).filter(el => !this.selectedUserNames.includes(el));
   }
   public get selectedUserNames(): string[] {
-    return this.project.projectUsers.filter(el => el.id != this.me.id).map(el => el.name);
+    return this.project.projectUsers.filter(el => el.id != this.me.id && el.id != this.project.owner.id).map(el => el.name);
   }
 
 

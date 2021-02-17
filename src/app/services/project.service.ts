@@ -26,20 +26,25 @@ export class ProjectService {
     return this.data.users;
   }
   public addProjectUser(user: ProjectUserRes) {
-    const users = this.data.users;
-    users.push(user);
-    this.data.users = users;
+    const data = this.data;
+    data.users.push(user);
+    this.data = data;
+    console.log(this.data.users);
   }
   public removeProjectUser(user: ProjectUserRes) {
-    const users = this.data.users;
-    const index = users.findIndex(el => el.id == user.id);
-    users.splice(index, 1);
-    this.data.users = users;
+    const data = this.data;
+    const index = data.users.findIndex(el => el.id == user.id);
+    data.users.splice(index, 1);
+    this.data = data;
   }
   public set projectUsers(users: ProjectUserRes[]) {
     const data = this.data;
     data.users = users;
     this.data = data;
+  }
+
+  public get owner(): ProjectUserRes {
+    return this.data.createdBy;
   }
 
   private get data(): GetProjectRes {

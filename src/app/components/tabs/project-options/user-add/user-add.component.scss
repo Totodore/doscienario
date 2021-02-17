@@ -6,7 +6,8 @@ section {
   border-top: 1px solid hsla(0,0%,100%,.12);
 }
 .chip-selector {
-  width: 70%;
+  width: 100%;
+  max-width: 550px;
   display: block;
   margin: auto;
 }

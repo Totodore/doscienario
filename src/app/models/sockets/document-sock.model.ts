@@ -20,7 +20,9 @@ export class WriteDocumentReq {
   constructor(
     public changes: Change[],
     public docId: number,
-    public lastChangeId: number
+    public lastChangeId: number,
+    public clientUpdateId: number,
+    public clientId: string
   ) {}
 }
 
@@ -29,5 +31,6 @@ export interface WriteDocumentRes {
   userId: string;
   updateId: number;
   change: Change[];
+  lastClientUpdateId: number;
 }
 export type Change = [ 1 | 0 | -1, string | number, number? ];

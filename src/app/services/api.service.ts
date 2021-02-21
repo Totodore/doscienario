@@ -1,3 +1,4 @@
+import { ProjectUserRes } from 'src/app/models/api/project.model';
 import { Socket } from 'socket.io-client';
 import { GetProjectRes } from './../models/api/project.model';
 import { FileRes, ImageRes } from './../models/api/res.model';
@@ -132,6 +133,9 @@ export class ApiService {
 
   public get jwt(): string {
     return localStorage.getItem("jwt");
+  }
+  public get user(): ProjectUserRes {
+    return JSON.parse(localStorage.getItem("me"));
   }
 
   private get projectId(): string {

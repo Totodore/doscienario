@@ -1,5 +1,4 @@
-import { TabService } from './tab.service';
-import { DocumentModel, DocumentRes } from './../models/sockets/document-sock.model';
+import { DocumentModel, DocumentRes, Change, WriteDocumentRes } from './../models/sockets/document-sock.model';
 import { GetProjectRes, ProjectUserRes } from './../models/api/project.model';
 import { Injectable } from '@angular/core';
 
@@ -38,6 +37,12 @@ export class ProjectService {
     const id = doc.lastUpdate;
     doc.doc.lastChangeId = id;
     this.openDocs.push(doc.doc);
+  }
+  public updateDoc(incomingDoc: WriteDocumentRes) {
+    const doc = this.openDocs.find(el => el.id == incomingDoc.docId);
+    for (const change of incomingDoc.change) {
+
+    }
   }
   public setDocIndex(index: number, id: number) {
     const indexEl = this.openDocs.findIndex(el => el.id == id);

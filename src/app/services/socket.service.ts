@@ -86,12 +86,14 @@ export class SocketService {
     this.project.removeOpenDoc(docId);
   }
 
-  updateDocument(docId: number, changes: Change[], lastChangeId: number) {
-    this.socket.emit(Flags.WRITE_DOC, new WriteDocumentReq(changes, docId, lastChangeId));
+  updateDocument(docId: number, changes: Change[], lastChangeId: number, clientUpdateId: number) {
+    this.socket.emit(Flags.WRITE_DOC, new WriteDocumentReq(changes, docId, lastChangeId, clientUpdateId, this.api.user.id));
   }
 
   @EventHandler(Flags.WRITE_DOC)
   onUpdateDocument(doc: WriteDocumentRes) {
     this.project.openDocs.find(el => el.id == doc.docId).lastChangeId = doc.updateId;
+    if (doc.userId != this.api.user.id)
+      this.project.updateDoc(doc);
   }
 }

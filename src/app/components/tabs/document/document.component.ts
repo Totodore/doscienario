@@ -18,6 +18,7 @@ export class DocumentComponent implements OnInit, ITabElement {
   public show: boolean = false;
   public content: string = "";
   public id: number = 34;
+  public clientUpdateId: number = 0;
   public lastChangeId: number;
   public readonly editor = CKEditor;
 
@@ -54,7 +55,7 @@ export class DocumentComponent implements OnInit, ITabElement {
       i += change.count;
     }
     console.log(this.content, changes, this.doc.lastChangeId);
-    this.socket.updateDocument(this.id, changes, this.doc.lastChangeId);
+    this.socket.updateDocument(this.id, changes, this.doc.lastChangeId, ++this.clientUpdateId);
     this.content = data;
   }
 

@@ -1,3 +1,4 @@
+import { DocumentComponent } from './../components/tabs/document/document.component';
 import { ProjectOptionsComponent } from '../components/tabs/project-options/project-options.component';
 import { ComponentFactoryResolver, Inject, Injectable, Type, ViewContainerRef } from '@angular/core';
 import { ITabElement } from '../models/tab-element.model';
@@ -12,7 +13,8 @@ export class TabService {
   private rootViewContainer: ViewContainerRef;
 
   private readonly availableTabs: Type<ITabElement>[] = [
-    ProjectOptionsComponent
+    ProjectOptionsComponent,
+    DocumentComponent
   ];
 
   constructor(@Inject(ComponentFactoryResolver) factoryResolver: ComponentFactoryResolver) {

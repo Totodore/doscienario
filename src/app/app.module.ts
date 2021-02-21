@@ -20,6 +20,7 @@ import { HeaderComponent } from './components/views/board/header/header.componen
 import { LoginComponent } from './components/views/login/login.component';
 import { ConfirmPasswordComponent } from './components/utils/confirm-password/confirm-password.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { ReactiveFormsModule } from "@angular/forms";
 import { BoardComponent } from './components/views/board/board.component';
 import { appearance } from './style/default';
 import { MenuComponent } from './components/views/menu/menu.component';
@@ -31,6 +32,8 @@ import { TabViewComponent } from './components/views/board/tab-view/tab-view.com
 import { ProjectOptionsComponent } from './components/tabs/project-options/project-options.component';
 import { SelectChipComponent } from './components/utils/select-chip/select-chip.component';
 import { UserAddComponent } from './components/tabs/project-options/user-add/user-add.component';
+import { DocumentComponent } from './components/tabs/document/document.component';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 @NgModule({
   declarations: [
     AppComponent,
@@ -45,9 +48,11 @@ import { UserAddComponent } from './components/tabs/project-options/user-add/use
     TabViewComponent,
     ProjectOptionsComponent,
     SelectChipComponent,
-    UserAddComponent
+    UserAddComponent,
+    DocumentComponent
   ],
   imports: [
+    ReactiveFormsModule,
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
@@ -66,6 +71,7 @@ import { UserAddComponent } from './components/tabs/project-options/user-add/use
     MatChipsModule,
     MatAutocompleteModule,
     MatSelectModule,
+    CKEditorModule
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: appearance }

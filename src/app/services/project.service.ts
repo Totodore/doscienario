@@ -1,7 +1,5 @@
-import { ApiService } from 'src/app/services/api.service';
-import { Socket } from 'socket.io-client';
-import { SocketService } from './socket.service';
-import { Flags } from './../models/sockets/flags.enum';
+import { TabService } from './tab.service';
+import { DocumentModel, DocumentRes } from './../models/sockets/document-sock.model';
 import { GetProjectRes, ProjectUserRes } from './../models/api/project.model';
 import { Injectable } from '@angular/core';
 
@@ -10,8 +8,7 @@ import { Injectable } from '@angular/core';
 })
 export class ProjectService {
 
-  constructor(
-  ) { }
+  public openDocs: DocumentModel[] = [];
 
   public get name(): string {
     return this.data.name;
@@ -37,6 +34,20 @@ export class ProjectService {
     data.users.splice(index, 1);
     this.data = data;
   }
+  public addOpenDoc(doc: DocumentRes) {
+    const id = doc.lastUpdate;
+    doc.doc.lastChangeId = id;
+    this.openDocs.push(doc.doc);
+  }
+  public setDocIndex(index: number, id: number) {
+    const indexEl = this.openDocs.findIndex(el => el.id == id);
+    this.openDocs[indexEl].elIndex = index;
+  }
+  public removeOpenDoc(docId: number) {
+    const index = this.openDocs.findIndex(el => el.id == docId);
+    this.openDocs.splice(index, 1);
+  }
+
   public set projectUsers(users: ProjectUserRes[]) {
     const data = this.data;
     data.users = users;

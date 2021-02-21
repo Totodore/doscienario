@@ -1,3 +1,5 @@
+import { TabService } from './tab.service';
+import { WriteDocumentReq, Change, DocumentModel, DocumentRes, WriteDocumentRes } from './../models/sockets/document-sock.model';
 import { ProjectService } from 'src/app/services/project.service';
 import { Flags } from './../models/sockets/flags.enum';
 import { ApiService } from './api.service';
@@ -15,8 +17,8 @@ export class SocketService {
   public socket: typeof Socket;
   constructor(
     private readonly api: ApiService,
-    private readonly project: ProjectService
-  ) {}
+    private readonly project: ProjectService,
+    ) {}
 
   connect() {
     this.socket = connect(`ws://${environment.apiUrl}`, {
@@ -61,5 +63,35 @@ export class SocketService {
   @EventHandler(Flags.REMOVE_USER_PROJECT)
   onRemoveUserProject(user: UserDetailsRes) {
     this.project.removeProjectUser(user);
+  }
+
+  /**
+   * Open a document or create one
+   */
+  openDocument(docId?: number) {
+    this.socket.emit(Flags.OPEN_DOC, docId);
+  }
+
+  @EventHandler(Flags.SEND_DOC)
+  onOpenDocument(doc: DocumentRes) {
+    this.project.addOpenDoc(doc);
+  }
+
+  closeDocument(docId: number) {
+    this.socket.emit(Flags.CLOSE_DOC, docId);
+  }
+
+  @EventHandler(Flags.CLOSE_DOC)
+  onCloseDocument(docId: number) {
+    this.project.removeOpenDoc(docId);
+  }
+
+  updateDocument(docId: number, changes: Change[], lastChangeId: number) {
+    this.socket.emit(Flags.WRITE_DOC, new WriteDocumentReq(changes, docId, lastChangeId));
+  }
+
+  @EventHandler(Flags.WRITE_DOC)
+  onUpdateDocument(doc: WriteDocumentRes) {
+    this.project.openDocs.find(el => el.id == doc.docId).lastChangeId = doc.updateId;
   }
 }

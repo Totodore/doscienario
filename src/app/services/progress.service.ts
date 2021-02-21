@@ -11,10 +11,12 @@ export class ProgressService {
 
   public show(determinate = false) {
     this._mode = determinate ? "determinate" : "indeterminate";
-    this._showing = true;
+    if (!this._showing)
+      this._showing = true;
   }
   public hide() {
-    this._showing = false;
+    if (this.showing)
+      this._showing = false;
   }
   public updateValue(val: number) {
     this._value = val;

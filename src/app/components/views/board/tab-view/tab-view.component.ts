@@ -1,3 +1,4 @@
+import { DocumentComponent } from './../../../tabs/document/document.component';
 import { WelcomeTabComponent } from '../../../tabs/welcome-tab/welcome-tab.component';
 import { TabService } from '../../../../services/tab.service';
 import { AfterViewInit, Component, Inject, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
@@ -20,7 +21,7 @@ export class TabViewComponent implements AfterViewInit {
     setTimeout(() => {
       this.tab.setRootViewContainerRef(this.container);
       this.tab.loadSavedTabs();
+      this.tab.pushTab(DocumentComponent, false);
     }, 0);
-
   }
 }

@@ -9,7 +9,9 @@ export interface DocumentModel {
   lastEditing: string;
   createdDate: string;
   elIndex?: number;
+  changes: Map<number, Change[]>;
   lastChangeId: number;
+  clientUpdateId?: number;
 }
 export interface DocumentRes {
   doc: DocumentModel;
@@ -30,7 +32,7 @@ export interface WriteDocumentRes {
   docId: number;
   userId: string;
   updateId: number;
-  change: Change[];
+  changes: Change[];
   lastClientUpdateId: number;
 }
-export type Change = [ 1 | 0 | -1, string | number, number? ];
+export type Change = [ 1 | -1, number, string ];

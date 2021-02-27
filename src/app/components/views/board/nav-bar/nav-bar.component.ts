@@ -1,3 +1,4 @@
+import { TabService } from './../../../../services/tab.service';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -5,11 +6,15 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './nav-bar.component.html',
   styleUrls: ['./nav-bar.component.scss']
 })
-export class NavBarComponent implements OnInit {
+export class NavBarComponent {
 
-  constructor() { }
+  public dispDocOptions: boolean = true;
+  constructor(
+    public readonly tabs: TabService
+  ) { }
 
-  ngOnInit(): void {
+  get hasOpenedTab(): boolean {
+    return this.tabs.displayedTab != null;
   }
 
 }

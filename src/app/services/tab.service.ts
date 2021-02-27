@@ -53,6 +53,9 @@ export class TabService {
       tab.show = false;
     this.tabs[index].show = true;
   }
+  public renameTab(index: number) {
+    this._tabs[index][1]?.onRename();
+  }
 
   private addTabToStorage(tab: Type<ITabElement>) {
     const index = this.availableTabs.indexOf(tab);
@@ -74,5 +77,9 @@ export class TabService {
 
   public get tabs(): ITabElement[] {
     return this._tabs.map(el => el[1]) ?? [];
+  }
+  public get displayedTab(): [number, ITabElement] {
+    const index = this._tabs.findIndex(el => el[1].show == true);
+    return index > -1 ? [index, this._tabs[index][1]] : null;
   }
 }

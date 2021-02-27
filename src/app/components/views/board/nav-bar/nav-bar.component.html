@@ -1,10 +1,8 @@
 <div class="nav-bar">
   <mat-divider [vertical]="true"></mat-divider>
   <div class="wrapper">
-    <mat-form-field color="accent" class="search">
-      <mat-label>Rechercher</mat-label>
-      <input type="search" matInput>
-      <mat-icon color="accent" matSuffix>search</mat-icon>
-    </mat-form-field>
+    <app-search-options class="search"></app-search-options>
+    <app-options-separator (toggle)="dispDocOptions = !dispDocOptions"></app-options-separator>
+    <app-document-options *ngIf="hasOpenedTab && dispDocOptions" [docIndex]="tabs.displayedTab[0]"></app-document-options>
   </div>
 </div>

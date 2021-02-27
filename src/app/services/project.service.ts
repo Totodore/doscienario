@@ -88,7 +88,6 @@ export class ProjectService {
         default: break;
       }
     }
-    console.log(content);
     doc.content = content;
   }
   public setDocIndex(index: number, id: number) {

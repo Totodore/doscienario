@@ -1,0 +1,21 @@
+.wrapper {
+  position: relative;
+  margin: 10px 0px;
+  button {
+    position: absolute;
+    top: -17px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #b0bec530;
+    height: 30px;
+    line-height: 30px;
+    width: 30px;
+    mat-icon {
+      transition: transform 300ms;
+    }
+    mat-icon.closed {
+      transform: rotate(180deg);
+    }
+  }
+
+}

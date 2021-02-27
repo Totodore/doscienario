@@ -1,3 +1,5 @@
+import { RenameTabComponent } from './../../utils/rename-tab/rename-tab.component';
+import { MatDialog } from '@angular/material/dialog';
 import { WorkerManagerService } from '../../../services/worker-manager.service';
 import { Change, DocumentModel } from './../../../models/sockets/document-sock.model';
 import { ProgressService } from 'src/app/services/progress.service';
@@ -27,7 +29,8 @@ export class DocumentComponent implements OnInit, ITabElement {
     private readonly socket: SocketService,
     private readonly project: ProjectService,
     private readonly progress: ProgressService,
-    private readonly worker: WorkerManagerService
+    private readonly worker: WorkerManagerService,
+    private readonly dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
@@ -52,8 +55,16 @@ export class DocumentComponent implements OnInit, ITabElement {
     this.progressWatcher();
   }
 
+  public onRename() {
+    const dialog = this.dialog.open(RenameTabComponent);
+    dialog.componentInstance.onConfirm.subscribe((newTitle: string) => {
+      this.title = newTitle;
+      dialog.close();
+    });
+  }
+
   private onDocParsed(changes: Change[]) {
-    console.log("Doc changed", changes);
+    // console.log("Doc changed", changes);
     this.displayProgress = false;
     this.progress.hide();
     this.socket.updateDocument(this.id, changes, this.doc.lastChangeId, ++this.doc.clientUpdateId);

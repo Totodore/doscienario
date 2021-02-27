@@ -1,0 +1,18 @@
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+
+@Component({
+  selector: 'app-options-separator',
+  templateUrl: './options-separator.component.html',
+  styleUrls: ['./options-separator.component.scss']
+})
+export class OptionsSeparatorComponent {
+
+  public displayed = true;
+
+  @Output() private toggle: EventEmitter<void> = new EventEmitter;
+
+  public onToggle() {
+    this.displayed = !this.displayed;
+    this.toggle.emit();
+  }
+}

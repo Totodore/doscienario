@@ -2,7 +2,7 @@
   <mat-divider [vertical]="true"></mat-divider>
   <div class="wrapper">
     <app-search-options class="search"></app-search-options>
-    <app-options-separator (toggle)="dispDocOptions = !dispDocOptions"></app-options-separator>
-    <app-document-options *ngIf="hasOpenedTab && dispDocOptions" [docIndex]="tabs.displayedTab[0]"></app-document-options>
+    <app-options-separator (toggle)="dispDocOptions = !dispDocOptions" *ngIf="hasOpenedTab"></app-options-separator>
+    <app-document-options *ngIf="hasOpenedTab && dispDocOptions"></app-document-options>
   </div>
 </div>

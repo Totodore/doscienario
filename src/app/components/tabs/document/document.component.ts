@@ -1,4 +1,3 @@
-import { RenameTabComponent } from './../../utils/rename-tab/rename-tab.component';
 import { MatDialog } from '@angular/material/dialog';
 import { WorkerManagerService } from '../../../services/worker-manager.service';
 import { Change, DocumentModel } from './../../../models/sockets/document-sock.model';
@@ -16,7 +15,6 @@ import { CKEditor5 } from '@ckeditor/ckeditor5-angular';
 })
 export class DocumentComponent implements OnInit, ITabElement {
 
-  public title: string = "Chargement...";
   public show: boolean = false;
   public content: string = "";
   public id: number = 60;
@@ -30,7 +28,6 @@ export class DocumentComponent implements OnInit, ITabElement {
     private readonly project: ProjectService,
     private readonly progress: ProgressService,
     private readonly worker: WorkerManagerService,
-    private readonly dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
@@ -40,7 +37,6 @@ export class DocumentComponent implements OnInit, ITabElement {
   }
 
   docLoaded(editor: CKEditor5.BaseEditor): void {
-    this.title = this.doc?.title ? this.doc.title : this.title;
     this.progress.hide();
     this.content = this.doc.content;
     editor.ui.getEditableElement().parentElement.insertBefore(
@@ -53,14 +49,6 @@ export class DocumentComponent implements OnInit, ITabElement {
     this.worker.postMessage<[string, string]>("diff", [this.content, data]);
     this.content = data;
     this.progressWatcher();
-  }
-
-  public onRename() {
-    const dialog = this.dialog.open(RenameTabComponent);
-    dialog.componentInstance.onConfirm.subscribe((newTitle: string) => {
-      this.title = newTitle;
-      dialog.close();
-    });
   }
 
   private onDocParsed(changes: Change[]) {
@@ -79,6 +67,14 @@ export class DocumentComponent implements OnInit, ITabElement {
     const doc = this.project.openDocs?.find(el => el?.id == this?.id);
     this.content = doc?.content || "";
     return doc;
+  }
+
+  get title(): string {
+    if (this.doc == null)
+      return "Chargement...";
+    else if (this.doc.title?.length == 0)
+      return "Nouveau document";
+    else return this.doc.title;
   }
 
 }

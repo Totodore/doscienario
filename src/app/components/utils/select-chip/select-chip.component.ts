@@ -26,22 +26,26 @@ export class SelectChipComponent {
   @Input()
   public data: string[];
 
+  @Input()
+  public canAddData: boolean = false;
+
   @ViewChild("elInput")
   public elInput: ElementRef<HTMLInputElement>;
 
   public filterEls(value: string): string[] {
-    return this.data.filter(el => el.toLowerCase().includes(value.toLowerCase()));
+    value = value?.toLowerCase();
+    return this.data?.filter(el => !this.addedEls.includes(el) && el?.toLowerCase()?.includes(value)) ?? [];
   }
 
   public addEl(event: MatAutocompleteSelectedEvent | MatChipInputEvent) {
     const value = event instanceof MatAutocompleteSelectedEvent ? event.option.viewValue : event.value;
 
-    if (this.data.includes(value) && !this.addedEls.includes(value)) {
-      this.addedEls.push(value);
-      this.data.splice(this.data.indexOf(value), 1);
+    if ((this.data.includes(value.toLowerCase()) || this.canAddData) && !this.addedEls.includes(value.toLowerCase()) && value.trim().length > 0) {
+      this.addedEls.push(value.toLowerCase());
+      this.data.splice(this.data.indexOf(value.toLowerCase()), 1);
+      this.sendEls();
     }
     this.elInput.nativeElement.value = '';
-    this.sendEls();
   }
 
   public removeEl(event: string) {

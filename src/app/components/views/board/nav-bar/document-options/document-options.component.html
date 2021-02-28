@@ -1,4 +1,13 @@
 <div class="wrapper">
-
-  <button mat-stroked-button color="accent" (click)="tabs.renameTab(docIndex)">Renommer le document <mat-icon matSuffix>edit</mat-icon></button>
+  <mat-form-field color="accent">
+    <mat-label>Titre du document</mat-label>
+    <input type="text" #input matInput [(ngModel)]="doc.title" (ngModelChange)="onRename()">
+  </mat-form-field>
+  <div class="doc-tags">
+    <mat-chip-list aria-label="doc tags" *ngIf="doc.tags && doc.tags.length > 0">
+      <mat-chip *ngFor="let tag of doc.tags" [style]="'background-color:' + tag.color">#{{ tag.name }}</mat-chip>
+      <mat-chip (click)="openTagEdit()"><mat-icon color="accent">edit</mat-icon></mat-chip>
+    </mat-chip-list>
+    <button mat-stroked-button *ngIf="!doc.tags?.length" (click)="openTagEdit()" color="accent">Ajouter des tags</button>
+  </div>
 </div>

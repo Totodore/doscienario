@@ -1,4 +1,10 @@
 .wrapper {
   padding: 10px 0;
   text-align: center;
+  mat-form-field, button {
+    width: 100%;
+    input {
+      color: whitesmoke;
+    }
+  }
 }

@@ -1,3 +1,4 @@
+import { Tag } from './../sockets/tag-sock.model';
 import { DocumentTypes } from './../document-types.enum';
 export interface CreateProjectReq {
   name: string;
@@ -37,7 +38,7 @@ export interface GetProjectRes {
 
   blueprints: GetProjectBlueprintRes[];
 
-  tags: GetProjectTagRes[];
+  tags: Tag[];
 
   files: File[];
 }
@@ -66,19 +67,6 @@ export interface GetProjectDocumentImageRes {
   documentPos: number;
 
   documentId: number;
-}
-
-export interface GetProjectTagRes {
-  id: number;
-
-  name: string;
-
-  projectId: number;
-
-  createdById: string;
-
-  color: string;
-
 }
 
 export interface GetProjectBlueprintRes {

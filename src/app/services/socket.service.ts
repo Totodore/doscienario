@@ -1,5 +1,6 @@
+import { Tag } from './../models/sockets/tag-sock.model';
 import { TabService } from './tab.service';
-import { WriteDocumentReq, Change, DocumentModel, DocumentRes, WriteDocumentRes } from './../models/sockets/document-sock.model';
+import { WriteDocumentReq, Change, DocumentModel, DocumentRes, WriteDocumentRes, RenameDocumentRes, EditTagDocumentReq, AddTagDocumentRes } from './../models/sockets/document-sock.model';
 import { ProjectService } from 'src/app/services/project.service';
 import { Flags } from './../models/sockets/flags.enum';
 import { ApiService } from './api.service';
@@ -97,5 +98,39 @@ export class SocketService {
     this.project.openDocs.find(el => el.id == doc.docId).lastChangeId = doc.updateId;
     if (doc.userId != this.api.user.id)
       this.project.updateDoc(doc);
+  }
+
+  @EventHandler(Flags.RENAME_DOC)
+  onRenameDocument(doc: RenameDocumentRes) {
+    this.project.openDocs.find(el => el.id == doc.docId).title = doc.title;
+  }
+
+  @EventHandler(Flags.CREATE_TAG)
+  onCreateTag(tag: Tag) {
+    const projectTag = this.project.tags.find(el => el.name == tag.name);
+    if (projectTag && projectTag.id == null)
+      this.project.updateProjectTag(tag);
+    else this.project.addProjectTag(tag);
+  }
+
+  @EventHandler(Flags.TAG_ADD_DOC)
+  onAddTagDoc(packet: AddTagDocumentRes) {
+    const projectTag = this.project.tags.find(el => el.name == packet.tag.name);
+    if (projectTag && projectTag.id == null)
+      this.project.updateProjectTag(packet.tag);
+    else if (!projectTag)
+      this.project.addProjectTag(packet.tag);
+    const doc = this.project.openDocs.find(el => el.id == packet.docId);
+    const tag = doc.tags.find(el => el.name == packet.tag.name);
+    if (tag)
+      doc.tags[doc.tags.indexOf(tag)] = packet.tag;
+    else
+      doc.tags.push(packet.tag);
+  }
+
+  @EventHandler(Flags.TAG_REMOVE_DOC)
+  onRemoveTagDoc(packet: EditTagDocumentReq) {
+    const tags = this.project.openDocs.find(el => el.id == packet.docId).tags;
+    tags.splice(tags.findIndex(el => el.name == packet.name.toLowerCase()), 1);
   }
 }

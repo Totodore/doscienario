@@ -1,0 +1,15 @@
+<h1 mat-dialog-title>
+  Editer les tags du document
+</h1>
+
+<div mat-dialog-content style="text-align: center;">
+  <app-select-chip [addedEls]="docTagNames" [label]="'Editer les tags'"
+    [data]="tagNames"
+    [canAddData]="true"
+    (els)="updateTags($event)"
+    ></app-select-chip>
+</div>
+
+<div mat-dialog-actions align="end">
+  <button mat-stroked-button color="accent" mat-dialog-close>Confirmer</button>
+</div>

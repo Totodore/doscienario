@@ -1,7 +1,6 @@
 import { OptionsSeparatorComponent } from './components/views/board/nav-bar/options-separator/options-separator.component';
 import { SearchOptionsComponent } from './components/views/board/nav-bar/search-options/search-options.component';
 import { DocumentOptionsComponent } from './components/views/board/nav-bar/document-options/document-options.component';
-import { RenameTabComponent } from './components/utils/rename-tab/rename-tab.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -38,6 +37,7 @@ import { SelectChipComponent } from './components/utils/select-chip/select-chip.
 import { UserAddComponent } from './components/tabs/project-options/user-add/user-add.component';
 import { DocumentComponent } from './components/tabs/document/document.component';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { EditTagsComponent } from './components/utils/edit-tags/edit-tags.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -54,10 +54,10 @@ import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
     SelectChipComponent,
     UserAddComponent,
     DocumentComponent,
-    RenameTabComponent,
     DocumentOptionsComponent,
     SearchOptionsComponent,
-    OptionsSeparatorComponent
+    OptionsSeparatorComponent,
+    EditTagsComponent
   ],
   imports: [
     ReactiveFormsModule,

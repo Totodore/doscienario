@@ -1,6 +1,7 @@
 import { DocumentModel, DocumentRes, Change, WriteDocumentRes } from './../models/sockets/document-sock.model';
 import { GetProjectRes, ProjectUserRes } from './../models/api/project.model';
 import { Injectable } from '@angular/core';
+import { Tag } from '../models/sockets/tag-sock.model';
 
 @Injectable({
   providedIn: 'root'
@@ -98,10 +99,41 @@ export class ProjectService {
     const index = this.openDocs.findIndex(el => el.id == docId);
     this.openDocs.splice(index, 1);
   }
+  public renameDoc(docId: number, title: string) {
+    this.openDocs.find(el => el.id == docId).title = title;
+  }
+  public updateDocTags(docId: number, tags: Tag[]) {
+    this.openDocs.find(el => el.id == docId).tags = tags;
+  }
+  public addProjectTag(tag: Tag) {
+    const tags = this.tags;
+    tags.push(tag);
+    this.tags = tags;
+  }
+  public removeProjectTag(id: number) {
+    const tags = this.tags;
+    tags.splice(this.tags.findIndex(el => el.id == id), 1);
+    this.tags = tags;
+  }
+  public updateProjectTag(tag: Tag) {
+    const tags = this.tags;
+    const index = tags.findIndex(el => el.name == tag.name);
+    tags[index] = tag;
+    this.tags = tags;
+  }
 
   public set projectUsers(users: ProjectUserRes[]) {
     const data = this.data;
     data.users = users;
+    this.data = data;
+  }
+
+  public get tags(): Tag[] {
+    return this.data.tags;
+  }
+  public set tags(tags: Tag[]) {
+    const data = this.data;
+    data.tags = tags;
     this.data = data;
   }
 

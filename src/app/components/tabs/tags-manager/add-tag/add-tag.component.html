@@ -1,0 +1,20 @@
+<h1 mat-dialog-title>
+  Ajouter un tag primaire
+</h1>
+
+<div mat-dialog-content style="text-align: center;">
+  <mat-form-field color="accent" style="width: 100%;">
+    <mat-label>Nouveau tag primaire</mat-label>
+    <input type="text" #input matInput [(ngModel)]="tagName" (ngModelChange)="onInputChange($event)">
+  </mat-form-field> <br>
+  <mat-form-field color="accent" style="width: 100%;">
+    <mat-label>Couleur du tag</mat-label>
+    <input matInput [ngxMatColorPicker]="picker" [(ngModel)]="color">
+    <ngx-mat-color-toggle matSuffix [for]="picker"></ngx-mat-color-toggle>
+    <ngx-mat-color-picker #picker [touchUi]="false" [color]="'#FF0000'"></ngx-mat-color-picker>
+  </mat-form-field>
+</div>
+
+<div mat-dialog-actions align="end">
+  <button mat-stroked-button color="accent" (click)="addTag()">Confirmer</button>
+</div>

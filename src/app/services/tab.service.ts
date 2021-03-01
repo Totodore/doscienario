@@ -1,3 +1,4 @@
+import { TagsManagerComponent } from './../components/tabs/tags-manager/tags-manager.component';
 import { DocumentComponent } from './../components/tabs/document/document.component';
 import { ProjectOptionsComponent } from '../components/tabs/project-options/project-options.component';
 import { ComponentFactoryResolver, Inject, Injectable, Type, ViewContainerRef } from '@angular/core';
@@ -14,7 +15,8 @@ export class TabService {
 
   private readonly availableTabs: Type<ITabElement>[] = [
     ProjectOptionsComponent,
-    DocumentComponent
+    DocumentComponent,
+    TagsManagerComponent
   ];
 
   constructor(@Inject(ComponentFactoryResolver) factoryResolver: ComponentFactoryResolver) {

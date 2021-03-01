@@ -21,7 +21,6 @@ export class TabViewComponent implements AfterViewInit {
     setTimeout(() => {
       this.tab.setRootViewContainerRef(this.container);
       this.tab.loadSavedTabs();
-      this.tab.pushTab(DocumentComponent, false);
     }, 0);
   }
 }

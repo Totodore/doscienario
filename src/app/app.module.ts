@@ -1,3 +1,4 @@
+import { AddTagComponent } from './components/tabs/tags-manager/add-tag/add-tag.component';
 import { OptionsSeparatorComponent } from './components/views/board/nav-bar/options-separator/options-separator.component';
 import { SearchOptionsComponent } from './components/views/board/nav-bar/search-options/search-options.component';
 import { DocumentOptionsComponent } from './components/views/board/nav-bar/document-options/document-options.component';
@@ -38,6 +39,8 @@ import { UserAddComponent } from './components/tabs/project-options/user-add/use
 import { DocumentComponent } from './components/tabs/document/document.component';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { EditTagsComponent } from './components/utils/edit-tags/edit-tags.component';
+import { TagsManagerComponent } from './components/tabs/tags-manager/tags-manager.component';
+import { MAT_COLOR_FORMATS, NgxMatColorPickerModule, NGX_MAT_COLOR_FORMATS } from '@angular-material-components/color-picker';
 @NgModule({
   declarations: [
     AppComponent,
@@ -57,7 +60,9 @@ import { EditTagsComponent } from './components/utils/edit-tags/edit-tags.compon
     DocumentOptionsComponent,
     SearchOptionsComponent,
     OptionsSeparatorComponent,
-    EditTagsComponent
+    EditTagsComponent,
+    TagsManagerComponent,
+    AddTagComponent
   ],
   imports: [
     ReactiveFormsModule,
@@ -79,10 +84,12 @@ import { EditTagsComponent } from './components/utils/edit-tags/edit-tags.compon
     MatChipsModule,
     MatAutocompleteModule,
     MatSelectModule,
-    CKEditorModule
+    CKEditorModule,
+    NgxMatColorPickerModule
   ],
   providers: [
-    { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: appearance }
+    { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: appearance },
+    { provide: MAT_COLOR_FORMATS, useValue: NGX_MAT_COLOR_FORMATS }
   ],
   bootstrap: [AppComponent]
 })

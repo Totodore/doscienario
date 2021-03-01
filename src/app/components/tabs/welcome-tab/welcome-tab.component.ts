@@ -1,3 +1,4 @@
+import { TagsManagerComponent } from './../tags-manager/tags-manager.component';
 import { ProjectOptionsComponent } from '../project-options/project-options.component';
 import { TabService } from '../../../services/tab.service';
 import { ITabElement } from '../../../models/tab-element.model';
@@ -18,5 +19,9 @@ export class WelcomeTabComponent {
 
   public openSettings() {
     this.tabService.pushTab(ProjectOptionsComponent);
+  }
+
+  public openTags() {
+    this.tabService.pushTab(TagsManagerComponent);
   }
 }

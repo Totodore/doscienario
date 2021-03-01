@@ -1,0 +1,10 @@
+<div class="wrapper" *ngIf="show">
+  <h1>Gérer les tags</h1>
+  <section>
+    <mat-chip-list aria-label="doc tags" *ngIf="primaryTags && primaryTags.length > 0">
+      <mat-chip *ngFor="let tag of primaryTags" [style]="'background-color:' + tag.color">#{{ tag.name }}</mat-chip>
+      <mat-chip><mat-icon color="accent">add</mat-icon></mat-chip>
+    </mat-chip-list>
+    <button mat-stroked-button (click)="addPrimaryTag()">Créer des tags primaires</button>
+  </section>
+</div>

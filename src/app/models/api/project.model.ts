@@ -50,6 +50,8 @@ export interface GetProjectDocumentRes {
 
   type: DocumentTypes;
 
+  tags: Tag[];
+
   images: GetProjectDocumentImageRes[];
 }
 

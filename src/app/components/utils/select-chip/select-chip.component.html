@@ -1,15 +1,15 @@
 <mat-form-field color="accent" style="width: 100%;">
   <mat-label>{{ label }}</mat-label>
   <mat-chip-list #chipList>
-    <mat-chip *ngFor="let el of addedEls" (removed)="removeEl(el)">
-      {{ el }}
+    <mat-chip *ngFor="let el of addedEls" (removed)="removeEl(el)" (click)="click.emit(el)" [style]="'background-color: #' + colors.get(el)">
+      {{ prefix + el }}
       <mat-icon matChipRemove>cancel</mat-icon>
     </mat-chip>
     <input #elInput [placeholder]="placeholder" [matAutocomplete]="auto" [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="addElAction" (matChipInputTokenEnd)="addEl($event)">
   </mat-chip-list>
   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addEl($event)">
     <mat-option *ngFor="let el of filterEls(elInput.value)" [value]="el">
-      {{ el }}
+      {{ prefix + el }}
     </mat-option>
   </mat-autocomplete>
 </mat-form-field>

@@ -1,5 +1,5 @@
 import { DocumentModel, DocumentRes, Change, WriteDocumentRes } from './../models/sockets/document-sock.model';
-import { GetProjectRes, ProjectUserRes } from './../models/api/project.model';
+import { GetProjectRes, ProjectUserRes, GetProjectDocumentRes } from './../models/api/project.model';
 import { Injectable } from '@angular/core';
 import { Tag } from '../models/sockets/tag-sock.model';
 
@@ -9,30 +9,31 @@ import { Tag } from '../models/sockets/tag-sock.model';
 export class ProjectService {
 
   public openDocs: DocumentModel[] = [];
+  private data: GetProjectRes = JSON.parse(localStorage.getItem("project-data"));
+
+  public async loadData(data: GetProjectRes) {
+    this.data = data;
+    localStorage.setItem("project-data", JSON.stringify(data));
+  }
 
   public get name(): string {
     return this.data.name;
   }
   public set name(name: string) {
-    const data = this.data;
-    data.name = name;
-    this.data = data;
+    this.data.name = name;
   }
 
   public get projectUsers(): ProjectUserRes[] {
     return this.data.users;
   }
   public addProjectUser(user: ProjectUserRes) {
-    const data = this.data;
-    data.users.push(user);
-    this.data = data;
-    console.log(this.data.users);
+    this.data.users.push(user);
+    this.saveData();
   }
   public removeProjectUser(user: ProjectUserRes) {
-    const data = this.data;
-    const index = data.users.findIndex(el => el.id == user.id);
-    data.users.splice(index, 1);
-    this.data = data;
+    const index = this.data.users.findIndex(el => el.id == user.id);
+    this.data.users.splice(index, 1);
+    this.saveData();
   }
   public addOpenDoc(doc: DocumentRes) {
     const id = doc.lastUpdate;
@@ -106,45 +107,42 @@ export class ProjectService {
     this.openDocs.find(el => el.id == docId).tags = tags;
   }
   public addProjectTag(tag: Tag) {
-    const tags = this.tags;
-    tags.push(tag);
-    this.tags = tags;
+    this.data.tags.push(tag);
+    this.saveData();
   }
-  public removeProjectTag(id: number) {
-    const tags = this.tags;
-    tags.splice(this.tags.findIndex(el => el.id == id), 1);
-    this.tags = tags;
+  public removeProjectTag(name: string) {
+    this.data.tags.splice(this.tags.findIndex(el => el.name === name), 1);
+    this.saveData();
   }
-  public updateProjectTag(tag: Tag) {
-    const tags = this.tags;
-    const index = tags.findIndex(el => el.name == tag.name);
-    tags[index] = tag;
-    this.tags = tags;
+  public updateProjectTag(tag: Tag, newTag?: Tag) {
+    const index = this.tags.findIndex(el => el.name === tag.name);
+    this.data.tags[index] = newTag ?? tag;
+    this.saveData();
+  }
+
+  public saveData() {
+    setTimeout(() => localStorage.setItem("project-data", JSON.stringify(this.data)), 0);
   }
 
   public set projectUsers(users: ProjectUserRes[]) {
-    const data = this.data;
-    data.users = users;
-    this.data = data;
+    this.data.users = users;
+    this.saveData();
   }
 
   public get tags(): Tag[] {
     return this.data.tags;
   }
   public set tags(tags: Tag[]) {
-    const data = this.data;
-    data.tags = tags;
-    this.data = data;
+    this.data.tags = tags;
+    this.saveData();
   }
-
   public get owner(): ProjectUserRes {
     return this.data.createdBy;
   }
-
-  private get data(): GetProjectRes {
-    return JSON.parse(localStorage.getItem("project-data"));
+  public get id(): number {
+    return this.data.id;
   }
-  private set data(data: GetProjectRes) {
-    localStorage.setItem("project-data", JSON.stringify(data));
+  public get docs(): GetProjectDocumentRes[] {
+    return this.data.documents;
   }
 }

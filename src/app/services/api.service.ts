@@ -1,3 +1,4 @@
+import { ProjectService } from 'src/app/services/project.service';
 import { ProjectUserRes } from 'src/app/models/api/project.model';
 import { Socket } from 'socket.io-client';
 import { GetProjectRes } from './../models/api/project.model';
@@ -16,8 +17,10 @@ export class ApiService {
   private readonly root: string = `http://${environment.apiUrl}`;
   public socket: typeof Socket;
   constructor(
-    private readonly http: HttpClient
+    private readonly http: HttpClient,
+    private readonly project: ProjectService
   ) { }
+
 
   public async login(body: UserLoginReq): Promise<boolean> {
     try {
@@ -121,7 +124,7 @@ export class ApiService {
   public async openProject(projectId: number) {
     const res = await this.get<GetProjectRes>(`project/${projectId}`);
     localStorage.setItem("project", projectId.toString());
-    localStorage.setItem("project-data", JSON.stringify(res));
+    this.project.loadData(res);
   }
 
   public get logged(): boolean {

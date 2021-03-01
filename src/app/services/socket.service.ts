@@ -1,4 +1,4 @@
-import { Tag } from './../models/sockets/tag-sock.model';
+import { Tag, UpdateTagColorReq, UpdateTagNameReq } from './../models/sockets/tag-sock.model';
 import { TabService } from './tab.service';
 import { WriteDocumentReq, Change, DocumentModel, DocumentRes, WriteDocumentRes, RenameDocumentRes, EditTagDocumentReq, AddTagDocumentRes } from './../models/sockets/document-sock.model';
 import { ProjectService } from 'src/app/services/project.service';
@@ -132,5 +132,22 @@ export class SocketService {
   onRemoveTagDoc(packet: EditTagDocumentReq) {
     const tags = this.project.openDocs.find(el => el.id == packet.docId).tags;
     tags.splice(tags.findIndex(el => el.name == packet.name.toLowerCase()), 1);
+  }
+
+  @EventHandler(Flags.COLOR_TAG)
+  onColorTag(packet: UpdateTagColorReq) {
+    this.project.tags.find(el => el.name === packet.name).color = packet.color;
+    this.project.saveData();
+  }
+
+  @EventHandler(Flags.RENAME_TAG)
+  onRenameTag(packet: UpdateTagNameReq) {
+    this.project.tags.find(el => el.name === packet.oldName).name = packet.name;
+    this.project.saveData();
+  }
+
+  @EventHandler(Flags.REMOVE_TAG)
+  onRemoveTag(tagName: string) {
+    this.project.removeProjectTag(tagName);
   }
 }

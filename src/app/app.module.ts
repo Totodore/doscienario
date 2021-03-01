@@ -41,6 +41,7 @@ import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { EditTagsComponent } from './components/utils/edit-tags/edit-tags.component';
 import { TagsManagerComponent } from './components/tabs/tags-manager/tags-manager.component';
 import { MAT_COLOR_FORMATS, NgxMatColorPickerModule, NGX_MAT_COLOR_FORMATS } from '@angular-material-components/color-picker';
+import { ConfirmComponent } from './components/utils/confirm/confirm.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -62,7 +63,8 @@ import { MAT_COLOR_FORMATS, NgxMatColorPickerModule, NGX_MAT_COLOR_FORMATS } fro
     OptionsSeparatorComponent,
     EditTagsComponent,
     TagsManagerComponent,
-    AddTagComponent
+    AddTagComponent,
+    ConfirmComponent
   ],
   imports: [
     ReactiveFormsModule,

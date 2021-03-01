@@ -14,8 +14,17 @@ export class SelectChipComponent {
   @Input()
   public addedEls: string[] = [];
 
+  @Input()
+  public prefix: string = "";
+
+  @Input()
+  public colors: Map<string, string> = new Map();
+
   @Output()
   public els: EventEmitter<string[]> = new EventEmitter<string[]>();
+
+  @Output()
+  public click: EventEmitter<string> = new EventEmitter<string>();
 
   @Input()
   public label: string;

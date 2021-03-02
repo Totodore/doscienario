@@ -1,3 +1,4 @@
+import { Tag } from 'src/app/models/sockets/tag-sock.model';
 import { DocumentModel } from './../../../../../models/sockets/document-sock.model';
 import { MatDialog } from '@angular/material/dialog';
 import { SocketService } from './../../../../../services/socket.service';
@@ -40,6 +41,10 @@ export class DocumentOptionsComponent {
   }
   get docId(): number {
     return this.tabs.displayedTab[1].docId;
+  }
+  get docTags(): Tag[] {
+    const tagIds = this.doc.tags.map(el => el.id);
+    return this.project.tags.filter(el => tagIds.includes(el.id));
   }
   get tabId(): string {
     return this.tabs.displayedTab[1].tabId;

@@ -7,7 +7,9 @@
     [data]="tagNames"
     [canAddData]="true"
     (els)="updateTags($event)"
+    [colors]="docTagColors"
     [placeholder]="'Nouveau tag'"
+    (click)="tagClick($event)"
     ></app-select-chip>
 </div>
 

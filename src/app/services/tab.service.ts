@@ -26,10 +26,9 @@ export class TabService {
   public setRootViewContainerRef(viewContainerRef: ViewContainerRef) {
     this.rootViewContainer = viewContainerRef
   }
-  private addDynamicComponent(el: Type<ITabElement>, id?: number) {
+  private addDynamicComponent(el: Type<ITabElement>) {
     const factory = this.factoryResolver.resolveComponentFactory(el)
     const component = factory.create(this.rootViewContainer.injector);
-    component.instance.docId ??= id;
     component.instance.show = true;
     this._tabs.push([el, component.instance]);
     this.rootViewContainer.insert(component.hostView);
@@ -37,13 +36,13 @@ export class TabService {
 
   public loadSavedTabs() {
     for (const index of this.savedTabs)
-      this.pushTab(this.availableTabs[index[0] || index], false, index[1]);
+      this.pushTab(this.availableTabs[index[0] || index], false);
   }
 
-  public pushTab(tab: Type<ITabElement>, save = true, id?: number) {
+  public pushTab(tab: Type<ITabElement>, save = true) {
     for (const tab of this.tabs)
       tab.show = false;
-    this.addDynamicComponent(tab, id);
+    this.addDynamicComponent(tab);
     if (save)
       this.addTabToStorage(tab);
   }

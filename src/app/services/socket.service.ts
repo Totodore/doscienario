@@ -90,7 +90,7 @@ export class SocketService {
   updateDocument(docId: number, tabId: string, changes: Change[], lastChangeId: number, clientUpdateId: number) {
     const doc = this.project.openDocs[tabId];
     doc.changes.set(clientUpdateId, changes);
-    setTimeout(() => this.socket.emit(Flags.WRITE_DOC, new WriteDocumentReq(changes, docId, lastChangeId, clientUpdateId, this.api.user.id)), 3000);
+    this.socket.emit(Flags.WRITE_DOC, new WriteDocumentReq(changes, docId, lastChangeId, clientUpdateId, this.api.user.id));
   }
 
   @EventHandler(Flags.WRITE_DOC)

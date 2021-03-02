@@ -21,8 +21,6 @@ export class DocumentComponent implements OnInit, ITabElement {
   public lastChangeId: number;
   public readonly editor = CKEditor;
 
-  @Input() public docId: number;
-
   private displayProgress: boolean = false;
 
   constructor(
@@ -78,6 +76,10 @@ export class DocumentComponent implements OnInit, ITabElement {
     else if (this.doc.title?.length == 0)
       return "Nouveau document";
     else return this.doc.title;
+  }
+
+  get docId(): number {
+    return this.doc?.id;
   }
 
 }

@@ -20,11 +20,11 @@ export class EditTagsComponent {
   ) { }
 
   updateTags(editedTags: string[]) {
+    console.log(editedTags);
     const createdTags = editedTags.filter(el => !this.project.tags.find(value => el === value.name)).map(el => new Tag(el));
     const newTags = [...this.project.tags.filter(el => editedTags.includes(el.name)), ...createdTags];
     const oldTags = this.doc.tags;
     const diff = arrayDiff(oldTags, newTags, (a, b) => a.name === b.name);
-
     this.project.updateDocTags(this.tabId, newTags);
     const docId = this.project.openDocs[this.tabId].id;
 
@@ -34,6 +34,9 @@ export class EditTagsComponent {
     for (const removedTag of diff.removed.filter(el => !diff.added.find(val => val.name == el.name)))
       this.socket.socket.emit(Flags.TAG_REMOVE_DOC, new EditTagDocumentReq(docId, removedTag.name));
   }
+  public tagClick(tagName: string) {
+    console.log(tagName);
+  }
 
   get doc() {
     return this.project.openDocs[this.tabId];
@@ -42,7 +45,16 @@ export class EditTagsComponent {
   get tagNames() {
     return this.project.tags?.map(el => el.name) ?? [];
   }
+  get docTags() {
+    return this.doc.tags;
+  }
   get docTagNames() {
-    return this.doc.tags?.map(el => el.name) ?? [];
+    return this.docTags?.map(el => el.name) ?? [];
+  }
+  get docTagColors() {
+    const map = new Map<string, string>();
+    for (const el of this.docTags)
+      map.set(el.name, el.color);
+    return map;
   }
 }

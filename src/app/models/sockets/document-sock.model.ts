@@ -18,6 +18,7 @@ export interface DocumentModel {
 export interface DocumentRes {
   doc: DocumentModel;
   lastUpdate: number;
+  reqId: string;
 }
 export class WriteDocumentReq {
 
@@ -34,6 +35,7 @@ export interface WriteDocumentRes {
   docId: number;
   userId: string;
   updateId: number;
+  reqId: string;
   changes: Change[];
   lastClientUpdateId: number;
 }

@@ -16,7 +16,7 @@ export class NavBarComponent {
   ) { }
 
   get hasOpenedTab(): boolean {
-    return this.tabs.displayedTab != null && this.project.openDocs.find(el => el.id == this.tabs.displayedTab[1].id) != null;
+    return this.tabs.displayedTab != null && this.project.openDocs[this.tabs.displayedTab[1].tabId] != null;
   }
 
 }

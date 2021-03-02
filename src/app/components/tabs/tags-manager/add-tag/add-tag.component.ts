@@ -8,7 +8,6 @@ import { Component, Inject, Input, OnInit } from '@angular/core';
 import { Tag, UpdateTagColorReq } from 'src/app/models/sockets/tag-sock.model';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Color } from '@angular-material-components/color-picker';
-import { F } from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'app-add-tag',

@@ -14,7 +14,7 @@ import { EditTagDocumentReq } from 'src/app/models/sockets/document-sock.model';
 export class EditTagsComponent {
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public id: number,
+    @Inject(MAT_DIALOG_DATA) public tabId: string,
     public readonly project: ProjectService,
     private readonly socket: SocketService
   ) { }
@@ -25,17 +25,18 @@ export class EditTagsComponent {
     const oldTags = this.doc.tags;
     const diff = arrayDiff(oldTags, newTags, (a, b) => a.name === b.name);
 
-    this.project.updateDocTags(this.id, newTags);
+    this.project.updateDocTags(this.tabId, newTags);
+    const docId = this.project.openDocs[this.tabId].id;
 
     //Little patch with filter method to avoid repetitions in diff.added and removed
     for (const addedTag of diff.added.filter(el => !diff.removed.find(val => val.name === el.name)))
-      this.socket.socket.emit(Flags.TAG_ADD_DOC, new EditTagDocumentReq(this.id, addedTag.name));
+      this.socket.socket.emit(Flags.TAG_ADD_DOC, new EditTagDocumentReq(docId, addedTag.name));
     for (const removedTag of diff.removed.filter(el => !diff.added.find(val => val.name == el.name)))
-      this.socket.socket.emit(Flags.TAG_REMOVE_DOC, new EditTagDocumentReq(this.id, removedTag.name));
+      this.socket.socket.emit(Flags.TAG_REMOVE_DOC, new EditTagDocumentReq(docId, removedTag.name));
   }
 
   get doc() {
-    return this.project.openDocs.find(el => el.id == this.id);
+    return this.project.openDocs[this.tabId];
   }
 
   get tagNames() {

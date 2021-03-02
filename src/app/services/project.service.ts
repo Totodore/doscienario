@@ -8,9 +8,10 @@ import { Tag } from '../models/sockets/tag-sock.model';
 })
 export class ProjectService {
 
-  public openDocs: DocumentModel[] = [];
-  private data: GetProjectRes = JSON.parse(localStorage.getItem("project-data"));
+  public openDocs: { [k: string]: DocumentModel } = {};
+  public requestingId: number;
 
+  private data: GetProjectRes = JSON.parse(localStorage.getItem("project-data"));
   public async loadData(data: GetProjectRes) {
     this.data = data;
     localStorage.setItem("project-data", JSON.stringify(data));
@@ -35,15 +36,16 @@ export class ProjectService {
     this.data.users.splice(index, 1);
     this.saveData();
   }
-  public addOpenDoc(doc: DocumentRes) {
-    const id = doc.lastUpdate;
-    doc.doc.lastChangeId = id;
-    doc.doc.changes = new Map<number, Change[]>();
-    doc.doc.clientUpdateId = 0;
-    this.openDocs.push(doc.doc);
+  public addOpenDoc(packet: DocumentRes) {
+    const id = packet.lastUpdate;
+    packet.doc.lastChangeId = id;
+    packet.doc.changes = new Map<number, Change[]>();
+    packet.doc.clientUpdateId = 0;
+    this.requestingId = packet.doc.id;
+    this.openDocs[packet.reqId] = packet.doc;
   }
   public updateDoc(incomingDoc: WriteDocumentRes) {
-    const doc = this.openDocs.find(el => el.id == incomingDoc.docId);
+    const doc = this.openDocs[incomingDoc.reqId];
     let content: string = "";
     //On part du dernier ID du packet recu jusqu'au dernière id du document,
     for (let updateIndex = incomingDoc.lastClientUpdateId + 1; updateIndex <= doc.clientUpdateId; updateIndex++) {
@@ -93,18 +95,18 @@ export class ProjectService {
     doc.content = content;
   }
   public setDocIndex(index: number, id: number) {
-    const indexEl = this.openDocs.findIndex(el => el.id == id);
+    const indexEl = Object.values(this.openDocs).findIndex(el => el.id == id);
     this.openDocs[indexEl].elIndex = index;
   }
   public removeOpenDoc(docId: number) {
-    const index = this.openDocs.findIndex(el => el.id == docId);
-    this.openDocs.splice(index, 1);
+    const index = Object.values(this.openDocs).findIndex(el => el.id == docId);
+    delete this.openDocs[index];
   }
-  public renameDoc(docId: number, title: string) {
-    this.openDocs.find(el => el.id == docId).title = title;
+  public renameDoc(tabId: string, title: string) {
+    this.openDocs[tabId].title = title;
   }
-  public updateDocTags(docId: number, tags: Tag[]) {
-    this.openDocs.find(el => el.id == docId).tags = tags;
+  public updateDocTags(tabId: string, tags: Tag[]) {
+    this.openDocs[tabId].tags = tags;
   }
   public addProjectTag(tag: Tag) {
     this.data.tags.push(tag);
@@ -144,5 +146,9 @@ export class ProjectService {
   }
   public get docs(): GetProjectDocumentRes[] {
     return this.data.documents;
+  }
+
+  public getDoc(docId: number) {
+    return Object.values(this.openDocs).find(el => el.id == docId);
   }
 }

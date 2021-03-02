@@ -19,7 +19,7 @@ export class SocketService {
   constructor(
     private readonly api: ApiService,
     private readonly project: ProjectService,
-    ) {}
+  ) {}
 
   connect() {
     this.socket = connect(`ws://${environment.apiUrl}`, {
@@ -69,13 +69,13 @@ export class SocketService {
   /**
    * Open a document or create one
    */
-  openDocument(docId?: number) {
-    this.socket.emit(Flags.OPEN_DOC, docId);
+  openDocument(tabId: string, docId?: number) {
+    this.socket.emit(Flags.OPEN_DOC, [tabId, docId]);
   }
 
   @EventHandler(Flags.SEND_DOC)
-  onOpenDocument(doc: DocumentRes) {
-    this.project.addOpenDoc(doc);
+  onOpenDocument(packet: DocumentRes) {
+    this.project.addOpenDoc(packet);
   }
 
   closeDocument(docId: number) {
@@ -87,22 +87,22 @@ export class SocketService {
     this.project.removeOpenDoc(docId);
   }
 
-  updateDocument(docId: number, changes: Change[], lastChangeId: number, clientUpdateId: number) {
-    const doc = this.project.openDocs.find(el => el.id == docId);
+  updateDocument(docId: number, tabId: string, changes: Change[], lastChangeId: number, clientUpdateId: number) {
+    const doc = this.project.openDocs[tabId];
     doc.changes.set(clientUpdateId, changes);
     setTimeout(() => this.socket.emit(Flags.WRITE_DOC, new WriteDocumentReq(changes, docId, lastChangeId, clientUpdateId, this.api.user.id)), 3000);
   }
 
   @EventHandler(Flags.WRITE_DOC)
   onUpdateDocument(doc: WriteDocumentRes) {
-    this.project.openDocs.find(el => el.id == doc.docId).lastChangeId = doc.updateId;
+    this.project.getDoc(doc.docId).lastChangeId = doc.updateId;
     if (doc.userId != this.api.user.id)
       this.project.updateDoc(doc);
   }
 
   @EventHandler(Flags.RENAME_DOC)
   onRenameDocument(doc: RenameDocumentRes) {
-    this.project.openDocs.find(el => el.id == doc.docId).title = doc.title;
+    this.project.getDoc(doc.docId).title = doc.title;
   }
 
   @EventHandler(Flags.CREATE_TAG)
@@ -120,7 +120,7 @@ export class SocketService {
       this.project.updateProjectTag(packet.tag);
     else if (!projectTag)
       this.project.addProjectTag(packet.tag);
-    const doc = this.project.openDocs.find(el => el.id == packet.docId);
+    const doc = this.project.getDoc(packet.docId);
     const tag = doc.tags.find(el => el.name == packet.tag.name);
     if (tag)
       doc.tags[doc.tags.indexOf(tag)] = packet.tag;
@@ -130,7 +130,7 @@ export class SocketService {
 
   @EventHandler(Flags.TAG_REMOVE_DOC)
   onRemoveTagDoc(packet: EditTagDocumentReq) {
-    const tags = this.project.openDocs.find(el => el.id == packet.docId).tags;
+    const tags = this.project.getDoc(packet.docId).tags;
     tags.splice(tags.findIndex(el => el.name == packet.name.toLowerCase()), 1);
   }
 

@@ -1,6 +1,6 @@
 import { Router } from '@angular/router';
 import { CreateProjectReq, CreateProjectRes } from '../../../models/api/project.model';
-import { CreateProjectComponent } from '../../utils/create-project/create-project.component';
+import { AskInputComponent } from '../../utils/ask-input/ask-input.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SnackbarService } from '../../../services/snackbar.service';
 import { UserDetailsRes, UserProjectsRes } from '../../../models/api/user.model';
@@ -38,7 +38,7 @@ export class MenuComponent implements OnInit {
   }
 
   public async createProject() {
-    const dialog = this.dialog.open(CreateProjectComponent);
+    const dialog = this.dialog.open(AskInputComponent, { data: "Créer un nouveau projet" });
     dialog.componentInstance.onConfirm.subscribe(async (name: string) => {
       dialog.close();
       this.progress.show();

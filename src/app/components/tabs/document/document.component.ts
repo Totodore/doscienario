@@ -1,13 +1,13 @@
-import { MatDialog } from '@angular/material/dialog';
 import { WorkerManagerService } from '../../../services/worker-manager.service';
 import { Change, DocumentModel } from './../../../models/sockets/document-sock.model';
 import { ProgressService } from 'src/app/services/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { SocketService } from './../../../services/socket.service';
 import { ITabElement } from './../../../models/tab-element.model';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import * as CKEditor from "@ckeditor/ckeditor5-build-classic";
 import { CKEditor5 } from '@ckeditor/ckeditor5-angular';
+import { v4 as uuid4 } from "uuid";
 @Component({
   selector: 'app-document',
   templateUrl: './document.component.html',
@@ -17,9 +17,11 @@ export class DocumentComponent implements OnInit, ITabElement {
 
   public show: boolean = false;
   public content: string = "";
-  public id: number = 60;
+  public tabId: string;
   public lastChangeId: number;
   public readonly editor = CKEditor;
+
+  @Input() public docId: number;
 
   private displayProgress: boolean = false;
 
@@ -31,8 +33,9 @@ export class DocumentComponent implements OnInit, ITabElement {
   ) { }
 
   ngOnInit(): void {
+    this.tabId = uuid4();
     this.progress.show();
-    this.socket.openDocument(this.id);
+    this.socket.openDocument(this.tabId, this.docId);
     this.worker.addEventListener<Change[]>("diff", (data) => this.onDocParsed(data));
   }
 
@@ -55,7 +58,7 @@ export class DocumentComponent implements OnInit, ITabElement {
     // console.log("Doc changed", changes);
     this.displayProgress = false;
     this.progress.hide();
-    this.socket.updateDocument(this.id, changes, this.doc.lastChangeId, ++this.doc.clientUpdateId);
+    this.socket.updateDocument(this.docId, this.tabId, changes, this.doc.lastChangeId, ++this.doc.clientUpdateId);
   }
 
   private progressWatcher() {
@@ -64,7 +67,7 @@ export class DocumentComponent implements OnInit, ITabElement {
   }
 
   get doc(): DocumentModel {
-    const doc = this.project.openDocs?.find(el => el?.id == this?.id);
+    const doc = this.project.openDocs[this.tabId];
     this.content = doc?.content || "";
     return doc;
   }

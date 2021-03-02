@@ -1,3 +1,31 @@
-.search {
-  width: 100%;
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  .search {
+    flex: 2 1;
+    width: 100%;
+  }
+  .add-options {
+    div {
+      margin-top: 15px;
+      display: flex;
+      justify-content: space-evenly;
+      button {
+        height: 45px;
+        width: 45px;
+        line-height: 45px;
+        position: relative;
+        .main-icon {
+          font-size: 25px
+        }
+        mat-icon:not(.main-icon) {
+          position: absolute;
+          top: 3px;
+          right: 3px;
+          font-size: 20px;
+        }
+      }
+    }
+  }
 }

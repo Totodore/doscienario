@@ -28,7 +28,7 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { BoardComponent } from './components/views/board/board.component';
 import { appearance } from './style/default';
 import { MenuComponent } from './components/views/menu/menu.component';
-import { CreateProjectComponent } from './components/utils/create-project/create-project.component';
+import { AskInputComponent } from './components/utils/ask-input/ask-input.component';
 import { NavBarComponent } from './components/views/board/nav-bar/nav-bar.component';
 import { MatDividerModule } from '@angular/material/divider';
 import { WelcomeTabComponent } from './components/tabs/welcome-tab/welcome-tab.component';
@@ -50,7 +50,7 @@ import { ConfirmComponent } from './components/utils/confirm/confirm.component';
     ConfirmPasswordComponent,
     BoardComponent,
     MenuComponent,
-    CreateProjectComponent,
+    AskInputComponent,
     NavBarComponent,
     WelcomeTabComponent,
     TabViewComponent,

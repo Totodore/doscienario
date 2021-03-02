@@ -26,25 +26,27 @@ export class TabService {
   public setRootViewContainerRef(viewContainerRef: ViewContainerRef) {
     this.rootViewContainer = viewContainerRef
   }
-  private addDynamicComponent(el: Type<ITabElement>) {
+  private addDynamicComponent(el: Type<ITabElement>, id?: number) {
     const factory = this.factoryResolver.resolveComponentFactory(el)
     const component = factory.create(this.rootViewContainer.injector);
+    component.instance.docId ??= id;
+    component.instance.show = true;
     this._tabs.push([el, component.instance]);
     this.rootViewContainer.insert(component.hostView);
   }
 
   public loadSavedTabs() {
     for (const index of this.savedTabs)
-      this.pushTab(this.availableTabs[index], false);
+      this.pushTab(this.availableTabs[index[0] || index], false, index[1]);
   }
 
-  public pushTab(tab: Type<ITabElement>, save = true) {
+  public pushTab(tab: Type<ITabElement>, save = true, id?: number) {
     for (const tab of this.tabs)
       tab.show = false;
-    this.addDynamicComponent(tab);
+    this.addDynamicComponent(tab, id);
     if (save)
       this.addTabToStorage(tab);
-    }
+  }
   public removeTab(index: number) {
     this.removeTabToStorage(this._tabs[index][0]);
     this.rootViewContainer.remove(index);
@@ -55,11 +57,8 @@ export class TabService {
       tab.show = false;
     this.tabs[index].show = true;
   }
-  public renameTab(index: number) {
-    this._tabs[index][1]?.onRename();
-  }
 
-  private addTabToStorage(tab: Type<ITabElement>) {
+  private addTabToStorage(tab: Type<ITabElement>, id?: number) {
     const index = this.availableTabs.indexOf(tab);
     const tabs = this.savedTabs;
     tabs.push(index);
@@ -73,7 +72,7 @@ export class TabService {
     tabs.splice(tabs.indexOf(index), 1);
     localStorage.setItem("tabs", JSON.stringify(tabs));
   }
-  private get savedTabs(): number[] {
+  private get savedTabs(): (number | [number, number])[] {
     return JSON.parse(localStorage.getItem("tabs")) ?? [];
   }
 

@@ -1,4 +1,5 @@
-<ckeditor *ngIf="doc != null"
+<div class="wrapper" *ngIf="show">
+  <ckeditor *ngIf="doc != null"
   [editor]="editor"
   [(ngModel)]="doc?.content == null ? '' : doc.content"
   (ngModelChange)="onChange($event)"
@@ -6,4 +7,5 @@
   ngDefaultControl
   (ready)="docLoaded($event)"
   ></ckeditor>
-<h1 *ngIf="doc == null">Chargement du document...</h1>
+  <h1 *ngIf="doc == null">Chargement du document...</h1>
+</div>

@@ -12,6 +12,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   private tabViewport: HTMLDivElement;
   private wheelAction: (e: WheelEvent) => void = (e) => this.tabViewport.scrollLeft += e.deltaY;
+  private mouseEnter: () => void = () => window.addEventListener('wheel', this.wheelAction);
+  private mouseLeave: () => void = () => window.removeEventListener('wheel', this.wheelAction);
 
   constructor(
     public readonly progress: ProgressService,
@@ -20,11 +22,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.tabViewport = document.querySelector(".mat-tab-label-container");
-    window.addEventListener('wheel', this.wheelAction);
+    this.tabViewport.addEventListener("mouseenter", this.mouseEnter);
+    this.tabViewport.addEventListener("mouseleave", this.mouseLeave);
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('wheel', this.wheelAction);
+    this.tabViewport.removeEventListener("mouseenter", this.mouseEnter);
+    this.tabViewport.removeEventListener("mouseleave", this.mouseLeave);
   }
 
 

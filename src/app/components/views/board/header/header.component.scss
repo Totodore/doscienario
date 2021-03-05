@@ -8,7 +8,7 @@
 }
 
 mat-progress-bar {
-  position: fixed;
+  position: absolute;
   z-index: 1000;
   top: 0;
   transition: opacity 250ms;

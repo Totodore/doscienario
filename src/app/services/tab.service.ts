@@ -54,7 +54,9 @@ export class TabService {
   public showTab(index: number) {
     for (const tab of this.tabs)
       tab.show = false;
-    this.tabs[index].show = true;
+    try {
+      this.tabs[index].show = true;
+    } catch (error) { };
   }
 
   private addTabToStorage(tab: Type<ITabElement>, id?: number) {

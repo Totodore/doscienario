@@ -119,3 +119,15 @@ button:focus {
   background-color: $grey-medium-color !important;
   color: whitesmoke !important;
 }
+
+.mat-tab-label-container {
+  &::-webkit-scrollbar {
+    height: 2px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, .35);
+    border-radius: 30px;
+  }
+  scrollbar-width: thin;
+  overflow-x: auto !important;
+}

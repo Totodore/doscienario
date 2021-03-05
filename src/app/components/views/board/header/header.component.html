@@ -1,5 +1,5 @@
 <mat-progress-bar [mode]="progress.mode" [value]="progress.value" [style.opacity]="progress.showing ? 1 : 0"></mat-progress-bar>
-<mat-tab-group animationDuration="0ms" color="accent" [selectedIndex]="tabService.displayedTab ? tabService.displayedTab[0] : 0" (selectedIndexChange)="tabChanged($event)">
+<mat-tab-group animationDuration="0ms" color="accent" [selectedIndex]="tabService.displayedTab ? tabService.displayedTab[0] : 0" (selectedIndexChange)="tabChanged($event)" [disablePagination]="true">
   <mat-tab *ngFor="let tab of tabService.tabs; let i = index">
     <ng-template mat-tab-label>
       {{ tab.title }}

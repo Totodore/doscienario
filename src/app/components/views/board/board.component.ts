@@ -8,6 +8,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class BoardComponent implements OnInit {
 
+
   constructor(
     private readonly socket: SocketService
   ) { }
@@ -15,5 +16,6 @@ export class BoardComponent implements OnInit {
   ngOnInit(): void {
     this.socket.connect();
   }
+
 
 }

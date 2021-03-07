@@ -2,13 +2,13 @@ import { Router } from '@angular/router';
 import { ApiService } from './api.service';
 import { DocumentModel, DocumentRes, Change, WriteDocumentRes } from './../models/sockets/document-sock.model';
 import { GetProjectRes, ProjectUserRes, GetProjectDocumentRes, SearchQueryRes } from './../models/api/project.model';
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { Tag } from '../models/sockets/tag-sock.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ProjectService {
+export class ProjectService implements OnInit {
 
   public openDocs: { [k: string]: DocumentModel } = {};
   public requestingId: number;
@@ -16,6 +16,9 @@ export class ProjectService {
   constructor(
     private readonly router: Router
   ) {}
+  ngOnInit(): void {
+    console.log("test");
+  }
 
   private data: GetProjectRes = JSON.parse(localStorage.getItem("project-data"));
   public async loadData(data: GetProjectRes) {

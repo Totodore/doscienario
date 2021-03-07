@@ -53,6 +53,8 @@ export interface GetProjectDocumentRes {
   tags: Tag[];
 
   images: GetProjectDocumentImageRes[];
+
+  title: string;
 }
 
 export interface GetProjectDocumentImageRes {
@@ -78,3 +80,10 @@ export interface GetProjectBlueprintRes {
   name: string;
 
 }
+
+export interface SearchQueryRes {
+  docs: number[];
+  tags: string[];
+}
+
+export type SearchResults = (GetProjectDocumentRes | Tag)[];

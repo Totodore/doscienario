@@ -62,11 +62,11 @@ export class MenuComponent implements OnInit {
     this.progress.show();
     try {
       await this.api.openProject(project.id);
-      this.progress.hide();
       this.router.navigateByUrl("/");
     } catch (e) {
       console.error(e);
       this.snackbar.snack("Impossible de charger le projet");
+    } finally {
       this.progress.hide();
     }
   }

@@ -1,7 +1,10 @@
+import { Router } from '@angular/router';
+import { ApiService } from './api.service';
 import { DocumentModel, DocumentRes, Change, WriteDocumentRes } from './../models/sockets/document-sock.model';
-import { GetProjectRes, ProjectUserRes, GetProjectDocumentRes } from './../models/api/project.model';
+import { GetProjectRes, ProjectUserRes, GetProjectDocumentRes, SearchQueryRes } from './../models/api/project.model';
 import { Injectable } from '@angular/core';
 import { Tag } from '../models/sockets/tag-sock.model';
+import { sortByRelevance } from '../utils/helpers';
 
 @Injectable({
   providedIn: 'root'
@@ -11,10 +14,16 @@ export class ProjectService {
   public openDocs: { [k: string]: DocumentModel } = {};
   public requestingId: number;
 
+  constructor(
+    private readonly router: Router
+  ) {}
+
   private data: GetProjectRes = JSON.parse(localStorage.getItem("project-data"));
   public async loadData(data: GetProjectRes) {
     this.data = data;
     localStorage.setItem("project-data", JSON.stringify(data));
+    this.openDocs = {};
+    this.requestingId = null;
   }
 
   public get name(): string {
@@ -94,6 +103,7 @@ export class ProjectService {
     }
     doc.content = content;
   }
+
   public setDocIndex(index: number, id: number) {
     const indexEl = Object.values(this.openDocs).findIndex(el => el.id == id);
     this.openDocs[indexEl].elIndex = index;
@@ -124,6 +134,12 @@ export class ProjectService {
 
   public saveData() {
     setTimeout(() => localStorage.setItem("project-data", JSON.stringify(this.data)), 0);
+  }
+  public exit() {
+    localStorage.removeItem("project-data");
+    localStorage.removeItem("project");
+    localStorage.removeItem("tabs");
+    this.router.navigateByUrl("/menu");
   }
 
   public set projectUsers(users: ProjectUserRes[]) {

@@ -14,6 +14,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule, MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { MatInputModule } from "@angular/material/input";
+import { MatRippleModule } from '@angular/material/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { AppComponent } from './app.component';
 import { MatChipsModule } from '@angular/material/chips';
@@ -42,6 +43,7 @@ import { EditTagsComponent } from './components/utils/edit-tags/edit-tags.compon
 import { TagsManagerComponent } from './components/tabs/tags-manager/tags-manager.component';
 import { MAT_COLOR_FORMATS, NgxMatColorPickerModule, NGX_MAT_COLOR_FORMATS } from '@angular-material-components/color-picker';
 import { ConfirmComponent } from './components/utils/confirm/confirm.component';
+import { SearchResultsComponent } from './components/views/board/nav-bar/search-options/search-results/search-results.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -64,7 +66,8 @@ import { ConfirmComponent } from './components/utils/confirm/confirm.component';
     EditTagsComponent,
     TagsManagerComponent,
     AddTagComponent,
-    ConfirmComponent
+    ConfirmComponent,
+    SearchResultsComponent
   ],
   imports: [
     ReactiveFormsModule,
@@ -87,7 +90,8 @@ import { ConfirmComponent } from './components/utils/confirm/confirm.component';
     MatAutocompleteModule,
     MatSelectModule,
     CKEditorModule,
-    NgxMatColorPickerModule
+    NgxMatColorPickerModule,
+    MatRippleModule
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: appearance },

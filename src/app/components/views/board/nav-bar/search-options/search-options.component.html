@@ -1,9 +1,12 @@
 <div class="wrapper">
-  <mat-form-field color="accent" class="search">
-    <mat-label>Rechercher</mat-label>
-    <input type="search" matInput>
-    <mat-icon color="accent" matSuffix>search</mat-icon>
-  </mat-form-field>
+  <div class="search-wrapper">
+    <mat-form-field color="accent" class="search">
+      <mat-label>Rechercher</mat-label>
+      <input type="search" matInput placeholder="@doc, #tag" [(ngModel)]="searchQuery" (ngModelChange)="search()">
+      <mat-icon color="accent" matSuffix>search</mat-icon>
+    </mat-form-field>
+    <app-search-results [results]="results" *ngIf="results"></app-search-results>
+  </div>
   <div class="add-options">
     <mat-divider></mat-divider>
     <div>

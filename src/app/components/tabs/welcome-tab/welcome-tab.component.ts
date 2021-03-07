@@ -1,3 +1,6 @@
+import { SnackbarService } from './../../../services/snackbar.service';
+import { ApiService } from './../../../services/api.service';
+import { ProgressService } from './../../../services/progress.service';
 import { TagsManagerComponent } from './../tags-manager/tags-manager.component';
 import { ProjectOptionsComponent } from '../project-options/project-options.component';
 import { TabService } from '../../../services/tab.service';
@@ -14,7 +17,10 @@ export class WelcomeTabComponent {
 
   constructor(
     public readonly project: ProjectService,
-    public readonly tabService: TabService
+    public readonly tabService: TabService,
+    private readonly progress: ProgressService,
+    private readonly api: ApiService,
+    private readonly snackbar: SnackbarService
   ) { }
 
   public openSettings() {
@@ -23,5 +29,21 @@ export class WelcomeTabComponent {
 
   public openTags() {
     this.tabService.pushTab(TagsManagerComponent);
+  }
+  public async reSync() {
+    this.tabService.closeAllTab();
+    try {
+      this.progress.show();
+      await this.api.openProject(this.project.id);
+      this.snackbar.snack("Projet re-synchronisé !");
+    } catch (e) {
+      this.snackbar.snack("Erreur lors de la re-synchronisation !");
+    } finally {
+      this.progress.hide();
+    }
+  }
+  public async exit() {
+    this.tabService.closeAllTab();
+    this.project.exit();
   }
 }

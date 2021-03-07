@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 
 @Component({
   selector: 'app-options-separator',
@@ -8,6 +8,8 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 export class OptionsSeparatorComponent {
 
   public displayed = true;
+
+  @Input() public title?: string;
 
   @Output() private toggle: EventEmitter<void> = new EventEmitter;
 

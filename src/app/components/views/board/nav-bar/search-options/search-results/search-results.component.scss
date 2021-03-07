@@ -1,0 +1,26 @@
+.wrapper {
+  color: whitesmoke;
+  max-height: 80vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  &::-webkit-scrollbar {
+    width: 2px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, .35);
+    border-radius: 30px;
+  }
+  .result {
+    display: flex;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+    align-items: center;
+    padding-top: 10px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    cursor: pointer;
+    h3 {
+      margin: 0;
+      margin-left: 10px;
+    }
+  }
+}

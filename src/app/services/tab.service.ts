@@ -58,6 +58,10 @@ export class TabService {
       this.tabs[index].show = true;
     } catch (error) { };
   }
+  public closeAllTab() {
+    for (let i = 0; i < this._tabs.length; i++)
+      this.removeTab(i);
+  }
 
   private addTabToStorage(tab: Type<ITabElement>, id?: number) {
     const index = this.availableTabs.indexOf(tab);

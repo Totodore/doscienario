@@ -73,8 +73,8 @@ export class TagsManagerComponent implements ITabElement {
 
   get docTags(): Tag[] {
     return this.project.docs
-      .reduce<Tag[]>((prev, curr) => [...prev, ...curr.tags], [])
-      .map(el => this.project.tags.find(val => val.name === el.name))
+      .reduce<string[]>((prev, curr) => [...prev, ...curr.tags.map(el => el.name)], [])
+      .map(el => this.project.tags.find(val => val.name === el))
       .filter(el => el != null && !el.primary);
   }
 }

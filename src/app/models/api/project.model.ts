@@ -48,11 +48,9 @@ export interface GetProjectDocumentRes {
 
   createdDate: string;
 
-  type: DocumentTypes;
+  tags: { name: string, id: number }[];
 
-  tags: Tag[];
-
-  images: GetProjectDocumentImageRes[];
+  images?: GetProjectDocumentImageRes[];
 
   title: string;
 }

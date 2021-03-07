@@ -31,10 +31,13 @@ export class DocumentComponent implements OnInit, ITabElement {
   ) { }
 
   ngOnInit(): void {
+    this.worker.addEventListener<Change[]>("diff", (data) => this.onDocParsed(data));
+  }
+
+  openTab(id?: number) {
     this.tabId = uuid4();
     this.progress.show();
-    this.socket.openDocument(this.tabId, this.docId);
-    this.worker.addEventListener<Change[]>("diff", (data) => this.onDocParsed(data));
+    this.socket.openDocument(this.tabId, id);
   }
 
   docLoaded(editor: CKEditor5.BaseEditor): void {
@@ -79,7 +82,7 @@ export class DocumentComponent implements OnInit, ITabElement {
   }
 
   get docId(): number {
-    return this.doc?.id;
+     return this.doc?.id;
   }
 
 }

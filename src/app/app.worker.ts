@@ -38,39 +38,48 @@ function search(needle: string, data: [Tag[], GetProjectDocumentRes[]]): SearchR
     /**
      * Search docs
      */
-    docs.push(...data[1].filter(el => el.title.toLowerCase().includes(needle.substr(1))));
+    if (needle[1] === '*')
+      docs = data[1];
+    else
+      docs.push(...data[1].filter(el => el.title.toLowerCase().includes(needle.substr(1))));
   } else if (needle.startsWith('#')) {
     /**
      * Search tags and docs that have these tags
      */
     tags.push(...data[0].filter(tag => tag.name.toLowerCase().includes(needle.substr(1))));
     docs.push(...data[1].filter(doc => doc.tags.find(docTag => tags.map(el => el.name).includes(docTag.name))));
+  } else if (needle === '*') {
+    tags = data[0];
+    docs = data[1];
   } else {
     /**
      * Search tags, docs and docs affiliated with these tags
      */
-    docs.push(...data[1].filter(el => el.title.toLowerCase().includes(needle.substr(1))));
-    tags.push(...data[0].filter(tag => tag.name.toLowerCase().includes(needle.substr(1))));
-    docs.push(...data[1].filter(doc => doc.tags.find(docTag => tags.map(el => el.name).includes(docTag.name))));
-  }
-  //Make results unique and sort them by relevance
-  docs = docs.reduce<GetProjectDocumentRes[]>((prev, curr) => !prev.includes(curr) ? [...prev, curr] : prev, [])
-    .sort((a, b) => sortByRelevance(a, b, needle, (el) => el.title));
-  tags = tags.reduce<Tag[]>((prev, curr) => !prev.includes(curr) ? [...prev, curr] : prev, [])
-    .sort((a, b) => sortByRelevance(a, b, needle, el => el.name));
-  let els: SearchResults = [];
-  const length = docs.length + tags.length;
-  let j = 0;
-  let k = 0;
-  for (let i = 0; i < length; i++) {
-    console.log(j, k);
-    if (i % 2 === 0 && docs[j]) {
-      els.push(docs[j])
-      j++;
-    } else if (tags[k]) {
-      els.push(tags[k]);
-      k++;
+    if (needle[1] === '*')
+      tags = data[0];
+    else {
+      docs.push(...data[1].filter(el => el.title.toLowerCase().includes(needle.substr(1))));
+      tags.push(...data[0].filter(tag => tag.name.toLowerCase().includes(needle.substr(1))));
+      docs.push(...data[1].filter(doc => doc.tags.find(docTag => tags.map(el => el.name).includes(docTag.name))));
     }
   }
+  //Make results unique and sort them by relevance
+  const docsIds = docs.map(el => el.id).reduce<number[]>((prev, curr) => [...prev, curr], []);
+  const tagsIds = tags.map(el => el.name).reduce<string[]>((prev, curr) => [...prev, curr], []);
+  docs = docs
+    .filter(doc => docsIds.includes(doc.id))
+    .sort((a, b) => sortByRelevance(a, b, needle, (el) => el.title));
+  tags = tags
+    .filter(tag => tagsIds.includes(tag.name))
+    .sort((a, b) => sortByRelevance(a, b, needle, el => el.name));
+
+  /**
+   * Alternative merge
+   */
+  let els: SearchResults;
+  if (docs.length > tags.length)
+    els = docs.reduce((prev, curr, i) => [...prev, curr, tags[i]], []).filter(el => el != null);
+  else
+    els = tags.reduce((prev, curr, i) => [...prev, curr, docs[i]], []).filter(el => el != null);
   return els;
 }

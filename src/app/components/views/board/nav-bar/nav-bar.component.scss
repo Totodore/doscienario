@@ -1,7 +1,7 @@
 .nav-bar {
   display: flex;
   min-height: 100vh;
-  mat-divider {
+  mat-divider.separator {
     height: 100vh;
   }
   .wrapper {
@@ -11,6 +11,16 @@
     width: 100%;
     .search {
       flex: 2 1 auto;
+    }
+    .btn-menu-separator {
+      margin-top: 10px;
+    }
+    .btn-menu {
+      margin: 10px 0;
+      width: 100%;
+      mat-icon {
+        margin-left: 10px;
+      }
     }
   }
 }

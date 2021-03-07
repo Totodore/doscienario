@@ -4,7 +4,6 @@ import { DocumentModel, DocumentRes, Change, WriteDocumentRes } from './../model
 import { GetProjectRes, ProjectUserRes, GetProjectDocumentRes, SearchQueryRes } from './../models/api/project.model';
 import { Injectable } from '@angular/core';
 import { Tag } from '../models/sockets/tag-sock.model';
-import { sortByRelevance } from '../utils/helpers';
 
 @Injectable({
   providedIn: 'root'
@@ -52,6 +51,10 @@ export class ProjectService {
     packet.doc.clientUpdateId = 0;
     this.requestingId = packet.doc.id;
     this.openDocs[packet.reqId] = packet.doc;
+    if (!this.data.documents.find(el => el.id == packet.doc.id)) {
+      this.data.documents.push(packet.doc);
+      this.saveData();
+    }
   }
   public updateDoc(incomingDoc: WriteDocumentRes) {
     const doc = this.openDocs[incomingDoc.reqId];
@@ -114,9 +117,15 @@ export class ProjectService {
   }
   public renameDoc(tabId: string, title: string) {
     this.openDocs[tabId].title = title;
+    const docId = this.openDocs[tabId].id;
+    this.data.documents.find(el => el.id == docId).title = title;
+    this.saveData();
   }
   public updateDocTags(tabId: string, tags: Tag[]) {
     this.openDocs[tabId].tags = tags;
+    const docId = this.openDocs[tabId].id;
+    this.data.documents.find(el => el.id == docId).tags = tags;
+    this.saveData();
   }
   public addProjectTag(tag: Tag) {
     this.data.tags.push(tag);

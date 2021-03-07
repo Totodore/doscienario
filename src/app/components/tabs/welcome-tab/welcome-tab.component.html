@@ -1,4 +1,4 @@
-<div class="wrapper">
+<div class="wrapper" *ngIf="show">
   <h1>Bienvenue sur le projet {{ project.name }}&nbsp;!</h1>
   <button mat-stroked-button color="accent" (click)="openSettings()">Configurer le projet <mat-icon matSuffix>settings</mat-icon></button>
   <button mat-stroked-button color="accent" (click)="openTags()">Gérer les tags <mat-icon matSuffix>label</mat-icon></button>

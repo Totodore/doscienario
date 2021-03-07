@@ -6,14 +6,17 @@ import { ProjectOptionsComponent } from '../project-options/project-options.comp
 import { TabService } from '../../../services/tab.service';
 import { ITabElement } from '../../../models/tab-element.model';
 import { ProjectService } from '../../../services/project.service';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, Provider, Type, ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'app-welcome-tab',
   templateUrl: './welcome-tab.component.html',
   styleUrls: ['./welcome-tab.component.scss']
 })
-export class WelcomeTabComponent {
+export class WelcomeTabComponent implements ITabElement {
+
+  public title: string = "Menu";
+  @Input() public show: boolean = false;
 
   constructor(
     public readonly project: ProjectService,

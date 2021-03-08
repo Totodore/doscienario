@@ -1,8 +1,8 @@
-import { DocumentComponent } from './../../../../../tabs/document/document.component';
-import { TabService } from './../../../../../../services/tab.service';
-import { GetProjectDocumentRes, SearchResults } from './../../../../../../models/api/project.model';
-import { Tag } from './../../../../../../models/sockets/tag-sock.model';
-import { ProjectService } from './../../../../../../services/project.service';
+import { DocumentComponent } from '../../../../tabs/document/document.component';
+import { TabService } from '../../../../../services/tab.service';
+import { GetProjectDocumentRes, SearchResults } from '../../../../../models/api/project.model';
+import { Tag } from '../../../../../models/sockets/tag-sock.model';
+import { ProjectService } from '../../../../../services/project.service';
 import { Component, Input, OnInit } from '@angular/core';
 import { SearchQueryRes } from 'src/app/models/api/project.model';
 

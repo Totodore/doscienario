@@ -1,6 +1,5 @@
 .wrapper {
   color: whitesmoke;
-  max-height: calc(100vh - 136px);
   overflow-y: auto;
   scrollbar-width: thin;
   &::-webkit-scrollbar {

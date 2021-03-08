@@ -1,3 +1,4 @@
+import { SearchResults } from './../../../../models/api/project.model';
 import { WelcomeTabComponent } from './../../../tabs/welcome-tab/welcome-tab.component';
 import { ProjectService } from 'src/app/services/project.service';
 import { TabService } from './../../../../services/tab.service';
@@ -11,6 +12,7 @@ import { Component, OnInit } from '@angular/core';
 export class NavBarComponent {
 
   public dispDocOptions: boolean = true;
+  public results: SearchResults;
   constructor(
     public readonly tabs: TabService,
     private readonly project: ProjectService

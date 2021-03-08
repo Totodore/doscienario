@@ -1,14 +1,8 @@
 import { WorkerManagerService } from './../../../../../services/worker-manager.service';
-import { SnackbarService } from './../../../../../services/snackbar.service';
 import { ProgressService } from 'src/app/services/progress.service';
-import { GetProjectDocumentRes, SearchQueryRes, SearchResults } from './../../../../../models/api/project.model';
+import { SearchResults } from './../../../../../models/api/project.model';
 import { ProjectService } from './../../../../../services/project.service';
-import { ApiService } from './../../../../../services/api.service';
-import { Flags } from './../../../../../models/sockets/flags.enum';
-import { SocketService } from './../../../../../services/socket.service';
-import { DocumentComponent } from './../../../../tabs/document/document.component';
-import { TabService } from './../../../../../services/tab.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-search-options',
@@ -21,20 +15,15 @@ export class SearchOptionsComponent implements OnInit {
   public queryCount = 0;
   public sortState: ("doc" | "tag")[] = ["doc", "tag"];
 
-  public results: SearchResults;
+  @Output() public results: EventEmitter<SearchResults> = new EventEmitter<SearchResults>();
 
   constructor(
-    private readonly tabs: TabService,
     private readonly project: ProjectService,
     private readonly progress: ProgressService,
     private readonly workerManager: WorkerManagerService
   ) { }
   ngOnInit(): void {
     this.workerManager.addEventListener('search', (data: SearchResults) => this.onSearch(data));
-  }
-
-  public createDoc() {
-    this.tabs.pushTab(DocumentComponent, false);
   }
 
   public async search() {
@@ -48,7 +37,7 @@ export class SearchOptionsComponent implements OnInit {
   }
 
   public onSearch(data: SearchResults) {
-    this.results = data;
+    this.results.emit(data);
     this.queryCount--;
     if (this.queryCount == 0)
       this.progress.hide();

@@ -5,22 +5,5 @@
       <input type="search" matInput placeholder="@doc, #tag" [(ngModel)]="searchQuery" (ngModelChange)="search()">
       <mat-icon color="accent" matSuffix>search</mat-icon>
     </mat-form-field>
-    <app-search-results [results]="results" *ngIf="results"></app-search-results>
-  </div>
-  <div class="add-options">
-    <mat-divider></mat-divider>
-    <div>
-      <button mat-stroked-button (click)="createDoc()">
-        <mat-icon class="main-icon" color="accent">description</mat-icon>
-        <mat-icon color="accent" matSuffix>add</mat-icon>
-      </button>
-      <button mat-stroked-button>
-        <mat-icon class="main-icon" color="accent" matSuffix>account_tree</mat-icon>
-        <mat-icon color="accent" matSuffix>add</mat-icon>
-      </button>
-      <button mat-stroked-button>
-        <mat-icon class="main-icon" color="accent" matSuffix>folder</mat-icon>
-      </button>
-    </div>
   </div>
 </div>

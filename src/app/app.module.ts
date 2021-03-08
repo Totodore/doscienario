@@ -1,3 +1,4 @@
+import { AddOptionsComponent } from './components/views/board/nav-bar/add-options/add-options.component';
 import { AddTagComponent } from './components/tabs/tags-manager/add-tag/add-tag.component';
 import { OptionsSeparatorComponent } from './components/views/board/nav-bar/options-separator/options-separator.component';
 import { SearchOptionsComponent } from './components/views/board/nav-bar/search-options/search-options.component';
@@ -43,9 +44,10 @@ import { EditTagsComponent } from './components/utils/edit-tags/edit-tags.compon
 import { TagsManagerComponent } from './components/tabs/tags-manager/tags-manager.component';
 import { MAT_COLOR_FORMATS, NgxMatColorPickerModule, NGX_MAT_COLOR_FORMATS } from '@angular-material-components/color-picker';
 import { ConfirmComponent } from './components/utils/confirm/confirm.component';
-import { SearchResultsComponent } from './components/views/board/nav-bar/search-options/search-results/search-results.component';
+import { SearchResultsComponent } from './components/views/board/nav-bar/search-results/search-results.component';
 @NgModule({
   declarations: [
+    AddOptionsComponent,
     AppComponent,
     HeaderComponent,
     LoginComponent,

@@ -1,6 +1,6 @@
 import { Tag, UpdateTagColorReq, UpdateTagNameReq } from './../models/sockets/tag-sock.model';
 import { TabService } from './tab.service';
-import { WriteDocumentReq, Change, DocumentModel, DocumentRes, WriteDocumentRes, RenameDocumentRes, EditTagDocumentReq, AddTagDocumentRes } from './../models/sockets/document-sock.model';
+import { WriteDocumentReq, Change, DocumentModel, DocumentRes, WriteDocumentRes, RenameDocumentRes, EditTagDocumentReq, AddTagDocumentRes, OpenDocumentRes } from './../models/sockets/document-sock.model';
 import { ProjectService } from 'src/app/services/project.service';
 import { Flags } from './../models/sockets/flags.enum';
 import { ApiService } from './api.service';
@@ -73,9 +73,14 @@ export class SocketService {
     this.socket.emit(Flags.OPEN_DOC, [tabId, docId]);
   }
 
-  @EventHandler(Flags.SEND_DOC)
-  onOpenDocument(packet: DocumentRes) {
+  @EventHandler(Flags.OPEN_DOC)
+  onOpenDocument(packet: OpenDocumentRes) {
     this.project.addOpenDoc(packet);
+  }
+
+  @EventHandler(Flags.SEND_DOC)
+  onSendDocument(packet: DocumentRes) {
+    this.project.addSendDoc(packet);
   }
 
   closeDocument(docId: number) {
@@ -102,7 +107,7 @@ export class SocketService {
 
   @EventHandler(Flags.RENAME_DOC)
   onRenameDocument(doc: RenameDocumentRes) {
-    this.project.getDoc(doc.docId).title = doc.title;
+    this.project.renameDocFromSocket(doc.title, doc.docId);
   }
 
   @EventHandler(Flags.CREATE_TAG)
@@ -136,14 +141,16 @@ export class SocketService {
 
   @EventHandler(Flags.COLOR_TAG)
   onColorTag(packet: UpdateTagColorReq) {
-    this.project.tags.find(el => el.name === packet.name).color = packet.color;
-    this.project.saveData();
+    const newTag = this.project.tags.find(el => el.name === packet.name);
+    newTag.color = packet.color;
+    this.project.updateProjectTag(new Tag(packet.name), newTag);
   }
 
   @EventHandler(Flags.RENAME_TAG)
   onRenameTag(packet: UpdateTagNameReq) {
-    this.project.tags.find(el => el.name === packet.oldName).name = packet.name;
-    this.project.saveData();
+    const newTag = this.project.tags.find(el => el.name === packet.oldName);
+    newTag.name = packet.name;
+    this.project.updateProjectTag(new Tag(packet.oldName), newTag);
   }
 
   @EventHandler(Flags.REMOVE_TAG)

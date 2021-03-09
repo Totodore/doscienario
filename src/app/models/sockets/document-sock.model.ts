@@ -1,3 +1,4 @@
+import { GetProjectDocumentRes } from "../api/project.model";
 import { UserDetailsRes } from "../api/user.model";
 import { Tag } from "./tag-sock.model";
 
@@ -64,3 +65,10 @@ export class AddTagDocumentRes {
   ) {}
 }
 
+
+export class OpenDocumentRes {
+  constructor(
+    public userId: string,
+    public doc: GetProjectDocumentRes
+  ) {}
+}

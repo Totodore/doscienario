@@ -1,6 +1,6 @@
 import { Router } from '@angular/router';
 import { ApiService } from './api.service';
-import { DocumentModel, DocumentRes, Change, WriteDocumentRes } from './../models/sockets/document-sock.model';
+import { DocumentModel, DocumentRes, Change, WriteDocumentRes, OpenDocumentRes } from './../models/sockets/document-sock.model';
 import { GetProjectRes, ProjectUserRes, GetProjectDocumentRes, SearchQueryRes } from './../models/api/project.model';
 import { Injectable, OnInit } from '@angular/core';
 import { Tag } from '../models/sockets/tag-sock.model';
@@ -47,11 +47,12 @@ export class ProjectService implements OnInit {
     this.data.users.splice(index, 1);
     this.saveData();
   }
-  public addOpenDoc(packet: DocumentRes) {
+  public addSendDoc(packet: DocumentRes) {
     const id = packet.lastUpdate;
     packet.doc.lastChangeId = id;
     packet.doc.changes = new Map<number, Change[]>();
     packet.doc.clientUpdateId = 0;
+    console.log("Add Send doc");
     this.requestingId = packet.doc.id;
     this.openDocs[packet.reqId] = packet.doc;
     if (!this.data.documents.find(el => el.id == packet.doc.id)) {
@@ -59,8 +60,18 @@ export class ProjectService implements OnInit {
       this.saveData();
     }
   }
+  /**
+   * Add a doc to the local data if the doc has been created
+   */
+  public addOpenDoc(packet: OpenDocumentRes) {
+    if (!this.data.documents.find(el => el.id == packet.doc.id)) {
+      this.data.documents.push(packet.doc);
+      this.saveData();
+    }
+  }
+
   public updateDoc(incomingDoc: WriteDocumentRes) {
-    const doc = this.openDocs[incomingDoc.reqId];
+    const doc = this.getDoc(incomingDoc.docId);
     let content: string = "";
     //On part du dernier ID du packet recu jusqu'au dernière id du document,
     for (let updateIndex = incomingDoc.lastClientUpdateId + 1; updateIndex <= doc.clientUpdateId; updateIndex++) {
@@ -118,6 +129,13 @@ export class ProjectService implements OnInit {
     const index = Object.values(this.openDocs).findIndex(el => el.id == docId);
     delete this.openDocs[index];
   }
+  public renameDocFromSocket(title: string, docId: number) {
+    this.data.documents.find(el => el.id == docId).title = title;
+    const doc = Object.values(this.openDocs).find(el => el.id == docId);
+    if (doc)
+      doc.title = title;
+    this.saveData();
+  }
   public renameDoc(tabId: string, title: string) {
     this.openDocs[tabId].title = title;
     const docId = this.openDocs[tabId].id;
@@ -136,6 +154,8 @@ export class ProjectService implements OnInit {
   }
   public removeProjectTag(name: string) {
     this.data.tags.splice(this.tags.findIndex(el => el.name === name), 1);
+    for (const doc of this.data.documents)
+      doc.tags.splice(doc.tags.findIndex(el => el.name === name), 1);
     this.saveData();
   }
   public updateProjectTag(tag: Tag, newTag?: Tag) {

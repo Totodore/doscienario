@@ -1,3 +1,4 @@
+import { SnackbarService } from './../../../services/snackbar.service';
 import { WorkerManagerService } from '../../../services/worker-manager.service';
 import { Change, DocumentModel } from './../../../models/sockets/document-sock.model';
 import { ProgressService } from 'src/app/services/progress.service';
@@ -28,6 +29,7 @@ export class DocumentComponent implements OnInit, ITabElement {
     private readonly project: ProjectService,
     private readonly progress: ProgressService,
     private readonly worker: WorkerManagerService,
+    private readonly snackbar: SnackbarService
   ) { }
 
   ngOnInit(): void {
@@ -59,7 +61,12 @@ export class DocumentComponent implements OnInit, ITabElement {
     // console.log("Doc changed", changes);
     this.displayProgress = false;
     this.progress.hide();
-    this.socket.updateDocument(this.docId, this.tabId, changes, this.doc.lastChangeId, ++this.doc.clientUpdateId);
+    try {
+      this.socket.updateDocument(this.docId, this.tabId, changes, this.doc.lastChangeId, ++this.doc.clientUpdateId);
+    } catch (error) {
+      this.snackbar.snack("Echec de la mise à jour du document, essayer de resynchroniser le projet !");
+      console.error(error);
+    }
   }
 
   private progressWatcher() {

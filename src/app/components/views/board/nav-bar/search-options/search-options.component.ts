@@ -28,7 +28,7 @@ export class SearchOptionsComponent implements OnInit {
 
   public async search() {
     if (this.searchQuery.length < 2 && this.searchQuery !== '*') {
-      this.results = null;
+      this.results.emit(null);
       return;
     }
     this.progress.show();

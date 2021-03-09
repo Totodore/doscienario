@@ -5,7 +5,7 @@
     "ng": "ng",
     "start": "ng serve --disable-host-check",
     "build": "ng build",
-    "publish": "cd ./dist && zip -r package.zip doscienario && git commit -m 'Publish package' && git push",
+    "publish": "cd ./dist && zip -r package.zip doscienario",
     "lint": "ng lint"
   },
   "private": true,

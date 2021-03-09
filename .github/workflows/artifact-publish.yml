@@ -7,7 +7,6 @@ on:
     branches:
       - master
 
-    # Publish `v1.2.3` tags as releases.
     tags:
       - v*
 
@@ -18,9 +17,7 @@ env:
   IMAGE_NAME: doscienario
 
 jobs:
-  # Push image to GitHub Packages.
-  # See also https://docs.docker.com/docker-hub/builds/
-  push:
+  Artifact:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
 
@@ -32,5 +29,6 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: Upload Artifact
+          name: doscenario-build
+    # Publish `v1.2.3` tags as releases.
           path: dist/doscienario/

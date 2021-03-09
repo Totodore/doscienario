@@ -27,8 +27,8 @@ jobs:
       - name: Build Angular Application
         run: npm it && npm run build
 
-      - uses: actions/upload-artifact@v2
+      - name: Deploy Page
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          name: doscenario-build
-    # Publish `v1.2.3` tags as releases.
-          path: dist/doscienario/
+          github_token: ${{ secrets.CR_PAT }}
+          publish_dir: ./dist/doscienario

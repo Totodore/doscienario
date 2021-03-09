@@ -47,9 +47,10 @@ export class TabService {
     for (const tab of this.tabs)
       tab.show = false;
     let displayedIndex: number;
-    console.log(id);
-    if ((id && this._tabs.findIndex(el => el[1].docId === id)) || (this._tabs.findIndex(el => el[0] === tab) && tab !== DocumentComponent))
-      displayedIndex = this._tabs.findIndex(el => el[1].docId === id) || this._tabs.findIndex(el => el[0] === tab);
+    if ((id && this._tabs.findIndex(el => el[1].docId === id) >= 0)
+      || (this._tabs.findIndex(el => el[0].name === tab.name) >= 0 && tab !== DocumentComponent)
+    )
+      displayedIndex = this._tabs.findIndex(el => el[1].docId === id) || this._tabs.findIndex(el => el[0].name === tab.name);
     console.log(displayedIndex >= 0 ? `Tab already exists : ${displayedIndex}` : `Creating new tab for ${tab.name}`);
     if (displayedIndex >= 0)
       this.showTab(displayedIndex);

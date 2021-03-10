@@ -1,3 +1,4 @@
+import { AutocompleteDocsComponent } from './components/tabs/document/autocomplete-docs/autocomplete-docs.component';
 import { AddOptionsComponent } from './components/views/board/nav-bar/add-options/add-options.component';
 import { AddTagComponent } from './components/tabs/tags-manager/add-tag/add-tag.component';
 import { OptionsSeparatorComponent } from './components/views/board/nav-bar/options-separator/options-separator.component';
@@ -69,7 +70,8 @@ import { SearchResultsComponent } from './components/views/board/nav-bar/search-
     TagsManagerComponent,
     AddTagComponent,
     ConfirmComponent,
-    SearchResultsComponent
+    SearchResultsComponent,
+    AutocompleteDocsComponent
   ],
   imports: [
     ReactiveFormsModule,

@@ -10,6 +10,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import * as CKEditor from "@ckeditor/ckeditor5-build-classic";
 import { CKEditor5 } from '@ckeditor/ckeditor5-angular';
 import { v4 as uuid4 } from "uuid";
+import { ThisReceiver } from '@angular/compiler';
 @Component({
   selector: 'app-document',
   templateUrl: './document.component.html',
@@ -22,6 +23,8 @@ export class DocumentComponent implements OnInit, ITabElement {
   public tabId: string;
   public lastChangeId: number;
   public readonly editor = CKEditor;
+  public tag: string;
+  public tagIndex: number;
 
   private displayProgress: boolean = false;
 
@@ -58,6 +61,20 @@ export class DocumentComponent implements OnInit, ITabElement {
     this.worker.postMessage<[string, string]>("diff", [this.content, data]);
     this.content = data;
     this.progressWatcher();
+
+    const el = document.createElement("div");
+    el.innerHTML = data;
+    const lastChar = el.innerText[el.innerText.length - 1];
+    if (lastChar === '@' && !this.tag && this.tagIndex >= 0) {
+      this.tag = "";
+      this.tagIndex = el.innerText.length - 1;
+    } else if (lastChar?.charCodeAt(0) === 160) {
+      this.tag = "";
+      this.tagIndex = -1;
+    } else
+      this.tag += lastChar;
+
+    console.log(this.tag, this.tagIndex);
   }
 
   private onDocParsed(changes: Change[]) {

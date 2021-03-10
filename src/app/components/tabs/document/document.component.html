@@ -7,5 +7,6 @@
   ngDefaultControl
   (ready)="editorLoaded($event)"
   ></ckeditor>
+  <app-autocomplete-docs [query]="" *ngIf="tagLength > 0"></app-autocomplete-docs>
   <h1 *ngIf="doc == null">Chargement du document...</h1>
 </div>

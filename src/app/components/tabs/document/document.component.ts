@@ -1,3 +1,4 @@
+import { TabService } from './../../../services/tab.service';
 import { SnackbarService } from './../../../services/snackbar.service';
 import { WorkerManagerService } from '../../../services/worker-manager.service';
 import { Change, DocumentModel } from './../../../models/sockets/document-sock.model';
@@ -28,6 +29,7 @@ export class DocumentComponent implements OnInit, ITabElement {
     private readonly socket: SocketService,
     private readonly project: ProjectService,
     private readonly progress: ProgressService,
+    private readonly tabs: TabService,
     private readonly worker: WorkerManagerService,
     private readonly snackbar: SnackbarService
   ) { }
@@ -36,13 +38,14 @@ export class DocumentComponent implements OnInit, ITabElement {
     this.worker.addEventListener<Change[]>("diff", (data) => this.onDocParsed(data));
   }
 
-  openTab(id?: number) {
+  openTab(id?: number): string {
     this.tabId = uuid4();
     this.progress.show();
     this.socket.openDocument(this.tabId, id);
+    return this.tabId;
   }
 
-  docLoaded(editor: CKEditor5.BaseEditor): void {
+  editorLoaded(editor: CKEditor5.BaseEditor): void {
     this.progress.hide();
     this.content = this.doc.content;
     editor.ui.getEditableElement().parentElement.insertBefore(

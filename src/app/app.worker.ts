@@ -46,11 +46,14 @@ function search(needle: string, data: [Tag[], GetProjectDocumentRes[]]): SearchR
     /**
      * Search tags and docs that have these tags
      */
-    tags.push(...data[0].filter(tag => tag.name.toLowerCase().includes(needle.substr(1))));
-    docs.push(...data[1].filter(doc => doc.tags.find(docTag => tags.map(el => el.name).includes(docTag.name))));
+    if (needle[1] === '*')
+      tags = data[0];
+    else {
+      tags.push(...data[0].filter(tag => tag.name.toLowerCase().includes(needle.substr(1))));
+      docs.push(...data[1].filter(doc => doc.tags.find(docTag => tags.map(el => el.name).includes(docTag.name))));
+    }
   } else if (needle === '*') {
-    tags = data[0];
-    docs = data[1];
+    [tags, docs] = data;
   } else {
     /**
      * Search tags, docs and docs affiliated with these tags

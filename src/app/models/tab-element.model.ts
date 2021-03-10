@@ -6,5 +6,5 @@ export interface ITabElement extends Component {
   docId?: number;
   show: boolean;
   onRename?: () => void;
-  openTab?: (id: number | string) => void;
+  openTab?: (id: number | string) => string;
 }

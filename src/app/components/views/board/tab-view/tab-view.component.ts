@@ -20,7 +20,6 @@ export class TabViewComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.tab.setRootViewContainerRef(this.container);
-      this.tab.loadSavedTabs();
     }, 0);
   }
 }

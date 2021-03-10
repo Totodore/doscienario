@@ -28,21 +28,25 @@ export class TabService {
   public setRootViewContainerRef(viewContainerRef: ViewContainerRef) {
     this.rootViewContainer = viewContainerRef
   }
-  private addDynamicComponent(el: Type<ITabElement>, id?: number) {
+  private addDynamicComponent(el: Type<ITabElement>, id?: number): string | void {
     const factory = this.factoryResolver.resolveComponentFactory(el)
     const component = factory.create(this.rootViewContainer.injector);
     component.instance.show = true;
     this._tabs.push([el, component.instance]);
     this.rootViewContainer.insert(component.hostView);
     if (component.instance?.openTab)
-      component.instance.openTab(id);
+      return component.instance.openTab(id);
   }
 
   public loadSavedTabs() {
     for (const index of this.savedTabs)
-      this.pushTab(this.availableTabs[index[0] || index], false);
+      this.pushTab(this.availableTabs[index[0] || index], false, index[1]);
   }
 
+  /**
+   * Take an id, it can be a document id (number)
+   * or a tab id
+   */
   public pushTab(tab: Type<ITabElement>, save = true, id?: number) {
     for (const tab of this.tabs)
       tab.show = false;
@@ -56,9 +60,15 @@ export class TabService {
       this.showTab(displayedIndex);
     else {
       this.addDynamicComponent(tab, id);
-      if (save)
-        this.addTabToStorage(tab, id);
     }
+    if (save)
+      this.addTabToStorage(tab, id);
+  }
+
+  public updateTabStorage(tabId: string, docId: number) {
+    const tabs = this.savedTabs;
+    tabs.find(el => el[1] === tabId)[1] = docId;
+    localStorage.setItem("tabs", JSON.stringify(tabs));
   }
   /**
    * If index is not given, it remove the current tab
@@ -88,7 +98,7 @@ export class TabService {
       this.removeTab(i);
   }
 
-  private addTabToStorage(tab: Type<ITabElement>, id?: number) {
+  private addTabToStorage(tab: Type<ITabElement>, id?: number | string) {
     const index = this.availableTabs.indexOf(tab);
     const tabs = this.savedTabs;
     if (id && index >= 0)
@@ -104,7 +114,7 @@ export class TabService {
     tabs.splice(tabs.indexOf(id ? [index, id] : index), 1);
     localStorage.setItem("tabs", JSON.stringify(tabs));
   }
-  private get savedTabs(): (number | [number, number])[] {
+  private get savedTabs(): (number | [number, number | string])[] {
     return JSON.parse(localStorage.getItem("tabs")) ?? [];
   }
 

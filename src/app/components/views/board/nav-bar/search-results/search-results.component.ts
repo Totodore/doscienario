@@ -26,6 +26,6 @@ export class SearchResultsComponent {
     console.log(el);
     if ((el as Tag).name) {
       //TODO: TagView
-    } else this.tabs.pushTab(DocumentComponent, false, el.id);
+    } else this.tabs.pushTab(DocumentComponent, true, el.id);
   }
 }

@@ -5,7 +5,7 @@
   (ngModelChange)="onChange($event)"
   name="edit"
   ngDefaultControl
-  (ready)="docLoaded($event)"
+  (ready)="editorLoaded($event)"
   ></ckeditor>
   <h1 *ngIf="doc == null">Chargement du document...</h1>
 </div>

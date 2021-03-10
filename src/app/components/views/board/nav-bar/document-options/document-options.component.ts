@@ -36,6 +36,10 @@ export class DocumentOptionsComponent {
     });
   }
 
+  deleteDoc() {
+
+  }
+
   get doc(): DocumentModel {
     return this.project.openDocs[this.tabId];
   }

@@ -4,10 +4,11 @@
   min-height: 100vh;
   .body {
     display: flex;
+    flex-grow: 1;
     flex-direction: column;
     width: 75%;
   }
   app-nav-bar {
-    width: 25%;
+    width: 300px;
   }
 }

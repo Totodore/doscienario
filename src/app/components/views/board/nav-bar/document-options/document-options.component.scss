@@ -2,10 +2,19 @@
   padding: 0;
   text-align: center;
   margin-bottom: 10px;
-  mat-form-field, button {
+  mat-form-field, .btns {
     width: 100%;
     input {
       color: whitesmoke;
+    }
+  }
+  .btns {
+    display: flex;
+    .add-tags {
+      margin-right: 5px;
+    }
+    .remove-doc {
+      border-color: red;
     }
   }
 }

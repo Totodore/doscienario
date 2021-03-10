@@ -63,10 +63,7 @@ export class DocumentComponent implements OnInit, ITabElement {
     this.progress.hide();
     try {
       this.socket.updateDocument(this.docId, this.tabId, changes, this.doc.lastChangeId, ++this.doc.clientUpdateId);
-    } catch (error) {
-      this.snackbar.snack("Echec de la mise à jour du document, essayer de resynchroniser le projet !");
-      console.error(error);
-    }
+    } catch (error) {   }
   }
 
   private progressWatcher() {

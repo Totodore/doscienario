@@ -1,3 +1,4 @@
+import { ConfirmComponent } from './../../../../utils/confirm/confirm.component';
 import { Tag } from 'src/app/models/sockets/tag-sock.model';
 import { DocumentModel } from './../../../../../models/sockets/document-sock.model';
 import { MatDialog } from '@angular/material/dialog';
@@ -37,7 +38,15 @@ export class DocumentOptionsComponent {
   }
 
   deleteDoc() {
-
+    const dialog = this.dialog.open(ConfirmComponent, {
+      data: "Supprimer le doc ?"
+    });
+    dialog.componentInstance.confirm.subscribe(() => {
+      dialog.close();
+      this.socket.socket.emit(Flags.REMOVE_DOC, this.docId);
+      this.project.removeDoc(this.tabId);
+      this.tabs.removeTab();
+    });
   }
 
   get doc(): DocumentModel {

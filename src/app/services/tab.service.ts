@@ -60,12 +60,22 @@ export class TabService {
         this.addTabToStorage(tab, id);
     }
   }
-  public removeTab(index: number) {
+  /**
+   * If index is not given, it remove the current tab
+   */
+  public removeTab(index?: number) {
+    index ??= this.displayedTab[0];
     if (this.tabs[index].show)
       (this.tabs[index - 1] ?? this.tabs[this.tabs.length - 1]).show = true;
     this.removeTabToStorage(this._tabs[index][0]);
     this.rootViewContainer.remove(index);
     this._tabs.splice(index, 1);
+  }
+  public removeDocTab(docId: number) {
+    const index = this.tabs.findIndex(el => el.docId === docId);
+    console.log(index);
+    if (index >= 0)
+      this.removeTab(index);
   }
   public showTab(index: number) {
     for (const tab of this.tabs)

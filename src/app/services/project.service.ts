@@ -142,6 +142,26 @@ export class ProjectService implements OnInit {
     this.data.documents.find(el => el.id == docId).title = title;
     this.saveData();
   }
+  /**
+   * Remove a doc from its tab id or docId
+   * If it is tab id it means that the doc should be opened
+   */
+  public removeDoc(id: string | number) {
+    if (typeof id === 'string') {
+      const docId = this.openDocs[id].id;
+      delete this.openDocs[id];
+      this.data.documents.splice(this.docs.findIndex(el => el.id == docId), 1);
+    } else if (typeof id === 'number') {
+      for (const tabId in this.openDocs) {
+        if (this.openDocs[tabId].id === id) {
+          delete this.openDocs[tabId];
+          break;
+        }
+      }
+      this.data.documents.splice(this.docs.findIndex(el => el.id == id), 1);
+    }
+    this.saveData();
+  }
   public updateDocTags(tabId: string, tags: Tag[]) {
     this.openDocs[tabId].tags = tags;
     const docId = this.openDocs[tabId].id;

@@ -19,6 +19,7 @@ export class SocketService {
   constructor(
     private readonly api: ApiService,
     private readonly project: ProjectService,
+    private readonly tabs: TabService
   ) {}
 
   connect() {
@@ -108,6 +109,12 @@ export class SocketService {
   @EventHandler(Flags.RENAME_DOC)
   onRenameDocument(doc: RenameDocumentRes) {
     this.project.renameDocFromSocket(doc.title, doc.docId);
+  }
+
+  @EventHandler(Flags.REMOVE_DOC)
+  onRemoveDoc(docId: number) {
+    this.tabs.removeDocTab(docId);
+    this.project.removeDoc(docId);
   }
 
   @EventHandler(Flags.CREATE_TAG)

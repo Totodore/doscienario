@@ -48,10 +48,9 @@ export class DocumentComponent implements OnInit, ITabElement {
       ]
     }
   };
-  public tag: string;
-  public tagIndex: number;
 
   private displayProgress: boolean = false;
+  private hasEdited: boolean = false;
 
   constructor(
     private readonly socket: SocketService,
@@ -80,8 +79,9 @@ export class DocumentComponent implements OnInit, ITabElement {
     editor.ui.getEditableElement().parentElement.insertBefore(
       editor.ui.view.toolbar.element,
       editor.ui.getEditableElement()
-    )
-    document.querySelectorAll(".ck-content .mention").forEach((el: HTMLSpanElement) => el.onclick = () => this.onTagClick(el.getAttribute("data-mention")));
+    );
+    this.addTagsListener();
+    window.setInterval(() => this.hasEdited && this.addTagsListener(), 1000);
   }
 
   onChange(data: string) {
@@ -94,6 +94,7 @@ export class DocumentComponent implements OnInit, ITabElement {
     // console.log("Doc changed", changes);
     this.displayProgress = false;
     this.progress.hide();
+    this.hasEdited = true;
     try {
       this.socket.updateDocument(this.docId, this.tabId, changes, this.doc.lastChangeId, ++this.doc.clientUpdateId);
     } catch (error) {   }
@@ -109,6 +110,12 @@ export class DocumentComponent implements OnInit, ITabElement {
 
   private atTagNames(query: string): string[] {
     return this.project.tags.filter(el => el.name.toLowerCase().startsWith(query.toLowerCase())).map(el => "#" + el.name);
+  }
+
+  private addTagsListener() {
+    document.querySelectorAll(".ck-content .mention")
+      .forEach((el: HTMLSpanElement) => el.onclick = () => this.onTagClick(el.getAttribute("data-mention")));
+    this.hasEdited = false;
   }
 
   private onTagClick(tag: string) {

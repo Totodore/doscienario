@@ -60,9 +60,9 @@ export class TabService {
       this.showTab(displayedIndex);
     else {
       this.addDynamicComponent(tab, id);
+      if (save)
+        this.addTabToStorage(tab, id);
     }
-    if (save)
-      this.addTabToStorage(tab, id);
   }
 
   public updateTabStorage(tabId: string, docId: number) {

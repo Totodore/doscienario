@@ -14,7 +14,7 @@ import { Observable } from 'rxjs';
 })
 export class ApiService {
 
-  private readonly root: string = `http://${environment.apiUrl}`;
+  public readonly root: string = `http://${environment.apiUrl}`;
   public socket: typeof Socket;
   constructor(
     private readonly http: HttpClient,

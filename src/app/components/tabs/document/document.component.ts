@@ -1,3 +1,4 @@
+import { ApiService } from 'src/app/services/api.service';
 import { TabService } from './../../../services/tab.service';
 import { SnackbarService } from './../../../services/snackbar.service';
 import { WorkerManagerService } from '../../../services/worker-manager.service';
@@ -9,7 +10,6 @@ import { ITabElement } from './../../../models/tab-element.model';
 import { Component, Input, OnInit, Type } from '@angular/core';
 import * as CKEditor from "../../../../lib/ckeditor.js";
 import { CKEditor5 } from '@ckeditor/ckeditor5-angular';
-// import Mention from '@ckeditor/ckeditor5-mention/src/mention';
 import { v4 as uuid4 } from "uuid";
 @Component({
   selector: 'app-document',
@@ -24,10 +24,9 @@ export class DocumentComponent implements OnInit, ITabElement {
   public lastChangeId: number;
   public readonly editor: CKEditor5.EditorConstructor = CKEditor;
   public readonly editorCongig: CKEditor5.Config = {
-    // plugins: [Mention],
     toolbar: {
       items: [
-        "heading", "|", "bold", "italic", "BlockQuote", "|",
+        "heading", "|", "bold", "italic", "Underline", "BlockQuote", "HorizontalLine","|",
         "numberedList", "bulletedList", "|",
         "indent", "outdent", "|", "link", "imageUpload",
         "insertTable", "mediaEmbed", "|",
@@ -46,6 +45,15 @@ export class DocumentComponent implements OnInit, ITabElement {
           feed: (query: string) => this.atTagNames(query),
         }
       ]
+    },
+    simpleUpload: {
+      // The URL that the images are uploaded to.
+      uploadUrl: `${this.api.root}/res/image`,
+
+      // Headers sent along with the XMLHttpRequest to the upload server.
+      headers: {
+          Authorization: this.api.jwt
+      }
     }
   };
 
@@ -58,7 +66,7 @@ export class DocumentComponent implements OnInit, ITabElement {
     private readonly progress: ProgressService,
     private readonly tabs: TabService,
     private readonly worker: WorkerManagerService,
-    private readonly snackbar: SnackbarService
+    private readonly api: ApiService
   ) { }
 
   ngOnInit(): void {
@@ -84,6 +92,7 @@ export class DocumentComponent implements OnInit, ITabElement {
   }
 
   onChange(data: string) {
+    this.hasEdited = true;
     if (Math.abs(data.length - this.content.length) > 500) {
       const change: Change = [2, null, data];
       this.socket.updateDocument(this.docId, this.tabId, [change], this.doc.lastChangeId, ++this.doc.clientUpdateId);
@@ -98,7 +107,6 @@ export class DocumentComponent implements OnInit, ITabElement {
     // console.log("Doc changed", changes);
     this.displayProgress = false;
     this.progress.hide();
-    this.hasEdited = true;
     try {
       this.socket.updateDocument(this.docId, this.tabId, changes, this.doc.lastChangeId, ++this.doc.clientUpdateId);
     } catch (error) {   }

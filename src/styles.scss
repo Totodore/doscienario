@@ -140,6 +140,21 @@ ckeditor {
     .mention {
       cursor: pointer !important;
     }
+    .image {
+      @include mat-elevation(1);
+      overflow: hidden !important;
+      border-radius: 5px !important;
+      figcaption {
+        background-color: $grey-medium-color !important;
+        color: #b0bec5 !important;
+        &::before {
+          color: #b0bec5 !important;
+        }
+      }
+    }
+    hr {
+      height: 1px !important;
+    }
   }
 }
 

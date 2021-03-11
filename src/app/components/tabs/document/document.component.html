@@ -1,6 +1,7 @@
 <div class="wrapper" *ngIf="show">
   <ckeditor *ngIf="doc != null"
   [editor]="editor"
+  [config]="editorCongig"
   [(ngModel)]="doc?.content == null ? '' : doc.content"
   (ngModelChange)="onChange($event)"
   name="edit"

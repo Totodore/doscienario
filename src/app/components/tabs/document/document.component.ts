@@ -6,11 +6,11 @@ import { ProgressService } from 'src/app/services/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { SocketService } from './../../../services/socket.service';
 import { ITabElement } from './../../../models/tab-element.model';
-import { Component, Input, OnInit } from '@angular/core';
-import * as CKEditor from "@ckeditor/ckeditor5-build-classic";
+import { Component, Input, OnInit, Type } from '@angular/core';
+import * as CKEditor from "../../../../lib/ckeditor.js";
 import { CKEditor5 } from '@ckeditor/ckeditor5-angular';
+// import Mention from '@ckeditor/ckeditor5-mention/src/mention';
 import { v4 as uuid4 } from "uuid";
-import { ThisReceiver } from '@angular/compiler';
 @Component({
   selector: 'app-document',
   templateUrl: './document.component.html',
@@ -22,7 +22,32 @@ export class DocumentComponent implements OnInit, ITabElement {
   public content: string = "";
   public tabId: string;
   public lastChangeId: number;
-  public readonly editor = CKEditor;
+  public readonly editor: CKEditor5.EditorConstructor = CKEditor;
+  public readonly editorCongig: CKEditor5.Config = {
+    // plugins: [Mention],
+    toolbar: {
+      items: [
+        "heading", "|", "bold", "italic", "|",
+        "numberedList", "bulletedList", "|",
+        "indent", "outdent", "|", "link", "imageUpload",
+        "quote", "insertTable", "mediaEmbed", "|",
+        "undo", "redo"
+      ],
+      shouldNotGroupWhenFull: true
+    },
+    mention: {
+      feeds: [
+        {
+          marker: '@',
+          feed: (query: string) => this.atDocNames(query),
+        },
+        {
+          marker: '#',
+          feed: (query: string) => this.atTagNames(query),
+        }
+      ]
+    }
+  };
   public tag: string;
   public tagIndex: number;
 
@@ -48,33 +73,21 @@ export class DocumentComponent implements OnInit, ITabElement {
     return this.tabId;
   }
 
-  editorLoaded(editor: CKEditor5.BaseEditor): void {
+  editorLoaded(editor: CKEditor5.Editor): void {
+    console.log(Array.from( editor.ui.componentFactory.names() ));
     this.progress.hide();
     this.content = this.doc.content;
     editor.ui.getEditableElement().parentElement.insertBefore(
       editor.ui.view.toolbar.element,
       editor.ui.getEditableElement()
     )
+    document.querySelectorAll(".ck-content .mention").forEach((el: HTMLSpanElement) => el.onclick = () => this.onTagClick(el.getAttribute("data-mention")));
   }
 
   onChange(data: string) {
     this.worker.postMessage<[string, string]>("diff", [this.content, data]);
     this.content = data;
     this.progressWatcher();
-
-    const el = document.createElement("div");
-    el.innerHTML = data;
-    const lastChar = el.innerText[el.innerText.length - 1];
-    if (lastChar === '@' && !this.tag && this.tagIndex >= 0) {
-      this.tag = "";
-      this.tagIndex = el.innerText.length - 1;
-    } else if (lastChar?.charCodeAt(0) === 160) {
-      this.tag = "";
-      this.tagIndex = -1;
-    } else
-      this.tag += lastChar;
-
-    console.log(this.tag, this.tagIndex);
   }
 
   private onDocParsed(changes: Change[]) {
@@ -89,6 +102,21 @@ export class DocumentComponent implements OnInit, ITabElement {
   private progressWatcher() {
     this.displayProgress = true;
     setTimeout(() => this.displayProgress && this.progress.show(), 1000);
+  }
+  private atDocNames(query: string): string[] {
+    return this.project.docs.filter(el => el.title.toLowerCase().startsWith(query.toLowerCase())).map(el => "@" + el.title);
+  }
+
+  private atTagNames(query: string): string[] {
+    return this.project.tags.filter(el => el.name.toLowerCase().startsWith(query.toLowerCase())).map(el => "#" + el.name);
+  }
+
+  private onTagClick(tag: string) {
+    if (tag.startsWith("@")) {
+      const docId = this.project.docs.find(el => el.title.toLowerCase() === tag.substr(1).toLowerCase())?.id;
+      if (docId)
+        this.tabs.pushTab(DocumentComponent, true, docId);
+    } else if (tag.startsWith("#")) {}
   }
 
   get doc(): DocumentModel {

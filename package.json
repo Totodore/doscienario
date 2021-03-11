@@ -23,6 +23,7 @@
     "@angular/router": "~11.0.1",
     "@ckeditor/ckeditor5-angular": "^2.0.1",
     "@ckeditor/ckeditor5-build-classic": "^25.0.0",
+    "@ckeditor/ckeditor5-mention": "^26.0.0",
     "diff": "^5.0.0",
     "fast-array-diff": "^1.0.0",
     "fast_array_intersect": "^1.1.0",

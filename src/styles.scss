@@ -31,6 +31,43 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
   background-color: $grey-dark-color;
 }
+.ck-balloon-panel {
+  border: none !important;
+  @include mat-elevation(1);
+}
+.ck-mentions {
+  background-color: $grey-dark-color !important;
+  color: #b0bec5 !important;
+  border-radius: 0 !important;
+
+  overflow-y: auto !important;
+  scrollbar-width: thin !important;
+  &::-webkit-scrollbar {
+    width: 2px !important;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, .35) !important;
+    border-radius: 30px !important;
+  }
+
+  .ck-list__item {
+    .ck-button {
+      cursor: pointer !important;
+      transition: background-color 250ms !important;
+      .ck-button__label {
+        color: #b0bec5 !important;
+      }
+      &.ck-on {
+        background-color: $grey-light-color !important;
+        color: $grey-dark-color !important;
+      }
+      &:hover {
+        background-color: $grey-medium-color !important;
+      }
+
+    }
+  }
+}
 ckeditor {
   .ck-editor__editable_inline {
     height: calc(99vh - 48px - 43px) !important;
@@ -99,6 +136,9 @@ ckeditor {
     &::-webkit-scrollbar-thumb {
       background-color: rgba(255, 255, 255, .35) !important;
       border-radius: 30px !important;
+    }
+    .mention {
+      cursor: pointer !important;
     }
   }
 }

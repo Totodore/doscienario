@@ -40,7 +40,7 @@ export interface WriteDocumentRes {
   changes: Change[];
   lastClientUpdateId: number;
 }
-export type Change = [1 | -1, number, string];
+export type Change = [1 | -1 | 2, number, string];
 
 export class RenameDocumentReq {
   constructor(

@@ -27,10 +27,10 @@ export class DocumentComponent implements OnInit, ITabElement {
     // plugins: [Mention],
     toolbar: {
       items: [
-        "heading", "|", "bold", "italic", "|",
+        "heading", "|", "bold", "italic", "BlockQuote", "|",
         "numberedList", "bulletedList", "|",
         "indent", "outdent", "|", "link", "imageUpload",
-        "quote", "insertTable", "mediaEmbed", "|",
+        "insertTable", "mediaEmbed", "|",
         "undo", "redo"
       ],
       shouldNotGroupWhenFull: true
@@ -73,7 +73,6 @@ export class DocumentComponent implements OnInit, ITabElement {
   }
 
   editorLoaded(editor: CKEditor5.Editor): void {
-    console.log(Array.from( editor.ui.componentFactory.names() ));
     this.progress.hide();
     this.content = this.doc.content;
     editor.ui.getEditableElement().parentElement.insertBefore(
@@ -85,9 +84,14 @@ export class DocumentComponent implements OnInit, ITabElement {
   }
 
   onChange(data: string) {
-    this.worker.postMessage<[string, string]>("diff", [this.content, data]);
+    if (Math.abs(data.length - this.content.length) > 500) {
+      const change: Change = [2, null, data];
+      this.socket.updateDocument(this.docId, this.tabId, [change], this.doc.lastChangeId, ++this.doc.clientUpdateId);
+    } else {
+      this.worker.postMessage<[string, string]>("diff", [this.content, data]);
+      this.progressWatcher();
+    }
     this.content = data;
-    this.progressWatcher();
   }
 
   private onDocParsed(changes: Change[]) {

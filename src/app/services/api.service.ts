@@ -1,10 +1,11 @@
+import { ProgressService } from './progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ProjectUserRes } from 'src/app/models/api/project.model';
 import { Socket } from 'socket.io-client';
 import { GetProjectRes } from './../models/api/project.model';
 import { FileRes, ImageRes } from './../models/api/res.model';
 import { UserLoginReq } from './../models/api/user.model';
-import { HttpClient, HttpEvent, HttpHeaders, HttpRequest } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpEventType, HttpHeaders, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
@@ -18,7 +19,8 @@ export class ApiService {
   public socket: typeof Socket;
   constructor(
     private readonly http: HttpClient,
-    private readonly project: ProjectService
+    private readonly project: ProjectService,
+    private readonly progress: ProgressService
   ) { }
 
 
@@ -119,6 +121,25 @@ export class ApiService {
     const req = new HttpRequest("POST", `${this.root}/res/image`, form, { reportProgress: true, headers: this.headers });
 
     return this.http.request<ImageRes>(req);
+  }
+  public async importProject(file: Blob): Promise<boolean> {
+    this.progress.show(true);
+    const form = new FormData();
+    form.append("data", file);
+    const req = new HttpRequest("POST", `${this.root}/project/import`, form, { reportProgress: true, headers: this.headers });
+    return new Promise<boolean>((resolve) => {
+      this.http.request<void>(req).subscribe((e: HttpEvent<any>) => {
+        if (e.type === HttpEventType.UploadProgress) {
+          const prog = (e.loaded / e.total) * 100;
+          this.progress.updateValue(prog);
+          if (prog === 100) {
+            this.progress.updateValue(0);
+            this.progress.show(false);
+          }
+        } else if (e.type === HttpEventType.Response)
+          resolve(e.ok);
+      });
+    });
   }
 
   public async openProject(projectId: number) {

@@ -57,6 +57,16 @@ export class MenuComponent implements OnInit {
       }
     });
   }
+  public async importProject(input: HTMLInputElement) {
+    if (input.files[0]) {
+      if (await this.api.importProject(input.files[0])) {
+        this.snackbar.snack("Projet importé avec succès");
+        await this.ngOnInit();
+      } else {
+        this.snackbar.snack("Erreur lors de l'import du projet");
+      }
+    }
+  }
 
   public async openProject(project: UserProjectsRes) {
     this.progress.show();

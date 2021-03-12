@@ -48,7 +48,7 @@ export class DocumentComponent implements OnInit, ITabElement {
     },
     simpleUpload: {
       // The URL that the images are uploaded to.
-      uploadUrl: `${this.api.root}/res/image`,
+      uploadUrl: `${this.api.root}/res/${this.project.id}/image`,
 
       // Headers sent along with the XMLHttpRequest to the upload server.
       headers: {

@@ -5,6 +5,12 @@
   </button>
   <button mat-stroked-button color="accent" class="project" (click)="createProject()">
     <mat-icon color="accent">add</mat-icon>
-    Créer un nouveau project
+    Créer un nouveau projet
+  </button>
+  <button mat-stroked-button color="accent" class="project import">
+    <mat-icon color="accent">upload</mat-icon>
+    Importer un projet
+    <label for="file-import"></label>
+    <input type="file" id="file-import" #file (change)="importProject(file)">
   </button>
 </div>

@@ -9,7 +9,7 @@ $icon-size: 80px;
   display: flex;
   justify-content: space-evenly;
   flex-wrap: wrap;
-  width: 80%;
+  width: 100%;
   margin: auto;
   button {
     display: block;
@@ -27,6 +27,21 @@ $icon-size: 80px;
       width: $icon-size;
       line-height: $icon-size;
       font-size: $icon-size;
+    }
+    &.import {
+      position: relative;
+      input {
+        display: none;
+      }
+      label {
+        cursor: pointer;
+        position: absolute;
+        width: 100%;
+        top: 0; left: 0;
+        height: 100%;
+        z-index: 100;
+        opacity: 0;
+      }
     }
   }
 }

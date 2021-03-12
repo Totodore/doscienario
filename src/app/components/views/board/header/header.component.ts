@@ -16,7 +16,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private mouseLeave: () => void = () => window.removeEventListener('wheel', this.wheelAction);
 
   constructor(
-    public readonly progress: ProgressService,
     public readonly tabService: TabService,
   ) { }
 

@@ -1,3 +1,5 @@
+import { ConfirmComponent } from './../../utils/confirm/confirm.component';
+import { MatDialog } from '@angular/material/dialog';
 import { SnackbarService } from './../../../services/snackbar.service';
 import { ApiService } from 'src/app/services/api.service';
 import { SocketService } from './../../../services/socket.service';
@@ -17,7 +19,8 @@ export class ProjectOptionsComponent implements ITabElement {
     public readonly project: ProjectService,
     public readonly socket: SocketService,
     public readonly api: ApiService,
-    public readonly snackbar: SnackbarService
+    public readonly snackbar: SnackbarService,
+    public readonly dialog: MatDialog
   ) { }
 
   public title: string = "Options";
@@ -35,6 +38,20 @@ export class ProjectOptionsComponent implements ITabElement {
       location.href = `${this.api.root}/res/exported-data/${id}`;
     else
       this.snackbar.snack("Erreur lors de l'export du projet");
+  }
+
+  public deleteProject() {
+    const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer le projet ?" });
+    dialog.componentInstance.confirm.subscribe(async () => {
+      dialog.close();
+      try {
+        await this.api.delete(`project/${this.project.id}`);
+        this.project.exit();
+      } catch (e) {
+        console.error(e);
+        this.snackbar.snack("Erreur lors de la suppression du projet");
+      }
+    });
   }
 
 }

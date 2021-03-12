@@ -18,8 +18,12 @@
       button {
         width: fit-content;
         width: -moz-fit-content;
+        margin-top: 8px;
+        &:first-child {
+          margin-top: 0px;
+        }
         &:last-child {
-          margin-top: 8px;
+          border-color: red;
         }
       }
     }

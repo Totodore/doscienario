@@ -115,6 +115,9 @@ export class ProjectService implements OnInit {
           content = content.delete(change[1] + stepIndex, change[2].length);
           stepIndex -= change[2].length;
           break;
+        case 2:
+          content = change[2];
+          stepIndex = change[2].length;
         default: break;
       }
     }

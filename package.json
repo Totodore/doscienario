@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --disable-host-check",
-    "build": "ng build",
+    "build": "ng build --prod",
     "publish": "cd ./dist && zip -r package.zip doscienario",
     "lint": "ng lint"
   },

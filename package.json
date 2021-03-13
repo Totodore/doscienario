@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --disable-host-check",
-    "build": "ng build --prod --base-href /app/",
+    "build": "ng build --prod --base-href ./",
     "publish": "cd ./dist && zip -r package.zip doscienario",
     "lint": "ng lint"
   },

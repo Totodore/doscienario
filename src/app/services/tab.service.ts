@@ -47,13 +47,11 @@ export class TabService {
    * Take an id, it can be a document id (number)
    * or a tab id
    */
-  public pushTab(tab: Type<ITabElement>, save = true, id?: number) {
+  public pushTab(tab: Type<ITabElement>, save = true, id?: number, multiTab = false) {
     for (const tab of this.tabs)
       tab.show = false;
     let displayedIndex: number;
-    if ((id && this._tabs.findIndex(el => el[1].docId === id) >= 0)
-      || (this._tabs.findIndex(el => el[0].name === tab.name) >= 0 && tab !== DocumentComponent)
-    )
+    if ((id && this._tabs.findIndex(el => el[1].docId === id) >= 0) || (this._tabs.findIndex(el => el[0].name === tab.name) >= 0 && !multiTab))
       displayedIndex = this._tabs.findIndex(el => el[1].docId === id) || this._tabs.findIndex(el => el[0].name === tab.name);
     console.log(displayedIndex >= 0 ? `Tab already exists : ${displayedIndex}` : `Creating new tab for ${tab.name}`);
     if (displayedIndex >= 0)

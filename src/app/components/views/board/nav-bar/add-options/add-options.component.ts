@@ -13,6 +13,6 @@ export class AddOptionsComponent {
   ) { }
 
   createDoc() {
-    this.tabs.pushTab(DocumentComponent, false);
+    this.tabs.pushTab(DocumentComponent, false, null, true);
   }
 }

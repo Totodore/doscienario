@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: "doscenario.scriptis.fr"
+  apiUrl: "doscenario.scriptis.fr",
+  secured: true
 };

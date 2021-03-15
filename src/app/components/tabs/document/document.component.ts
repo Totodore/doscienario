@@ -134,7 +134,7 @@ export class DocumentComponent implements OnInit, ITabElement {
     if (tag.startsWith("@")) {
       const docId = this.project.docs.find(el => el.title.toLowerCase() === tag.substr(1).toLowerCase())?.id;
       if (docId)
-        this.tabs.pushTab(DocumentComponent, true, docId);
+        this.tabs.pushTab(DocumentComponent, true, docId, true);
     } else if (tag.startsWith("#")) {}
   }
 

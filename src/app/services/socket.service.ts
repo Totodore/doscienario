@@ -23,7 +23,7 @@ export class SocketService {
   ) {}
 
   connect() {
-    this.socket = connect(`ws://${environment.apiUrl}`, {
+    this.socket = connect(`${environment.secured ? "wss" : "ws"}://${environment.apiUrl}`, {
       path: "/dash",
       query: {
         "project": localStorage.getItem("project"),

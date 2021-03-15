@@ -95,6 +95,7 @@ export class SocketService {
 
   updateDocument(docId: number, tabId: string, changes: Change[], lastChangeId: number, clientUpdateId: number) {
     const doc = this.project.openDocs[tabId];
+    console.log("Updating doc", docId, "tab", tabId);
     doc.changes.set(clientUpdateId, changes);
     this.socket.emit(Flags.WRITE_DOC, new WriteDocumentReq(changes, docId, lastChangeId, clientUpdateId, this.api.user.id));
   }

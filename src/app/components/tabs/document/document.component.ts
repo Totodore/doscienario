@@ -7,7 +7,7 @@ import { ProgressService } from 'src/app/services/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { SocketService } from './../../../services/socket.service';
 import { ITabElement } from './../../../models/tab-element.model';
-import { Component, Input, OnInit, Type } from '@angular/core';
+import { Component, Input, OnInit, Type, OnDestroy } from '@angular/core';
 import * as CKEditor from "../../../../lib/ckeditor.js";
 import { CKEditor5 } from '@ckeditor/ckeditor5-angular';
 import { v4 as uuid4 } from "uuid";
@@ -16,7 +16,7 @@ import { v4 as uuid4 } from "uuid";
   templateUrl: './document.component.html',
   styleUrls: ['./document.component.scss']
 })
-export class DocumentComponent implements OnInit, ITabElement {
+export class DocumentComponent implements ITabElement, OnDestroy {
 
   public show: boolean = false;
   public content: string = "";
@@ -69,15 +69,16 @@ export class DocumentComponent implements OnInit, ITabElement {
     private readonly api: ApiService
   ) { }
 
-  ngOnInit(): void {
-    this.worker.addEventListener<Change[]>("diff", (data) => this.onDocParsed(data));
-  }
-
   openTab(id?: number): string {
     this.tabId = uuid4();
     this.progress.show();
     this.socket.openDocument(this.tabId, id);
+    this.worker.addEventListener<Change[]>(`diff-${this.tabId}`, (data) => this.onDocParsed(data));
     return this.tabId;
+  }
+
+  ngOnDestroy() {
+    this.worker.removeEventListener(`diff-${this.tabId}`);
   }
 
   editorLoaded(editor: CKEditor5.Editor): void {
@@ -97,7 +98,7 @@ export class DocumentComponent implements OnInit, ITabElement {
       const change: Change = [2, null, data];
       this.socket.updateDocument(this.docId, this.tabId, [change], this.doc.lastChangeId, ++this.doc.clientUpdateId);
     } else {
-      this.worker.postMessage<[string, string]>("diff", [this.content, data]);
+      this.worker.postMessage<[string, string]>(`diff-${this.tabId}`, [this.content, data]);
       this.progressWatcher();
     }
     this.content = data;

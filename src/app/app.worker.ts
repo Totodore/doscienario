@@ -8,7 +8,7 @@ import { sortByRelevance } from './utils/helpers';
 addEventListener('message', (e: MessageEvent<[string, any] | string>) => {
   if (e.data == "hello")
     console.log("Worker started");
-  else if (e.data[0] == 'diff')
+  else if (e.data[0].startsWith("diff"))
     //@ts-ignore
     postMessage([e.data[0], computeDiff(e.data[1])]);
   else if (e.data[0] == 'search')

@@ -6,7 +6,5 @@
     <app-options-separator (toggle)="dispDocOptions = !dispDocOptions" *ngIf="hasOpenedTab"></app-options-separator>
     <app-document-options *ngIf="hasOpenedTab && dispDocOptions"></app-document-options>
     <app-add-options></app-add-options>
-    <mat-divider *ngIf="tabs.hasTabs" class="btn-menu-separator"></mat-divider>
-    <button mat-stroked-button color="accent" class="btn-menu" (click)="openMenu()" *ngIf="tabs.hasTabs">Menu <mat-icon class="mat-18">menu_open</mat-icon></button>
   </div>
 </div>

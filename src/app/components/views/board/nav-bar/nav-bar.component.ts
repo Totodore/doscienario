@@ -18,10 +18,6 @@ export class NavBarComponent {
     private readonly project: ProjectService
   ) { }
 
-  public openMenu() {
-    this.tabs.pushTab(WelcomeTabComponent);
-  }
-
   get hasOpenedTab(): boolean {
     return this.tabs.displayedTab != null && this.project.openDocs[this.tabs.displayedTab[1].tabId] != null;
   }

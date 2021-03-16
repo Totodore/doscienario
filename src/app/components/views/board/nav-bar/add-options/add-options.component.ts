@@ -1,3 +1,4 @@
+import { BlueprintComponent } from './../../../../tabs/blueprint/blueprint.component';
 import { DocumentComponent } from './../../../../tabs/document/document.component';
 import { TabService } from './../../../../../services/tab.service';
 import { Component, Input } from '@angular/core';
@@ -19,5 +20,9 @@ export class AddOptionsComponent {
 
   public openMenu() {
     this.tabs.pushTab(WelcomeTabComponent);
+  }
+  public openBlueprint() {
+    console.log("test");
+    this.tabs.pushTab(BlueprintComponent);
   }
 }

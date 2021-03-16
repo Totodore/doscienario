@@ -1,3 +1,4 @@
+import { BlueprintComponent } from './../components/tabs/blueprint/blueprint.component';
 import { WelcomeTabComponent } from './../components/tabs/welcome-tab/welcome-tab.component';
 import { TagsManagerComponent } from './../components/tabs/tags-manager/tags-manager.component';
 import { DocumentComponent } from './../components/tabs/document/document.component';
@@ -17,6 +18,7 @@ export class TabService {
   private readonly availableTabs: Type<ITabElement>[] = [
     ProjectOptionsComponent,
     DocumentComponent,
+    BlueprintComponent,
     TagsManagerComponent,
     WelcomeTabComponent
   ];

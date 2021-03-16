@@ -1,0 +1,8 @@
+<div class="wrapper" *ngIf="show">
+  <canvas #viewport></canvas>
+  <div class="overlay">
+    <app-node [root]="true" cdkDragBoundary=".wrapper" [class.root]="true" cdkDrag>
+      <mat-icon class="mat-18" class="handle" cdkDragHandle>open_with</mat-icon>
+    </app-node>
+  </div>
+</div>

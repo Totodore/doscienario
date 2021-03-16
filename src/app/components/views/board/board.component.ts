@@ -45,15 +45,17 @@ export class BoardComponent implements OnInit {
 
   @HostListener('document:keydown', ['$event'])
   public onCtrlKeyDown(e: KeyboardEvent) {
-    e.stopImmediatePropagation();
-    e.preventDefault();
     if (!e.ctrlKey)
       return;
     switch (e.keyCode) {
       case W:
+        e.preventDefault();
+        e.stopImmediatePropagation();
         this.tabs.removeTab();
         break;
       case N:
+        e.preventDefault();
+        e.stopImmediatePropagation();
         this.tabs.pushTab(DocumentComponent, false, null, true);
       default:
         break;

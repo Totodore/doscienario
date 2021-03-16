@@ -4,7 +4,9 @@ import { ProgressService } from './../../../services/progress.service';
 import { ApiService } from './../../../services/api.service';
 import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
 import { SocketService } from './../../../services/socket.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { DocumentComponent } from '../../tabs/document/document.component';
+import { N, W } from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'app-board',
@@ -41,5 +43,20 @@ export class BoardComponent implements OnInit {
     }
   }
 
-
+  @HostListener('document:keydown', ['$event'])
+  public onCtrlKeyDown(e: KeyboardEvent) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    if (!e.ctrlKey)
+      return;
+    switch (e.keyCode) {
+      case W:
+        this.tabs.removeTab();
+        break;
+      case N:
+        this.tabs.pushTab(DocumentComponent, false, null, true);
+      default:
+        break;
+    }
+  }
 }

@@ -73,9 +73,9 @@ export class TabService {
    */
   public removeTab(index?: number) {
     index ??= this.displayedTab[0];
-    if (this.tabs[index].show)
+    if (this.tabs[index].show && this.tabs.length > 1)
       (this.tabs[index - 1] ?? this.tabs[this.tabs.length - 1]).show = true;
-    this.removeTabToStorage(this._tabs[index][0]);
+    this.removeTabToStorage(this._tabs[index][0], this._tabs[index][1]?.docId);
     this.rootViewContainer.remove(index);
     this._tabs.splice(index, 1);
   }
@@ -92,8 +92,9 @@ export class TabService {
       this.tabs[index].show = true;
   }
   public closeAllTab() {
-    for (let i = 0; i < this._tabs.length; i++)
-      this.removeTab(i);
+    const tabLength = this._tabs.length;
+    for (let i = 0; i < tabLength; i++)
+      this.removeTab(0);
   }
 
   private addTabToStorage(tab: Type<ITabElement>, id?: number | string) {

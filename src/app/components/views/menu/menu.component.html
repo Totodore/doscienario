@@ -1,4 +1,9 @@
-<h1>Mes projets</h1>
+<header>
+  <h1>Mes projets</h1>
+  <button mat-icon-button  color="accent" (click)="logout()" class="logout-btn">
+      <mat-icon class="mat-18">logout</mat-icon>
+  </button>
+</header>
 <div class="wrapper" *ngIf="data?.projects?.length != null">
   <button mat-stroked-button class="project" *ngFor="let project of data.projects" (click)="openProject(project)">
     {{ project.name }}

@@ -1,8 +1,22 @@
-h1 {
-  font-size: 35px;
-  text-align: center;
-  margin: 50px 0;
-  color: whitesmoke;
+
+header {
+  h1 {
+    font-size: 35px;
+    text-align: center;
+    margin: 50px 0;
+    color: whitesmoke;
+  }
+  .logout-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    mat-icon {
+      font-size: 30px;
+    }
+  }
 }
 $icon-size: 80px;
 .wrapper {

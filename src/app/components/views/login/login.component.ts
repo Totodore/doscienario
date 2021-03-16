@@ -37,7 +37,7 @@ export class LoginComponent implements OnInit {
     this.progress.hide();
     if (res) {
       this.router.navigateByUrl("/menu");
-      this.snackbar.snack(`Bienvenu ${this.name} !`);
+      this.snackbar.snack(`Bienvenue ${this.name} !`);
     }
     else {
       this.password = "";
@@ -57,7 +57,7 @@ export class LoginComponent implements OnInit {
         this.progress.hide();
         if (res) {
           this.router.navigateByUrl("/menu");
-          this.snackbar.snack(`Bienvenu ${this.name} !`);
+          this.snackbar.snack(`Bienvenue ${this.name} !`);
         } else
           this.snackbar.snack("Erreur lors de l'inscription !");
       } else

@@ -253,8 +253,11 @@ export class ProjectService implements OnInit {
     this.getBlueprint(packet.blueprint).nodes.find(el => el.id == packet.relation.childId).parentsRelations.push(packet.relation);
   }
   public removeBlueprintRelation(packet: RemoveRelationReq) {
-    //TODO: Finir cette merde
-    this.getBlueprint(packet.blueprint).nodes.find(el => el.id == packet.parentNode).childsRelations.filter(el => el.childId == el.)
+    const nodes = this.getBlueprint(packet.blueprint).nodes;
+    const parentIndex = nodes.find(el => el.id == packet.parentNode).childsRelations.findIndex(el => el.childId === packet.parentNode);
+    const childIndex = nodes.find(el => el.id == packet.childNode).parentsRelations.findIndex(el => el.parentId === packet.childNode);
+    nodes.find(el => el.id == packet.parentNode).childsRelations.splice(parentIndex, 1);
+    nodes.find(el => el.id == packet.childNode).parentsRelations.splice(childIndex, 1);
   }
   public updateBlueprintTags(tabId: string, tags: Tag[]) {
     this.openBlueprints[tabId].tags = tags;

@@ -15,14 +15,13 @@ export class AddOptionsComponent {
   ) { }
 
   createDoc() {
-    this.tabs.pushTab(DocumentComponent, false, null, true);
+    this.tabs.pushTab(DocumentComponent, false);
   }
 
   public openMenu() {
     this.tabs.pushTab(WelcomeTabComponent);
   }
   public openBlueprint() {
-    console.log("test");
-    this.tabs.pushTab(BlueprintComponent);
+    this.tabs.pushTab(BlueprintComponent, false);
   }
 }

@@ -1,4 +1,4 @@
-<div class="wrapper">
+<div class="wrapper" #wrapper>
   <mat-form-field color="accent" appearance="none">
     <textarea matInput
               cdkTextareaAutosize
@@ -8,4 +8,7 @@
     ></textarea>
   </mat-form-field>
   <ng-content></ng-content>
+  <span #addRel>
+    <mat-icon (click)="relationBegin.emit()" [class]="'mat-18 add-relation ' + btnAnchor">add</mat-icon>
+  </span>
 </div>

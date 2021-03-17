@@ -1,3 +1,4 @@
+import { TabTypes } from './../../../models/tab-element.model';
 import { SnackbarService } from './../../../services/snackbar.service';
 import { ApiService } from './../../../services/api.service';
 import { ProgressService } from './../../../services/progress.service';
@@ -15,7 +16,8 @@ import { ChangeDetectionStrategy, Component, Input, OnInit, Provider, Type, View
 })
 export class WelcomeTabComponent implements ITabElement {
 
-  public title: string = "Menu";
+  public readonly title = "Menu";
+  public readonly type = TabTypes.STANDALONE;
   @Input() public show: boolean = false;
 
   constructor(

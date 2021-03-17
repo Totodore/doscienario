@@ -1,9 +1,10 @@
-<div class="wrapper" *ngIf="show">
-  <canvas #viewport></canvas>
-  <div class="overlay">
-    <app-node [root]="true" [class.root]="true"></app-node>
-    <app-node cdkDragBoundary=".wrapper" cdkDrag (cdkDragMoved)="onDragNode($event)">
+<div class="wrapper" *ngIf="show" #wrapper>
+  <canvas #viewport *ngIf="blueprint"></canvas>
+  <div class="overlay" *ngIf="blueprint">
+    <app-node [data]="root" [style.top]="getAbsY(root.y)" [style.left]="getAbsX(root.x)" (relationBegin)="beginRelation(root)"></app-node>
+    <app-node *ngFor="let node of nodes" [data]="node" cdkDragBoundary=".wrapper" cdkDrag (cdkDragMoved)="onDragNode($event)" (relationBegin)="beginRelation(root)">
       <mat-icon class="mat-18" class="handle" cdkDragHandle>open_with</mat-icon>
     </app-node>
   </div>
+  <h1 *ngIf="!blueprint">Chargement du document...</h1>
 </div>

@@ -53,7 +53,7 @@ export class DocumentOptionsComponent {
     return this.project.openDocs[this.tabId];
   }
   get docId(): number {
-    return this.tabs.displayedTab[1].docId;
+    return this.tabs.displayedTab[1].id;
   }
   get docTags(): Tag[] {
     const tagIds = this.doc.tags.map(el => el.id);

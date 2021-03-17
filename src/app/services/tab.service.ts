@@ -4,7 +4,7 @@ import { TagsManagerComponent } from './../components/tabs/tags-manager/tags-man
 import { DocumentComponent } from './../components/tabs/document/document.component';
 import { ProjectOptionsComponent } from '../components/tabs/project-options/project-options.component';
 import { ComponentFactoryResolver, Inject, Injectable, Type, ViewContainerRef } from '@angular/core';
-import { ITabElement } from '../models/tab-element.model';
+import { ITabElement, TabTypes } from '../models/tab-element.model';
 
 @Injectable({
   providedIn: 'root'
@@ -36,8 +36,7 @@ export class TabService {
     component.instance.show = true;
     this._tabs.push([el, component.instance]);
     this.rootViewContainer.insert(component.hostView);
-    if (component.instance?.openTab)
-      return component.instance.openTab(id);
+    return component.instance.openTab?.(id);
   }
 
   public loadSavedTabs() {
@@ -49,12 +48,12 @@ export class TabService {
    * Take an id, it can be a document id (number)
    * or a tab id
    */
-  public pushTab(tab: Type<ITabElement>, save = true, id?: number, multiTab = false) {
+  public pushTab(tab: Type<ITabElement>, save = true, id?: number) {
     for (const tab of this.tabs)
       tab.show = false;
     let displayedIndex: number;
-    if ((id && this._tabs.findIndex(el => el[1].docId === id) >= 0) || (this._tabs.findIndex(el => el[0].name === tab.name) >= 0 && !multiTab))
-      displayedIndex = this._tabs.findIndex(el => el[1].docId === id) || this._tabs.findIndex(el => el[0].name === tab.name);
+    if ((id && this._tabs.findIndex(el => el[1].id === id) >= 0) || (this._tabs.findIndex(el => el[0].name === tab.name && el[1].type === TabTypes.STANDALONE) >= 0))
+      displayedIndex = this._tabs.findIndex(el => el[1].id === id) || this._tabs.findIndex(el => el[0].name === tab.name);
     console.log(displayedIndex >= 0 ? `Tab already exists : ${displayedIndex}` : `Creating new tab for ${tab.name}`);
     if (displayedIndex >= 0)
       this.showTab(displayedIndex);
@@ -79,17 +78,27 @@ export class TabService {
       this.tabs[index].onClose();
     if (this.tabs[index].show && this.tabs.length > 1)
       (this.tabs[index - 1] ?? this.tabs[this.tabs.length - 1]).show = true;
-    this.removeTabToStorage(this._tabs[index][0], this._tabs[index][1]?.docId);
+    this.removeTabToStorage(this._tabs[index][0], this._tabs[index][1]?.id);
     this.rootViewContainer.remove(index);
     this._tabs.splice(index, 1);
   }
+  public updateDocTab(tabId: string, docId: number) {
+    this.tabs.find(el => el.tabId === tabId).loadedTab?.();
+    if (!this.savedTabs.find(el => el?.[1] === docId && this.availableTabs.indexOf(DocumentComponent) === el?.[0]))
+      this.addTabToStorage(DocumentComponent, docId);
+  }
   public removeDocTab(docId: number) {
-    const index = this.tabs.findIndex(el => el.docId === docId);
+    const index = this.tabs.findIndex(el => el.id === docId && el.type === TabTypes.DOCUMENT);
     if (index >= 0)
       this.removeTab(index);
   }
+  public updateBlueprintTab(tabId: string, blueprintId: number) {
+    this.tabs.find(el => el.tabId === tabId).loadedTab?.();
+    if (!this.savedTabs.find(el => el?.[1] === blueprintId && this.availableTabs.indexOf(BlueprintComponent) === el?.[0]))
+      this.addTabToStorage(BlueprintComponent, blueprintId);
+  }
   public removeBlueprintTab(docId: number) {
-    const index = this.tabs.findIndex(el => el.docId === docId);
+    const index = this.tabs.findIndex(el => el.id === docId && el.type === TabTypes.BLUEPRINT);
     if (index >= 0)
       this.removeTab(index);
   }

@@ -6,7 +6,7 @@ import { Change, DocumentModel } from './../../../models/sockets/document-sock.m
 import { ProgressService } from 'src/app/services/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { SocketService } from './../../../services/socket.service';
-import { ITabElement } from './../../../models/tab-element.model';
+import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { Component, Input, OnInit, Type, OnDestroy, ChangeDetectionStrategy, Provider, ViewEncapsulation } from '@angular/core';
 import * as CKEditor from "../../../../lib/ckeditor.js";
 import { CKEditor5 } from '@ckeditor/ckeditor5-angular';
@@ -23,6 +23,8 @@ export class DocumentComponent implements ITabElement, OnDestroy {
   public content: string = "";
   public tabId: string;
   public lastChangeId: number;
+
+  public readonly type = TabTypes.DOCUMENT;
   public readonly editor: CKEditor5.EditorConstructor = CKEditor;
   public readonly editorCongig: CKEditor5.Config = {
     toolbar: {
@@ -71,13 +73,13 @@ export class DocumentComponent implements ITabElement, OnDestroy {
   ) { }
 
   onClose() {
-    this.socket.socket.emit(Flags.CLOSE_DOC, this.docId);
+    this.socket.socket.emit(Flags.CLOSE_DOC, this.id);
   }
 
   openTab(id?: number): string {
     this.tabId = uuid4();
     this.progress.show();
-    this.socket.socket.emit(Flags.OPEN_DOC, [this.tabId, this.docId]);
+    this.socket.socket.emit(Flags.OPEN_DOC, [this.tabId, id]);
     this.worker.addEventListener<Change[]>(`diff-${this.tabId}`, (data) => this.onDocParsed(data));
     return this.tabId;
   }
@@ -87,8 +89,6 @@ export class DocumentComponent implements ITabElement, OnDestroy {
   }
 
   editorLoaded(editor: CKEditor5.Editor): void {
-    this.progress.hide();
-    this.content = this.doc.content;
     editor.ui.getEditableElement().parentElement.insertBefore(
       editor.ui.view.toolbar.element,
       editor.ui.getEditableElement()
@@ -97,11 +97,16 @@ export class DocumentComponent implements ITabElement, OnDestroy {
     window.setInterval(() => this.hasEdited && this.addTagsListener(), 1000);
   }
 
+  loadedTab() {
+    this.progress.hide();
+    this.content = this.doc.content;
+  }
+
   onChange(data: string) {
     this.hasEdited = true;
     if (Math.abs(data.length - this.content.length) > 500) {
       const change: Change = [2, null, data];
-      this.socket.updateDocument(this.docId, this.tabId, [change], this.doc.lastChangeId, ++this.doc.clientUpdateId);
+      this.socket.updateDocument(this.id, this.tabId, [change], this.doc.lastChangeId, ++this.doc.clientUpdateId);
     } else {
       this.worker.postMessage<[string, string]>(`diff-${this.tabId}`, [this.content, data]);
       this.progressWatcher();
@@ -114,7 +119,7 @@ export class DocumentComponent implements ITabElement, OnDestroy {
     this.displayProgress = false;
     this.progress.hide();
     try {
-      this.socket.updateDocument(this.docId, this.tabId, changes, this.doc.lastChangeId, ++this.doc.clientUpdateId);
+      this.socket.updateDocument(this.id, this.tabId, changes, this.doc.lastChangeId, ++this.doc.clientUpdateId);
     } catch (error) {   }
   }
 
@@ -140,14 +145,12 @@ export class DocumentComponent implements ITabElement, OnDestroy {
     if (tag.startsWith("@")) {
       const docId = this.project.docs.find(el => el.title.toLowerCase() === tag.substr(1).toLowerCase())?.id;
       if (docId)
-        this.tabs.pushTab(DocumentComponent, true, docId, true);
+        this.tabs.pushTab(DocumentComponent, true, docId);
     } else if (tag.startsWith("#")) {}
   }
 
   get doc(): DocumentModel {
-    const doc = this.project.openDocs[this.tabId];
-    this.content = doc?.content || "";
-    return doc;
+    return this.project.openDocs[this.tabId];
   }
 
   get title(): string {
@@ -158,7 +161,7 @@ export class DocumentComponent implements ITabElement, OnDestroy {
     else return this.doc.title;
   }
 
-  get docId(): number {
+  get id(): number {
      return this.doc?.id;
   }
 

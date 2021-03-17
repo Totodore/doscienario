@@ -76,6 +76,7 @@ export class SocketService {
   @EventHandler(Flags.SEND_DOC)
   onSendDocument(packet: DocumentRes) {
     this.project.addSendDoc(packet);
+    this.tabs.updateDocTab(packet.reqId, packet.doc.id);
   }
 
   @EventHandler(Flags.CLOSE_DOC)
@@ -159,6 +160,7 @@ export class SocketService {
   @EventHandler(Flags.SEND_BLUEPRINT)
   onSendBlueprint(packet: SendBlueprintReq) {
     this.project.addSendBlueprint(packet);
+    this.tabs.updateBlueprintTab(packet.reqId, packet.blueprint.id);
   }
 
   @EventHandler(Flags.OPEN_BLUEPRINT)

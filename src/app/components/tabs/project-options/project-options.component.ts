@@ -1,3 +1,4 @@
+import { TabTypes } from './../../../models/tab-element.model';
 import { ConfirmComponent } from './../../utils/confirm/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SnackbarService } from './../../../services/snackbar.service';
@@ -27,6 +28,8 @@ export class ProjectOptionsComponent implements ITabElement {
   public show: boolean = true;
 
   public name: string = this.project.name;
+
+  public readonly type = TabTypes.STANDALONE;
 
   public updateName() {
     this.socket.updateProject(this.name);

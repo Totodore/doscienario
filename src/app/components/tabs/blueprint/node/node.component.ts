@@ -6,12 +6,12 @@ import { MatIcon } from '@angular/material/icon';
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss']
 })
-export class NodeComponent implements OnDestroy, AfterViewInit {
+export class NodeComponent implements AfterViewInit {
 
   @Input() data: Node;
 
   @Output()
-  public readonly relationBegin = new EventEmitter<[number, number]>();
+  private readonly relationBegin = new EventEmitter<[number, number]>();
 
   @ViewChild("wrapper", { static: false })
   public wrapper: ElementRef<HTMLDivElement>;
@@ -29,7 +29,10 @@ export class NodeComponent implements OnDestroy, AfterViewInit {
     this.addRelBtn.nativeElement.addEventListener("mouseleave", () => this.mouseHoverButton = false);
   }
 
-  ngOnDestroy(): void {
+  onAddRelButton(icon: MatIcon) {
+    const rect = (icon._elementRef.nativeElement as HTMLElement).getBoundingClientRect();
+    console.log(rect);
+    this.relationBegin.emit([rect.x, rect.y]);
   }
 
   @HostListener("mousemove", ['$event'])

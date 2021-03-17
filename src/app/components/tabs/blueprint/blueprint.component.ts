@@ -63,15 +63,15 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
     // this.context.moveTo()
   }
 
-  getAbsY(relY: number): number {
-    return relY + this.wrapper?.nativeElement?.clientHeight / 2;
+  getAbsTop(relY: number): number {
+    return relY + this.wrapper?.nativeElement?.getBoundingClientRect()?.height / 2;
   }
-  getAbsX(relX: number): number {
+  getAbsLeft(relX: number): number {
     return relX + this.paddingLeft;
   }
 
   beginRelation(parent: Node) {
-
+    console.log(parent);
   }
 
 

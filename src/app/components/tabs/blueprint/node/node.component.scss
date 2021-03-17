@@ -27,6 +27,7 @@
     background-color: #323232;
     transition: all 100ms;
     position: absolute;
+    box-shadow: 0 0 8px -3px rgb(0 0 0 / 50%);
 
     &.north {
       top: -17px;

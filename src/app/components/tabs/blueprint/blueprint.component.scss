@@ -1,6 +1,7 @@
 .wrapper {
   min-width: 100%;
   min-height: calc(100vh - 48px);
+  position: relative;
 }
 h1 {
   font-size: 35px;
@@ -12,8 +13,12 @@ h1 {
 .overlay {
   height: 100%;
   width: 100%;
+  position: absolute;
+  top: 0px;
+  left: 0px;
   app-node {
     position: absolute;
+    transform: translateY(-50%);
     .handle {
       opacity: 0.6;
       visibility: hidden;

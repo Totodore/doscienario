@@ -1,8 +1,8 @@
 <div class="wrapper" *ngIf="show" #wrapper>
   <canvas #viewport *ngIf="blueprint"></canvas>
   <div class="overlay" *ngIf="blueprint">
-    <app-node [data]="root" [style.top]="getAbsY(root.y)" [style.left]="getAbsX(root.x)" (relationBegin)="beginRelation(root)"></app-node>
-    <app-node *ngFor="let node of nodes" [data]="node" cdkDragBoundary=".wrapper" cdkDrag (cdkDragMoved)="onDragNode($event)" (relationBegin)="beginRelation(root)">
+    <app-node [data]="root" [style.top.px]="getAbsTop(root.y)" [style.left.px]="getAbsLeft(root.x)" (relationBegin)="beginRelation(root)"></app-node>
+    <app-node #node *ngFor="let node of nodes" [data]="node" cdkDragBoundary=".wrapper" cdkDrag (cdkDragMoved)="onDragNode($event)" (relationBegin)="beginRelation(root)">
       <mat-icon class="mat-18" class="handle" cdkDragHandle>open_with</mat-icon>
     </app-node>
   </div>

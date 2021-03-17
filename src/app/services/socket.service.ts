@@ -1,3 +1,4 @@
+import { OpenBlueprintReq, SendBlueprintReq, CloseBlueprintReq, CreateNodeReq, RemoveNodeReq, CreateRelationReq, RemoveRelationReq } from './../models/sockets/blueprint-sock.model';
 import { Tag, UpdateTagColorReq, UpdateTagNameReq } from './../models/sockets/tag-sock.model';
 import { TabService } from './tab.service';
 import { WriteDocumentReq, Change, DocumentModel, DocumentRes, WriteDocumentRes, RenameDocumentRes, EditTagDocumentReq, AddTagDocumentRes, OpenDocumentRes } from './../models/sockets/document-sock.model';
@@ -67,13 +68,6 @@ export class SocketService {
     this.project.removeProjectUser(user);
   }
 
-  /**
-   * Open a document or create one
-   */
-  openDocument(tabId: string, docId?: number) {
-    this.socket.emit(Flags.OPEN_DOC, [tabId, docId]);
-  }
-
   @EventHandler(Flags.OPEN_DOC)
   onOpenDocument(packet: OpenDocumentRes) {
     this.project.addOpenDoc(packet);
@@ -82,10 +76,6 @@ export class SocketService {
   @EventHandler(Flags.SEND_DOC)
   onSendDocument(packet: DocumentRes) {
     this.project.addSendDoc(packet);
-  }
-
-  closeDocument(docId: number) {
-    this.socket.emit(Flags.CLOSE_DOC, docId);
   }
 
   @EventHandler(Flags.CLOSE_DOC)
@@ -164,5 +154,43 @@ export class SocketService {
   @EventHandler(Flags.REMOVE_TAG)
   onRemoveTag(tagName: string) {
     this.project.removeProjectTag(tagName);
+  }
+
+  @EventHandler(Flags.SEND_BLUEPRINT)
+  onSendBlueprint(packet: SendBlueprintReq) {
+    this.project.addSendBlueprint(packet);
+  }
+
+  @EventHandler(Flags.OPEN_BLUEPRINT)
+  onOpenBlueprint(packet: OpenBlueprintReq) {
+    this.project.addOpenBlueprint(packet)
+  }
+
+  @EventHandler(Flags.CLOSE_BLUEPRINT)
+  onCloseBlueprint(packet: CloseBlueprintReq) {
+    this.project.removeOpenBlueprint(packet.id);
+  }
+
+  @EventHandler(Flags.REMOVE_BLUEPRINT)
+  onRemoveBlueprint(id: number) {
+    this.tabs.removeTab(id);
+    this.project.removeBlueprint(id);
+  }
+  @EventHandler(Flags.CREATE_NODE)
+  onCreateNode(packet: CreateNodeReq) {
+    this.project.addBlueprintNode(packet);
+  }
+  @EventHandler(Flags.REMOVE_NODE)
+  onRemoveNode(packet: RemoveNodeReq) {
+    this.project.removeBlueprintNode(packet);
+  }
+  @EventHandler(Flags.CREATE_RELATION)
+  onCreateRelation(packet: CreateRelationReq) {
+    this.project.addBlueprintRelation(packet);
+  }
+
+  @EventHandler(Flags.REMOVE_RELATION)
+  onRemoveRelation(packet: RemoveRelationReq) {
+    this.project.removeBlueprintRelation(packet);
   }
 }

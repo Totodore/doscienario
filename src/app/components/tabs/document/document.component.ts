@@ -7,10 +7,11 @@ import { ProgressService } from 'src/app/services/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { SocketService } from './../../../services/socket.service';
 import { ITabElement } from './../../../models/tab-element.model';
-import { Component, Input, OnInit, Type, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, Type, OnDestroy, ChangeDetectionStrategy, Provider, ViewEncapsulation } from '@angular/core';
 import * as CKEditor from "../../../../lib/ckeditor.js";
 import { CKEditor5 } from '@ckeditor/ckeditor5-angular';
 import { v4 as uuid4 } from "uuid";
+import { Flags } from 'src/app/models/sockets/flags.enum';
 @Component({
   selector: 'app-document',
   templateUrl: './document.component.html',
@@ -69,10 +70,14 @@ export class DocumentComponent implements ITabElement, OnDestroy {
     private readonly api: ApiService
   ) { }
 
+  onClose() {
+    this.socket.socket.emit(Flags.CLOSE_DOC, this.docId);
+  }
+
   openTab(id?: number): string {
     this.tabId = uuid4();
     this.progress.show();
-    this.socket.openDocument(this.tabId, id);
+    this.socket.socket.emit(Flags.OPEN_DOC, [this.tabId, this.docId]);
     this.worker.addEventListener<Change[]>(`diff-${this.tabId}`, (data) => this.onDocParsed(data));
     return this.tabId;
   }

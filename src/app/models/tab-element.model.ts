@@ -5,6 +5,6 @@ export interface ITabElement extends Component {
   tabId?: string;
   docId?: number;
   show: boolean;
-  onRename?: () => void;
+  onClose?: () => void;
   openTab?: (id: number | string) => string;
 }

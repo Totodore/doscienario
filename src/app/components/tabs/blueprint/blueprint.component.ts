@@ -1,6 +1,7 @@
 import { ITabElement } from './../../../models/tab-element.model';
 import { ProjectService } from './../../../services/project.service';
 import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy, Provider, Type, ViewEncapsulation } from '@angular/core';
+import { CdkDrag, CdkDragMove } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-blueprint',
@@ -12,6 +13,16 @@ export class BlueprintComponent implements OnInit, ITabElement {
   @ViewChild("viewport")
   public canvas: ElementRef<HTMLCanvasElement>;
   public context: CanvasRenderingContext2D;
+  public nodes: [
+    {
+      root: true,
+    },
+    {
+      root: false,
+      x: 256,
+      y: 256
+    }
+  ]
 
   constructor(
     private readonly project: ProjectService
@@ -27,8 +38,15 @@ export class BlueprintComponent implements OnInit, ITabElement {
     this.context = this.canvas.nativeElement.getContext("2d");
   }
 
-  redrawCanvas() {
+  onDragNode(e: CdkDragMove<CdkDrag>) {
+    const draggedNode = e.source.element.nativeElement;
+  }
 
+  drawCanvas() {
+    this.context.strokeStyle = 'red';
+    this.context.lineWidth = 2;
+    this.context.beginPath();
+    this.context.moveTo()
   }
 
 }

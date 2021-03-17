@@ -75,6 +75,8 @@ export class TabService {
    */
   public removeTab(index?: number) {
     index ??= this.displayedTab[0];
+    if (this.tabs[index].onClose)
+      this.tabs[index].onClose();
     if (this.tabs[index].show && this.tabs.length > 1)
       (this.tabs[index - 1] ?? this.tabs[this.tabs.length - 1]).show = true;
     this.removeTabToStorage(this._tabs[index][0], this._tabs[index][1]?.docId);
@@ -83,7 +85,11 @@ export class TabService {
   }
   public removeDocTab(docId: number) {
     const index = this.tabs.findIndex(el => el.docId === docId);
-    console.log(index);
+    if (index >= 0)
+      this.removeTab(index);
+  }
+  public removeBlueprintTab(docId: number) {
+    const index = this.tabs.findIndex(el => el.docId === docId);
     if (index >= 0)
       this.removeTab(index);
   }

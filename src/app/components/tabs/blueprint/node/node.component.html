@@ -9,6 +9,6 @@
   </mat-form-field>
   <ng-content></ng-content>
   <span #addRel>
-    <mat-icon #icon (click)="onAddRelButton(icon)" [class]="'mat-18 add-relation ' + btnAnchor">add</mat-icon>
+    <mat-icon #icon (click)="onAddRelButton(icon, $event)" [class]="'mat-18 add-relation ' + btnAnchor">add</mat-icon>
   </span>
 </div>

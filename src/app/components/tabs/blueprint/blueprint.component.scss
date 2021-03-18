@@ -2,6 +2,46 @@
   min-width: 100%;
   min-height: calc(100vh - 48px);
   position: relative;
+
+  canvas {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: 5;
+    pointer-events: none;
+  }
+  .overlay {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 10;
+    app-node {
+      position: absolute;
+      transform: translateY(-50%);
+      .handle {
+        opacity: 0.6;
+        visibility: hidden;
+        cursor: move;
+        color: #b0bec5;
+        padding: 4px;
+        border-radius: 25px;
+        background-color: #323232;
+        transition: all 100ms;
+        transform: scale(0.8);
+        top: -15px;
+        position: absolute;
+        right: -17px;
+      }
+      &:hover .handle {
+        visibility: visible;
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  }
+
 }
 h1 {
   font-size: 35px;
@@ -9,34 +49,4 @@ h1 {
   margin: 50px 30px;
   line-height: 35px;
   color: whitesmoke;
-}
-.overlay {
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  app-node {
-    position: absolute;
-    transform: translateY(-50%);
-    .handle {
-      opacity: 0.6;
-      visibility: hidden;
-      cursor: move;
-      color: #b0bec5;
-      padding: 4px;
-      border-radius: 25px;
-      background-color: #323232;
-      transition: all 100ms;
-      transform: scale(0.8);
-      top: -15px;
-      position: absolute;
-      right: -17px;
-    }
-    &:hover .handle {
-      visibility: visible;
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
 }

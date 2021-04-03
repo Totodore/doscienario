@@ -33,7 +33,6 @@ export class NodeComponent implements AfterViewInit {
   onAddRelButton(icon: MatIcon, e: Event) {
     e.stopImmediatePropagation();
     const rect = (icon._elementRef.nativeElement as HTMLElement).getBoundingClientRect();
-    console.log(rect);
     this.relationBegin.emit([rect.x + rect.width / 2, rect.y + rect.height / 2]);
   }
 

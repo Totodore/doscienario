@@ -42,10 +42,14 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   ) { }
 
   ngAfterViewChecked() {
-    if (this.canvas && !this.initialized) {
-      this.blueprintHandler.init(this.canvas.nativeElement, this.wrapper.nativeElement, this.overlay.nativeElement);
+    if (this.canvas && this.tabId && !this.initialized) {
+      this.blueprintHandler.init(this.canvas.nativeElement, this.wrapper.nativeElement, this.overlay.nativeElement, this.tabId, this.id);
       this.initialized = true;
     }
+  }
+
+  refreshView() {
+    this.blueprintHandler.drawRelations();
   }
 
   openTab(id?: string | number): string {
@@ -64,11 +68,11 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
     const draggedNode = e.source.element.nativeElement;
   }
 
-  getAbsTop(relY: number): number {
-    return relY + this.wrapper?.nativeElement?.getBoundingClientRect()?.height / 2;
+  get rootTop(): number {
+    return this.root.y + this.wrapper?.nativeElement?.getBoundingClientRect()?.height / 2;
   }
-  getAbsLeft(relX: number): number {
-    return relX + this.paddingLeft;
+  get rootLeft(): number {
+    return this.root.x + this.paddingLeft;
   }
 
   beginRelation(parent: NodeComponent, e: [number, number]) {

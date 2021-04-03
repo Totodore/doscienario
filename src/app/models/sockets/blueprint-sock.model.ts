@@ -8,6 +8,8 @@ export class Blueprint {
 
   nodes: Node[];
 
+  relationships: Relationship[];
+
   createdDate: Date;
 
   project: GetProjectRes;
@@ -18,7 +20,7 @@ export class Blueprint {
 
   lastEditor: ProjectUserRes;
 
-  lastEditing: Date
+  lastEditing: Date;
 }
 
 export class Node {
@@ -46,10 +48,6 @@ export class Node {
 
   blueprint: Blueprint;
 
-  parentsRelations: Relationship[];
-
-  childsRelations: Relationship[];
-
   tags: Tag[];
 }
 
@@ -60,9 +58,12 @@ export class Relationship {
 
   childId: number;
 
-  child: Node;
+  blueprint: Blueprint;
 
-  parent: Node;
+  ox: number;
+  oy: number;
+  ex: number;
+  ey: number;
 }
 
 export class SendBlueprintReq {
@@ -89,7 +90,9 @@ export class CreateNodeRes {
     public parentNode: number,
     public blueprint: number,
     public x: number,
-    public y: number
+    public y: number,
+    public ox: number,
+    public oy: number
   ) { }
 }
 export class CreateNodeReq {
@@ -114,7 +117,6 @@ export class CreateRelationReq {
 export class RemoveRelationReq {
   constructor(
     public blueprint: number,
-    public parentNode: number,
-    public childNode: number
+    public id: number
   ) {}
 }

@@ -1,3 +1,4 @@
+import { TabService } from './tab.service';
 import { Blueprint, SendBlueprintReq, OpenBlueprintReq, CreateNodeReq, Node, RemoveNodeReq, CreateRelationReq, RemoveRelationReq } from './../models/sockets/blueprint-sock.model';
 import { Router } from '@angular/router';
 import { ApiService } from './api.service';
@@ -15,7 +16,8 @@ export class ProjectService implements OnInit {
   public openBlueprints: { [k: string]: Blueprint } = {};
 
   constructor(
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly tabs: TabService
   ) {}
   ngOnInit(): void {
     console.log("test");
@@ -240,7 +242,7 @@ export class ProjectService implements OnInit {
     this.saveData();
   }
   public addBlueprintNode(packet: CreateNodeReq) {
-    this.getBlueprint(packet.node.blueprintId).nodes.push(packet.node);
+    this.getBlueprint(packet.node.blueprint.id).nodes.push(packet.node);
     this.saveData();
   }
   public removeBlueprintNode(packet: RemoveNodeReq) {
@@ -249,15 +251,12 @@ export class ProjectService implements OnInit {
     this.saveData();
   }
   public addBlueprintRelation(packet: CreateRelationReq) {
-    this.getBlueprint(packet.blueprint).nodes.find(el => el.id == packet.relation.parentId).childsRelations.push(packet.relation);
-    this.getBlueprint(packet.blueprint).nodes.find(el => el.id == packet.relation.childId).parentsRelations.push(packet.relation);
+    this.getBlueprint(packet.blueprint).relationships.push(packet.relation);
+    this.tabs.tabs.find(el => el.id === packet.blueprint).refreshView();
   }
   public removeBlueprintRelation(packet: RemoveRelationReq) {
-    const nodes = this.getBlueprint(packet.blueprint).nodes;
-    const parentIndex = nodes.find(el => el.id == packet.parentNode).childsRelations.findIndex(el => el.childId === packet.parentNode);
-    const childIndex = nodes.find(el => el.id == packet.childNode).parentsRelations.findIndex(el => el.parentId === packet.childNode);
-    nodes.find(el => el.id == packet.parentNode).childsRelations.splice(parentIndex, 1);
-    nodes.find(el => el.id == packet.childNode).parentsRelations.splice(childIndex, 1);
+    const index = this.getBlueprint(packet.blueprint).relationships.findIndex(el => el.id === packet.id);
+    this.getBlueprint(packet.blueprint).relationships.splice(index, 1);
   }
   public updateBlueprintTags(tabId: string, tags: Tag[]) {
     this.openBlueprints[tabId].tags = tags;

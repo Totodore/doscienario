@@ -1,6 +1,10 @@
+import { CreateNodeRes } from './../models/sockets/blueprint-sock.model';
+import { Flags } from './../models/sockets/flags.enum';
+import { SocketService } from './socket.service';
+import { ProjectService } from './project.service';
 import { Injectable } from '@angular/core';
 import { NodeComponent, Poles } from '../components/tabs/blueprint/node/node.component';
-
+import { CreateNodeReq, Node } from "../models/sockets/blueprint-sock.model";
 @Injectable({
   providedIn: 'root'
 })
@@ -17,21 +21,28 @@ export class BlueprintService {
   private mousePos: Tuple;
   private scrollIntervalId: number;
   private tresholdMousePole: Poles[];
+  private parentGhost: NodeComponent;
 
   private canvas: HTMLCanvasElement;
   private wrapper: HTMLElement;
   private overlay: HTMLElement;
+  private tabId: string;
+  private docId: number;
 
   public ghostNode: Tuple;
 
 
-  constructor() { }
+  constructor(
+    private readonly project: ProjectService,
+    private readonly socket: SocketService
+  ) { }
 
-  public init(canvas: HTMLCanvasElement, wrapper: HTMLElement, overlay: HTMLElement) {
-
+  public init(canvas: HTMLCanvasElement, wrapper: HTMLElement, overlay: HTMLElement, tabId: string, docId: number) {
+    this.tabId = tabId;
     this.canvas = canvas;
     this.wrapper = wrapper;
     this.overlay = overlay;
+    this.docId = docId;
 
     this.context = this.canvas.getContext("2d");
     this.canvas.width = this.wrapper.clientWidth * 2;
@@ -43,6 +54,8 @@ export class BlueprintService {
     this.wrapper.addEventListener("scroll", () => this.onScroll());
     this.wrapper.addEventListener("mousemove", (e) => this.onMouseMove(e));
     this.wrapper.addEventListener("click", (e) => this.onClick(e));
+
+    this.drawRelations();
   }
 
   /**
@@ -80,6 +93,14 @@ export class BlueprintService {
     if (this.drawState === "drawing") {
       e.preventDefault();
       this.drawState = "none";
+      this.socket.socket.emit(Flags.CREATE_NODE, new CreateNodeRes(
+        this.parentGhost.data.id,
+        this.docId,
+        this.ghostNode[0],
+        this.ghostNode[1],
+        this.drawingOriginPos[0],
+        this.drawingOriginPos[1]
+      ));
       this.ghostNode = null;
     }
   }
@@ -96,9 +117,25 @@ export class BlueprintService {
     ex = Math.min(ex, this.canvas.width - this.ghostSize[0]);
     ey = Math.min(ey, this.canvas.height - this.ghostSize[1]);
     oy -= 48;
+
+    this.drawRelations();
+    this.drawCurve([ox, oy], [ex, ey]);
+    this.ghostNode = [ex, ey];
+  }
+
+  public drawRelations() {
+    const blueprint = this.project.openBlueprints[this.tabId];
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    for (const rel of blueprint.relationships) {
+      this.drawCurve([rel.ox, rel.oy-48], [rel.ex, rel.ey]);
+    }
+  }
+
+  private drawCurve(o: Tuple, e: Tuple) {
+    const [ox, oy] = o;
+    const [ex, ey] = e;
     const [w, h] = [-(ox - ex), oy - ey];
     const [p1x, p1y, p2x, p2y] = [ox + w / 2, oy, ox + w / 2, ey];
-    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.context.strokeStyle = "#b0bec5";
     this.context.beginPath();
     this.context.moveTo(ox, oy);
@@ -106,8 +143,6 @@ export class BlueprintService {
     this.context.stroke();
     this.context.closePath();
     this.drawSkeleton([ox, oy], [w, h], [p1x, p1y, p2x, p2y]);
-
-    this.ghostNode = [ex, ey];
   }
 
   public beginGhostRelation(parent: NodeComponent, e: Tuple) {
@@ -117,6 +152,7 @@ export class BlueprintService {
     this.ghostSize = [parent.wrapper.nativeElement.clientWidth, parent.wrapper.nativeElement.clientHeight];
     this.drawingOriginPos = e;
     this.ghostNode = e;
+    this.parentGhost = parent;
   }
 
   /**

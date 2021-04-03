@@ -5,7 +5,7 @@ import { Blueprint, Node } from './../../../models/sockets/blueprint-sock.model'
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { ProjectService } from './../../../services/project.service';
 import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy, Provider, Type, ViewEncapsulation, AfterViewInit, AfterViewChecked, HostListener } from '@angular/core';
-import { CdkDrag, CdkDragMove } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragEnd, CdkDragMove, CdkDragStart } from '@angular/cdk/drag-drop';
 import { v4 as uuid4 } from "uuid";
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { Poles, NodeComponent } from './node/node.component';
@@ -64,8 +64,17 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   }
 
 
+  onDragStart(el: NodeComponent) {
+    this.blueprintHandler.onDragStart(el);
+  }
+  onDragEnd() {
+    this.blueprintHandler.onDragEnd();
+  }
   onDragNode(e: CdkDragMove<CdkDrag>) {
-    const draggedNode = e.source.element.nativeElement;
+    this.blueprintHandler.onDragMove([
+      e.distance.x,
+      e.distance.y
+    ]);
   }
 
   get rootTop(): number {

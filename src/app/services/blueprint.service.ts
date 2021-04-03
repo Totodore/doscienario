@@ -1,4 +1,4 @@
-import { CreateNodeRes } from './../models/sockets/blueprint-sock.model';
+import { CreateNodeRes, Relationship, Blueprint } from './../models/sockets/blueprint-sock.model';
 import { Flags } from './../models/sockets/flags.enum';
 import { SocketService } from './socket.service';
 import { ProjectService } from './project.service';
@@ -22,6 +22,9 @@ export class BlueprintService {
   private scrollIntervalId: number;
   private tresholdMousePole: Poles[];
   private parentGhost: NodeComponent;
+
+  private draggedNode: NodeComponent;
+  private draggedRelationships: Relationship[];
 
   private canvas: HTMLCanvasElement;
   private wrapper: HTMLElement;
@@ -70,7 +73,7 @@ export class BlueprintService {
    * Mouse Move event
    */
   private onMouseMove(e: MouseEvent) {
-    if (this.drawState === "drawing") {
+    if (this.drawState === "drawing" || this.drawState === "dragging") {
       this.mousePos = [e.x, e.y];
       const currTreshold = this.tresholdMouse([e.clientX, e.clientY]);
       if (!this.tresholdMousePole?.equals(currTreshold) && this.scrollIntervalId) {
@@ -82,9 +85,9 @@ export class BlueprintService {
         this.scrollIntervalId = window.setInterval(() => this.adaptViewport(currTreshold), 16.6);   //60fps
         this.tresholdMousePole = currTreshold;
       }
-
+    } if (this.drawState === "drawing")
       this.drawGhostNodeAndRel([e.x, e.y]);
-    }
+
   }
   /**
    * On mouse click event
@@ -201,6 +204,32 @@ export class BlueprintService {
     this.overlay.style.height = this.canvas.height + "px";
   }
 
+  public onDragStart(node: NodeComponent) {
+    this.drawState = "dragging";
+    this.draggedNode = node;
+    this.draggedRelationships = this.project.openBlueprints[this.tabId].relationships
+      .filter(el => el.childId === node.data.id || el.parentId === node.data.id)
+      .map(el => Object.assign({}, el));
+  }
+  public onDragMove(offset: Tuple) {
+    for (const rel of this.project.openBlueprints[this.tabId].relationships) {
+      const oldRel = this.draggedRelationships.find(el => el.id === rel.id);
+      // console.log(oldRel, offset);
+      if (rel.childId === this.draggedNode.data.id) {
+        rel.ex = oldRel.ex + offset[0];
+        rel.ey = oldRel.ey + offset[1] + this.draggedNode.wrapper.nativeElement.clientHeight / 2;
+      } else if (rel.parentId === this.draggedNode.data.id) {
+        rel.ox = oldRel.ox + offset[0];
+        rel.oy = oldRel.oy + offset[1];
+      }
+    }
+    this.drawRelations();
+  }
+  public onDragEnd() {
+    this.draggedNode = null;
+    this.draggedRelationships = null;
+    this.drawState = "none";
+  }
   /**
    * Draw the skeleton if the option is enabled
    */
@@ -232,5 +261,5 @@ export class BlueprintService {
   }
 }
 
-type DrawStates = "drawing" | "none";
+type DrawStates = "drawing" | "dragging" | "none";
 type Tuple = [number, number];

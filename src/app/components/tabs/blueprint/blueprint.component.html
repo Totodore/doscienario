@@ -1,8 +1,15 @@
 <div class="wrapper" *ngIf="show" #wrapper>
   <canvas #viewport *ngIf="blueprint"></canvas>
   <div class="overlay" *ngIf="blueprint" #overlay>
-    <app-node class="root" #rootEl [data]="root" [style.top.px]="rootTop" [style.left.px]="rootLeft" (relationBegin)="beginRelation(rootEl, $event)"></app-node>
-    <app-node #nodeEl *ngFor="let node of nodes" [style.left.px]="node.x" [style.top.px]="node.y" [data]="node" cdkDragBoundary=".wrapper" cdkDrag (cdkDragMoved)="onDragNode($event)" (relationBegin)="beginRelation(nodeEl, $event)">
+    <app-node class="root"
+      #rootEl [data]="root" [style.top.px]="rootTop" [style.left.px]="rootLeft"
+      (relationBegin)="beginRelation(rootEl, $event)"
+      ></app-node>
+    <app-node #nodeEl *ngFor="let node of nodes"
+      [style.left.px]="node.x" [style.top.px]="node.y"
+      [data]="node" cdkDragBoundary=".wrapper" cdkDrag
+      (cdkDragMoved)="onDragNode($event)" (relationBegin)="beginRelation(nodeEl, $event)"
+      (cdkDragStarted)="onDragStart(nodeEl)" (cdkDragEnded)="onDragEnd()">
       <mat-icon class="mat-18" class="handle" cdkDragHandle>open_with</mat-icon>
     </app-node>
     <app-node *ngIf="blueprintHandler.ghostNode" class="skeleton" [style.left.px]="blueprintHandler.ghostNode[0]" [style.top.px]="blueprintHandler.ghostNode[1]"></app-node>

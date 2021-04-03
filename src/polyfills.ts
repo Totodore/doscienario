@@ -18,6 +18,67 @@
  * BROWSER POLYFILLS
  */
 
+ (function(elmProto){
+  if ('scrollTopMax' in elmProto) {
+      return;
+  }
+  Object.defineProperties(elmProto, {
+    'scrollTopMax': {
+      get: function scrollTopMax(this: HTMLElement) {
+        return this.scrollHeight - this.clientHeight;
+      }
+    },
+    'scrollLeftMax': {
+      get: function scrollLeftMax(this: HTMLElement) {
+        return this.scrollWidth - this.clientWidth;
+      }
+    },
+    'isMaxScrollTop': {
+      get: function isMaxScrollTop(this: HTMLElement) {
+        return this.scrollHeight - Math.abs(this.scrollTop) - this.clientHeight < 1;
+      }
+    },
+    'isMaxScrollLeft': {
+      get: function isMaxScrollLeft(this: HTMLElement) {
+        return this.scrollWidth - Math.abs(this.scrollLeft) - Math.floor(this.clientWidth) < 1;
+      }
+    }
+  });
+ })(HTMLElement.prototype);
+
+String.prototype.insert = function(index: number, what: string) {
+  return index > 0
+      ? this.replace(new RegExp('.{' + index + '}'), '$&' + what)
+      : what + this;
+};
+String.prototype.delete = function(from: number, length: number = 1) {
+  return this.substring(0, from) + this.substring(from + length, this.length);
+}
+Array.prototype.equals = function<T = any>(this: Array<T>, array: Array<T>) {
+  // if the other array is a falsy value, return
+  if (!array)
+  return false;
+
+  // compare lengths - can save a lot of time
+  if (this.length != array.length)
+    return false;
+
+  for (var i = 0, l=this.length; i < l; i++) {
+    // Check if we have nested arrays
+    if (this[i] instanceof Array && array[i] instanceof Array) {
+        // recurse into the nested arrays
+        if (!(this[i] as unknown as Array<any>).equals<any>(array[i] as unknown as Array<any>))
+            return false;
+    }
+    else if (this[i] != array[i]) {
+        // Warning - two different object instances will never be equal: {x:20} != {x:20}
+        return false;
+    }
+  }
+  return true;
+}
+
+
 /** IE11 requires the following for NgClass support on SVG elements */
 // import 'classlist.js';  // Run `npm install --save classlist.js`.
 

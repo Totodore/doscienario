@@ -8,7 +8,8 @@ import { MatIcon } from '@angular/material/icon';
 })
 export class NodeComponent implements AfterViewInit {
 
-  @Input() data: Node;
+  @Input()
+  public data: Node;
 
   @Output()
   private readonly relationBegin = new EventEmitter<[number, number]>();
@@ -40,7 +41,7 @@ export class NodeComponent implements AfterViewInit {
   onMoveHover(e: MouseEvent) {
     if (this.mouseHoverButton) return;
     const [w, h] = [this.wrapper.nativeElement.parentElement.clientWidth, this.wrapper.nativeElement.parentElement.clientHeight];
-    if (e.offsetX < w / 4 && !this.data.isRoot)
+    if (e.offsetX < w / 4 && !this.data?.isRoot)
       this.btnAnchor = "west";
     else if (e.offsetX > (3 * w) / 4)
       this.btnAnchor = "east";
@@ -50,4 +51,4 @@ export class NodeComponent implements AfterViewInit {
       this.btnAnchor = "north";
   }
 }
-type Poles = "north" | "east" | "south" | "west";
+export type Poles = "north" | "east" | "south" | "west";

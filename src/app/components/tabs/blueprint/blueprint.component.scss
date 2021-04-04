@@ -30,28 +30,13 @@
     app-node {
       position: absolute;
       transform: translateY(-50%);
-      .handle {
-        opacity: 0.6;
-        visibility: hidden;
-        cursor: move;
-        color: #b0bec5;
-        padding: 4px;
-        border-radius: 25px;
-        background-color: #323232;
-        transition: all 100ms;
-        transform: scale(0.8);
-        top: -15px;
-        position: absolute;
-        right: -17px;
-      }
       &.skeleton {
         opacity: 0.3;
         pointer-events: none;
       }
-      &:hover .handle {
-        visibility: visible;
-        opacity: 1;
-        transform: scale(1);
+
+      ::ng-deep &.root .handle {
+        display: none !important;
       }
     }
   }

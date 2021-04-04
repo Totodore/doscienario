@@ -14,6 +14,18 @@ export class NodeComponent implements AfterViewInit {
   @Output()
   private readonly relationBegin = new EventEmitter<[number, number]>();
 
+  @Output()
+  private readonly dragStart = new EventEmitter<[number, number]>();
+
+  @Output()
+  private readonly dragEnd = new EventEmitter<[number, number]>();
+
+  @Output()
+  private readonly dragMove = new EventEmitter<[number, number]>();
+
+  private onMove = (e: MouseEvent) => this.onDragMove(e);
+  private onUp = (e: MouseEvent) => this.onDragEnd(e);
+
   @ViewChild("wrapper", { static: false })
   public wrapper: ElementRef<HTMLDivElement>;
 
@@ -48,6 +60,22 @@ export class NodeComponent implements AfterViewInit {
       this.btnAnchor = "south";
     else if (e.offsetY < h / 2)
       this.btnAnchor = "north";
+  }
+
+  onDragStart(e: MouseEvent) {
+    window.addEventListener("mousemove", this.onMove);
+    window.addEventListener("mouseup", this.onUp);
+    this.dragStart.emit([e.x, e.y]);
+  }
+
+  onDragMove(e: MouseEvent) {
+    this.wrapper.nativeElement.parentElement.style.top = e.y - 48 - (this.wrapper.nativeElement.parentElement.clientHeight / 2) + "px";
+    this.wrapper.nativeElement.parentElement.style.left = e.x + this.wrapper.nativeElement.parentElement.clientWidth + "px";
+  }
+
+  onDragEnd(e: MouseEvent) {
+    window.removeEventListener("mousemove", this.onMove);
+    window.removeEventListener("mouseup", this.onUp);
   }
 }
 export type Poles = "north" | "east" | "south" | "west";

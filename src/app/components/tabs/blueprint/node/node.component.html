@@ -11,4 +11,5 @@
   <span #addRel>
     <mat-icon #icon (click)="onAddRelButton(icon, $event)" [class]="'mat-18 add-relation ' + btnAnchor">add</mat-icon>
   </span>
+  <mat-icon class="mat-18" class="handle" (mousedown)="onDragStart($event)">open_with</mat-icon>
 </div>

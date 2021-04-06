@@ -66,6 +66,14 @@ export class Relationship {
   ey: number;
 }
 
+export class PlaceNodeOut {
+  constructor(
+    public blueprintId: number,
+    public id: number,
+    public pos: [number, number]
+  ) {}
+}
+
 export class SendBlueprintReq {
   constructor(
     public blueprint: Blueprint,

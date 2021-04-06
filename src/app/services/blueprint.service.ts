@@ -1,4 +1,4 @@
-import { CreateNodeRes, Relationship, Blueprint } from './../models/sockets/blueprint-sock.model';
+import { CreateNodeRes, Relationship, Blueprint, PlaceNodeOut } from './../models/sockets/blueprint-sock.model';
 import { Flags } from './../models/sockets/flags.enum';
 import { SocketService } from './socket.service';
 import { ProjectService } from './project.service';
@@ -130,7 +130,7 @@ export class BlueprintService {
     const blueprint = this.project.openBlueprints[this.tabId];
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     for (const rel of blueprint.relationships) {
-      this.drawCurve([rel.ox, rel.oy-48], [rel.ex, rel.ey]);
+      this.drawCurve([rel.ox, rel.oy - 48], [rel.ex, rel.ey]);
     }
   }
 
@@ -216,16 +216,28 @@ export class BlueprintService {
       const oldRel = this.draggedRelationships.find(el => el.id === rel.id);
       // console.log(oldRel, offset);
       if (rel.childId === this.draggedNode.data.id) {
-        rel.ex = oldRel.ex + offset[0];
-        rel.ey = oldRel.ey + offset[1] + this.draggedNode.wrapper.nativeElement.clientHeight / 2;
+        rel.ex = oldRel.ex - offset[0];
+        rel.ey = oldRel.ey - offset[1];
       } else if (rel.parentId === this.draggedNode.data.id) {
-        rel.ox = oldRel.ox + offset[0];
-        rel.oy = oldRel.oy + offset[1];
+        rel.ox = oldRel.ox - offset[0];
+        rel.oy = oldRel.oy - offset[1];
       }
     }
     this.drawRelations();
   }
-  public onDragEnd() {
+  public onDragEnd(node: Node, pos: [number, number]) {
+    const blueprint = this.project.openBlueprints[this.tabId];
+    const nodeData = blueprint.nodes.find(el => el.id === node.id);
+    nodeData.x -= pos[0];
+    nodeData.y -= pos[1];
+    for (const rel of blueprint.relationships) {
+      if (rel.childId === node.id) {
+        this.socket.socket.emit(Flags.PLACE_RELATIONSHIP, rel);
+      } else if (rel.parentId === this.draggedNode.data.id) {
+        this.socket.socket.emit(Flags.PLACE_RELATIONSHIP, rel);
+      }
+    }
+    this.socket.socket.emit(Flags.PLACE_NODE, new PlaceNodeOut(this.docId, node.id, [nodeData.x, nodeData.y]));
     this.draggedNode = null;
     this.draggedRelationships = null;
     this.drawState = "none";

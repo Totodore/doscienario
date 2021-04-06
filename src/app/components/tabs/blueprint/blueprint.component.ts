@@ -67,14 +67,11 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   onDragStart(el: NodeComponent) {
     this.blueprintHandler.onDragStart(el);
   }
-  onDragEnd() {
-    this.blueprintHandler.onDragEnd();
+  onDragEnd(el: NodeComponent, pos: [number, number]) {
+    this.blueprintHandler.onDragEnd(el.data, pos);
   }
-  onDragNode(e: CdkDragMove<CdkDrag>) {
-    this.blueprintHandler.onDragMove([
-      e.distance.x,
-      e.distance.y
-    ]);
+  onDragMove(pos: [number, number]) {
+    this.blueprintHandler.onDragMove(pos);
   }
 
   get rootTop(): number {

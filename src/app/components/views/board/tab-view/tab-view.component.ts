@@ -18,8 +18,6 @@ export class TabViewComponent implements AfterViewInit {
    * We use SetTimeout to avoid angular lifecycle error
    */
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      this.tab.setRootViewContainerRef(this.container);
-    }, 0);
+    this.tab.setRootViewContainerRef(this.container);
   }
 }

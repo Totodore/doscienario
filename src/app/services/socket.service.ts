@@ -1,4 +1,4 @@
-import { OpenBlueprintReq, SendBlueprintReq, CloseBlueprintReq, CreateNodeReq, RemoveNodeReq, CreateRelationReq, RemoveRelationReq } from './../models/sockets/blueprint-sock.model';
+import { OpenBlueprintReq, SendBlueprintReq, CloseBlueprintReq, CreateNodeReq, RemoveNodeReq, CreateRelationReq, RemoveRelationReq, PlaceNodeIn, Relationship } from './../models/sockets/blueprint-sock.model';
 import { Tag, UpdateTagColorReq, UpdateTagNameReq } from './../models/sockets/tag-sock.model';
 import { TabService } from './tab.service';
 import { WriteDocumentReq, Change, DocumentModel, DocumentRes, WriteDocumentRes, RenameDocumentRes, EditTagDocumentReq, AddTagDocumentRes, OpenDocumentRes } from './../models/sockets/document-sock.model';
@@ -181,6 +181,14 @@ export class SocketService {
   @EventHandler(Flags.CREATE_NODE)
   onCreateNode(packet: CreateNodeReq) {
     this.project.addBlueprintNode(packet);
+  }
+  @EventHandler(Flags.PLACE_NODE)
+  onPlaceNode(packet: PlaceNodeIn) {
+    this.project.placeBlueprintNode(packet);
+  }
+  @EventHandler(Flags.PLACE_RELATIONSHIP)
+  onPlaceRel(packet: Relationship) {
+    this.project.placeBlueprintRel(packet);
   }
   @EventHandler(Flags.REMOVE_NODE)
   onRemoveNode(packet: RemoveNodeReq) {

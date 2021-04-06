@@ -1,5 +1,5 @@
 import { TabService } from './tab.service';
-import { Blueprint, SendBlueprintReq, OpenBlueprintReq, CreateNodeReq, Node, RemoveNodeReq, CreateRelationReq, RemoveRelationReq } from './../models/sockets/blueprint-sock.model';
+import { Blueprint, SendBlueprintReq, OpenBlueprintReq, CreateNodeReq, Node, RemoveNodeReq, CreateRelationReq, RemoveRelationReq, PlaceNodeOut, PlaceNodeIn, Relationship } from './../models/sockets/blueprint-sock.model';
 import { Router } from '@angular/router';
 import { ApiService } from './api.service';
 import { DocumentModel, DocumentRes, Change, WriteDocumentRes, OpenDocumentRes } from './../models/sockets/document-sock.model';
@@ -244,6 +244,22 @@ export class ProjectService implements OnInit {
   public addBlueprintNode(packet: CreateNodeReq) {
     this.getBlueprint(packet.node.blueprint.id).nodes.push(packet.node);
     this.saveData();
+  }
+  public placeBlueprintNode(packet: PlaceNodeIn) {
+    const node = this.getBlueprint(packet.blueprintId).nodes.find(el => el.id === packet.id);
+    node.x = packet.pos[0];
+    node.y = packet.pos[1];
+    this.saveData();
+    this.tabs.tabs.find(el => el.id === packet.blueprintId).refreshView();
+  }
+  public placeBlueprintRel(packet: Relationship) {
+    const rel = this.getBlueprint(packet.blueprint.id).relationships.find(el => el.id === packet.id);
+    rel.ex = packet.ex;
+    rel.ey = packet.ey;
+    rel.ox = packet.ox;
+    rel.oy = packet.oy;
+    this.saveData();
+    this.tabs.tabs.find(el => el.id === packet.blueprint.id).refreshView();
   }
   public removeBlueprintNode(packet: RemoveNodeReq) {
     const index = this.getBlueprint(packet.blueprint).nodes.findIndex(el => el.id == packet.id);

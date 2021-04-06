@@ -73,6 +73,7 @@ export class PlaceNodeOut {
     public pos: [number, number]
   ) {}
 }
+export class PlaceNodeIn extends PlaceNodeOut { };
 
 export class SendBlueprintReq {
   constructor(

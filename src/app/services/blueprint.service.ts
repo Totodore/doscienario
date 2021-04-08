@@ -46,14 +46,17 @@ export class BlueprintService {
     this.wrapper = wrapper;
     this.overlay = overlay;
     this.docId = docId;
-
+    const [w, h] = [
+      this.project.openBlueprints[tabId].nodes.reduce((prev, curr) => prev > curr.x ? prev : curr.x, 0) + 530,
+      this.project.openBlueprints[tabId].nodes.reduce((prev, curr) => prev > curr.y ? prev : curr.y, 0) + 530,
+    ]
     this.context = this.canvas.getContext("2d");
-    this.canvas.width = this.wrapper.clientWidth * 2;
-    this.canvas.height = this.wrapper.clientHeight * 2;
-    this.canvas.style.width = this.canvas.width + "px";
-    this.canvas.style.height = this.canvas.height + "px";
-    this.overlay.style.width = this.canvas.width + "px";
-    this.overlay.style.height = this.canvas.height + "px";
+    this.canvas.width = w;
+    this.canvas.height = h;
+    this.canvas.style.width = w + "px";
+    this.canvas.style.height = h + "px";
+    this.overlay.style.width = w + "px";
+    this.overlay.style.height = h + "px";
     this.wrapper.addEventListener("scroll", () => this.onScroll());
     this.wrapper.addEventListener("mousemove", (e) => this.onMouseMove(e));
     this.wrapper.addEventListener("click", (e) => this.onClick(e));
@@ -129,12 +132,31 @@ export class BlueprintService {
   public drawRelations() {
     const blueprint = this.project.openBlueprints[this.tabId];
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.drawGrid();
     for (const rel of blueprint.relationships) {
       this.drawCurve([rel.ox, rel.oy - 48], [rel.ex, rel.ey]);
     }
   }
+  private drawGrid(step = 70) {
+    this.context.strokeStyle = "#ffffff1f";
+    this.context.lineWidth = 0.25;
+    this.context.beginPath();
+    //horizontal lines
+    for (let i = 0; i <= this.canvas.width; i += step) {
+      this.context.moveTo(0, i);
+      this.context.lineTo(this.canvas.width, i);
+    }
+    //vertical lines
+    for (let i = 0; i <= this.canvas.width; i += step) {
+      this.context.moveTo(i, 0);
+      this.context.lineTo(i, this.canvas.height);
+    }
+    this.context.stroke();
+    this.context.closePath();
+  }
 
   private drawCurve(o: Tuple, e: Tuple) {
+    this.context.lineWidth = 1;
     const [ox, oy] = o;
     const [ex, ey] = e;
     const [w, h] = [-(ox - ex), oy - ey];

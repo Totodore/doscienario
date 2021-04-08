@@ -32,7 +32,6 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   public show: boolean;
 
   public readonly type: TabTypes.BLUEPRINT;
-  private readonly paddingLeft = 48;
 
   constructor(
     private readonly project: ProjectService,
@@ -75,10 +74,10 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   }
 
   get rootTop(): number {
-    return this.root.y + this.wrapper?.nativeElement?.getBoundingClientRect()?.height / 2;
+    return this.root?.y + this.overlay?.nativeElement?.clientHeight / 2;
   }
   get rootLeft(): number {
-    return this.root.x + this.paddingLeft;
+    return this.root?.x + 48;
   }
 
   beginRelation(parent: NodeComponent, e: [number, number]) {
@@ -89,10 +88,10 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
     return this.project.openBlueprints[this.tabId];
   }
   get root(): Node {
-    return this.blueprint.nodes.find(el => el.isRoot);
+    return this.blueprint?.nodes?.find(el => el.isRoot);
   }
   get nodes(): Node[] {
-    return this.blueprint.nodes.filter(el => !el.isRoot);
+    return this.blueprint?.nodes?.filter(el => !el.isRoot);
   }
 
   get title(): string {

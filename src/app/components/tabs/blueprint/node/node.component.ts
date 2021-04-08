@@ -24,6 +24,9 @@ export class NodeComponent implements AfterViewInit {
   @Output()
   private readonly dragMove = new EventEmitter<[number, number]>();
 
+  @Output()
+  private readonly remove = new EventEmitter<void>();
+
   private onMove = (e: MouseEvent) => this.onDragMove(e);
   private onUp = (e: MouseEvent) => this.onDragEnd(e);
 
@@ -37,7 +40,6 @@ export class NodeComponent implements AfterViewInit {
   public mouseHoverButton = false;
 
   private viewport: HTMLElement;
-  private overlay: HTMLElement;
   private initialized: boolean;
   private dragOrigin: [number, number];
 
@@ -46,7 +48,6 @@ export class NodeComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     if (!this.initialized) {
       this.viewport = document.querySelector("app-blueprint > .wrapper");
-      this.overlay = this.viewport.querySelector(".overlay");
       this.addRelBtn.nativeElement.addEventListener("mouseenter", () => this.mouseHoverButton = true);
       this.addRelBtn.nativeElement.addEventListener("mouseleave", () => this.mouseHoverButton = false);
       this.initialized = true;
@@ -57,6 +58,11 @@ export class NodeComponent implements AfterViewInit {
     e.stopImmediatePropagation();
     const rect = (icon._elementRef.nativeElement as HTMLElement).getBoundingClientRect();
     this.relationBegin.emit([rect.x + rect.width / 2, rect.y + rect.height / 2]);
+  }
+
+  onRemoveClick(e: Event) {
+    e.stopImmediatePropagation();
+    this.remove.emit();
   }
 
   @HostListener("mousemove", ['$event'])

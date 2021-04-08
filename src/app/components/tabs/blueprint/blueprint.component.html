@@ -1,12 +1,9 @@
 <div class="wrapper" *ngIf="show" #wrapper>
   <canvas #viewport *ngIf="blueprint"></canvas>
   <div class="overlay" *ngIf="blueprint" #overlay>
-    <app-node class="root"
-      #rootEl [data]="root" [style.top.px]="rootTop" [style.left.px]="rootLeft"
-      (relationBegin)="beginRelation(rootEl, $event)"
-      ></app-node>
+    <app-node class="root" #rootEl [data]="root" (relationBegin)="beginRelation(rootEl, $event)"></app-node>
     <app-node #nodeEl *ngFor="let node of nodes"
-      [style.left.px]="node.x" [style.top.px]="node.y"
+      [style.left.px]="node.x" [style.top]="'calc(50% + ' + node.y + 'px)'"
       [data]="node" (dragMove)="onDragMove($event)" (relationBegin)="beginRelation(nodeEl, $event)"
       (dragStart)="onDragStart(nodeEl)" (dragEnd)="onDragEnd(nodeEl, $event)"></app-node>
     <app-node *ngIf="blueprintHandler.ghostNode" class="skeleton" [style.left.px]="blueprintHandler.ghostNode[0]" [style.top.px]="blueprintHandler.ghostNode[1]"></app-node>

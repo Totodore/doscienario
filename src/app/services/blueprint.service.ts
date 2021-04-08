@@ -47,8 +47,8 @@ export class BlueprintService {
     this.overlay = overlay;
     this.docId = docId;
     const [w, h] = [
-      this.project.openBlueprints[tabId].nodes.reduce((prev, curr) => prev > curr.x ? prev : curr.x, 0) + 530,
-      this.project.openBlueprints[tabId].nodes.reduce((prev, curr) => prev > curr.y ? prev : curr.y, 0) + 530,
+      Math.max(this.wrapper.clientWidth, this.project.openBlueprints[tabId].nodes.reduce((prev, curr) => prev > curr.x ? prev : curr.x, 0) + 530),
+      Math.max(this.wrapper.clientHeight, this.project.openBlueprints[tabId].nodes.reduce((prev, curr) => prev > curr.y ? prev : curr.y, 0) + 530),
     ]
     this.context = this.canvas.getContext("2d");
     this.canvas.width = w;
@@ -103,9 +103,9 @@ export class BlueprintService {
         this.parentGhost.data.id,
         this.docId,
         this.ghostNode[0],
-        this.ghostNode[1],
+        this.ghostNode[1] - this.overlay.clientHeight / 2,
         this.drawingOriginPos[0],
-        this.drawingOriginPos[1]
+        this.drawingOriginPos[1] - this.overlay.clientHeight / 2
       ));
       this.ghostNode = null;
     }
@@ -125,7 +125,7 @@ export class BlueprintService {
     oy -= 48;
 
     this.drawRelations();
-    this.drawCurve([ox, oy], [ex, ey]);
+    this.drawCurve([ox, oy], [ex, ey], false);
     this.ghostNode = [ex, ey];
   }
 
@@ -137,7 +137,7 @@ export class BlueprintService {
       this.drawCurve([rel.ox, rel.oy - 48], [rel.ex, rel.ey]);
     }
   }
-  private drawGrid(step = 70) {
+  private drawGrid(step = 80) {
     this.context.strokeStyle = "#ffffff1f";
     this.context.lineWidth = 0.25;
     this.context.beginPath();
@@ -155,19 +155,20 @@ export class BlueprintService {
     this.context.closePath();
   }
 
-  private drawCurve(o: Tuple, e: Tuple) {
+  private drawCurve(o: Tuple, e: Tuple, rel = true) {
     this.context.lineWidth = 1;
     const [ox, oy] = o;
     const [ex, ey] = e;
     const [w, h] = [-(ox - ex), oy - ey];
     const [p1x, p1y, p2x, p2y] = [ox + w / 2, oy, ox + w / 2, ey];
+    const half = rel ? this.overlay.clientHeight / 2 : 0;
     this.context.strokeStyle = "#b0bec5";
     this.context.beginPath();
-    this.context.moveTo(ox, oy);
-    this.context.bezierCurveTo(p1x, p1y, p2x, p2y, ex, ey);
+    this.context.moveTo(ox, oy + half);
+    this.context.bezierCurveTo(p1x, p1y + half, p2x, p2y + half, ex, ey + half);
     this.context.stroke();
     this.context.closePath();
-    this.drawSkeleton([ox, oy], [w, h], [p1x, p1y, p2x, p2y]);
+    this.drawSkeleton([ox, oy], [w, h], [p1x, p1y, p2x, p2y], rel);
   }
 
   public beginGhostRelation(parent: NodeComponent, e: Tuple) {
@@ -185,17 +186,19 @@ export class BlueprintService {
    */
   private adaptViewport(treshold: Poles[]) {
     if (treshold.includes("north")) {
-      this.wrapper.scrollTop -= 10;
+      if (this.wrapper.scrollTop === 0)
+        this.updateViewPortSize([0, 10]);
+      this.wrapper.scrollBy({ top: - 10, behavior: 'auto' });
     } if (treshold.includes("south")) {
       if (this.wrapper.isMaxScrollTop)
         this.updateViewPortSize([0, 10]);
-      this.wrapper.scrollTop += 10;
+      this.wrapper.scrollBy({ top: 10, behavior: 'auto' });
     } if (treshold.includes("east")) {
       if (this.wrapper.isMaxScrollLeft)
         this.updateViewPortSize([10, 0]);
-      this.wrapper.scrollLeft += 10;
+      this.wrapper.scrollBy({ left: 10, behavior: 'auto' });
     } if (treshold.includes("west"))
-      this.wrapper.scrollLeft -= 10;
+      this.wrapper.scrollBy({ left: - 10, behavior: 'auto' });
   }
 
   /**
@@ -219,11 +222,15 @@ export class BlueprintService {
    */
   private updateViewPortSize(size: Tuple) {
     this.canvas.width += size[0];
-    this.canvas.height += size[1];
+    this.canvas.height += size[1] * 2;
     this.canvas.style.width = this.canvas.width + "px";
     this.canvas.style.height = this.canvas.height + "px";
     this.overlay.style.width = this.canvas.width + "px";
     this.overlay.style.height = this.canvas.height + "px";
+    if (this.drawingOriginPos) {
+      this.drawingOriginPos[1] += size[1] / 2;
+      this.ghostNode[1] += size[1] / 2;
+    }
   }
 
   public onDragStart(node: NodeComponent) {
@@ -267,29 +274,30 @@ export class BlueprintService {
   /**
    * Draw the skeleton if the option is enabled
    */
-  private drawSkeleton(o: Tuple, s: Tuple, p: [number, number, number, number]) {
+  private drawSkeleton(o: Tuple, s: Tuple, p: [number, number, number, number], rel: boolean) {
     if (!this.enableSkeleton)
       return;
+    const half = rel ? this.overlay.clientHeight / 2 : 0;
     this.context.beginPath();
-    this.context.arc(p[0], p[1], 5, 0, 2 * Math.PI);  // Control point one
+    this.context.arc(p[0], p[1] + half, 5, 0, 2 * Math.PI);  // Control point one
     this.context.fillStyle = "red";
     this.context.fill();
     this.context.closePath();
 
     this.context.beginPath();
-    this.context.arc(p[2], p[3], 5, 0, 2 * Math.PI);  // Control point two
+    this.context.arc(p[2], p[3] + half, 5, 0, 2 * Math.PI);  // Control point two
     this.context.fillStyle = "blue";
     this.context.fill();
     this.context.closePath();
 
     this.context.beginPath();
     this.context.strokeStyle = "yellow";
-    this.context.moveTo(o[0], o[1]);
-    this.context.lineTo(o[0] + s[0] / 2, o[1]);
-    this.context.moveTo(o[0] + s[0] / 2, o[1]);
-    this.context.lineTo(o[0] + s[0] / 2, o[1] - s[1]);
-    this.context.moveTo(o[0] + s[0] / 2, o[1] - s[1]);
-    this.context.lineTo(o[0] + s[0], o[1] - s[1]);
+    this.context.moveTo(o[0], o[1] + half);
+    this.context.lineTo(o[0] + s[0] / 2, o[1] + half);
+    this.context.moveTo(o[0] + s[0] / 2, o[1] + half);
+    this.context.lineTo(o[0] + s[0] / 2, o[1] - s[1] + half);
+    this.context.moveTo(o[0] + s[0] / 2, o[1] - s[1] + half);
+    this.context.lineTo(o[0] + s[0], o[1] - s[1] + half);
     this.context.stroke();
     this.context.closePath();
   }

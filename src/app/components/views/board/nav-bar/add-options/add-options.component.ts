@@ -22,6 +22,7 @@ export class AddOptionsComponent {
     this.tabs.pushTab(WelcomeTabComponent);
   }
   public openBlueprint() {
+    console.log("test");
     this.tabs.pushTab(BlueprintComponent, false);
   }
 }

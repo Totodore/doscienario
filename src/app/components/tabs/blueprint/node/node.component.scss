@@ -31,6 +31,23 @@
     top: -15px;
     position: absolute;
     right: -17px;
+    box-shadow: 0 0 8px -3px rgb(0 0 0 / 50%);
+  }
+  .remove {
+    opacity: 0.6;
+    visibility: hidden;
+    cursor: pointer;
+    color: #b0bec5;
+    padding: 4px;
+    border-radius: 25px;
+    background-color: #323232;
+    transition: all 100ms;
+    transform: scale(0.8);
+    color: rgb(150, 0, 0);
+    top: -15px;
+    position: absolute;
+    left: -17px;
+    box-shadow: 0 0 8px -3px rgb(0 0 0 / 50%);
   }
 
   .add-relation {
@@ -81,7 +98,7 @@
         transform: scale(1) translateX(-50%);
       }
     }
-    .handle {
+    .handle, .remove {
       visibility: visible;
       opacity: 1;
       transform: scale(1);

@@ -34,9 +34,18 @@
         opacity: 0.3;
         pointer-events: none;
       }
+      &.root {
+        top: 50%;
+        left: 48px;
+      }
+      &:hover:not(.skeleton) ~ .skeleton {
+        opacity: 0 !important;
+      }
 
-      ::ng-deep &.root .handle {
-        display: none !important;
+      ::ng-deep &.root {
+        .handle, .remove {
+          display: none !important;
+        }
       }
     }
   }

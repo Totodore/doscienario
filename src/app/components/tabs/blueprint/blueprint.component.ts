@@ -1,7 +1,9 @@
+import { ConfirmComponent } from './../../utils/confirm/confirm.component';
+import { MatDialog } from '@angular/material/dialog';
 import { BlueprintService } from './../../../services/blueprint.service';
 import { ProgressService } from './../../../services/progress.service';
 import { SocketService } from './../../../services/socket.service';
-import { Blueprint, Node } from './../../../models/sockets/blueprint-sock.model';
+import { Blueprint, Node, RemoveNodeOut } from './../../../models/sockets/blueprint-sock.model';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { ProjectService } from './../../../services/project.service';
 import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy, Provider, Type, ViewEncapsulation, AfterViewInit, AfterViewChecked, HostListener } from '@angular/core';
@@ -9,6 +11,7 @@ import { CdkDrag, CdkDragEnd, CdkDragMove, CdkDragStart } from '@angular/cdk/dra
 import { v4 as uuid4 } from "uuid";
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { Poles, NodeComponent } from './node/node.component';
+import { removeNodeFromTree } from 'src/app/utils/helpers';
 
 
 @Component({
@@ -34,6 +37,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   public readonly type: TabTypes.BLUEPRINT;
 
   constructor(
+    private readonly dialog: MatDialog,
     private readonly project: ProjectService,
     private readonly socket: SocketService,
     private readonly progress: ProgressService,
@@ -73,15 +77,24 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
     this.blueprintHandler.onDragMove(pos);
   }
 
-  get rootTop(): number {
-    return this.root?.y + this.overlay?.nativeElement?.clientHeight / 2;
-  }
-  get rootLeft(): number {
-    return this.root?.x + 48;
-  }
-
   beginRelation(parent: NodeComponent, e: [number, number]) {
     this.blueprintHandler.beginGhostRelation(parent, e);
+  }
+
+  onRemove(el: NodeComponent) {
+    const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer ce noeud et tous ses enfants ?" });
+    dialog.componentInstance.confirm.subscribe(() => {
+      dialog.close();
+      const data = removeNodeFromTree(el.data.id,
+        this.nodes.map(el => el.id),
+        this.blueprint.relationships.map(el => [el.parentId, el.childId, el.id])
+      );
+      this.project.openBlueprints[this.tabId].nodes = this.project.openBlueprints[this.tabId].nodes.filter(el => !data.nodes.includes(el.id));
+      this.project.openBlueprints[this.tabId].relationships = this.project.openBlueprints[this.tabId].relationships.filter(el => !data.rels.includes(el.id));
+      this.socket.socket.emit(Flags.REMOVE_NODE, new RemoveNodeOut(el.data.id, this.id));
+      this.blueprintHandler.drawRelations();
+    });
+
   }
 
   get blueprint(): Blueprint {

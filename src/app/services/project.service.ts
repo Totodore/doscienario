@@ -1,11 +1,12 @@
 import { TabService } from './tab.service';
-import { Blueprint, SendBlueprintReq, OpenBlueprintReq, CreateNodeReq, Node, RemoveNodeReq, CreateRelationReq, RemoveRelationReq, PlaceNodeOut, PlaceNodeIn, Relationship } from './../models/sockets/blueprint-sock.model';
+import { Blueprint, SendBlueprintReq, OpenBlueprintReq, CreateNodeReq, CreateRelationReq, RemoveRelationReq, PlaceNodeOut, PlaceNodeIn, Relationship, RemoveNodeIn } from './../models/sockets/blueprint-sock.model';
 import { Router } from '@angular/router';
 import { ApiService } from './api.service';
 import { DocumentModel, DocumentRes, Change, WriteDocumentRes, OpenDocumentRes } from './../models/sockets/document-sock.model';
 import { GetProjectRes, ProjectUserRes, GetProjectDocumentRes, SearchQueryRes } from './../models/api/project.model';
 import { Injectable, OnInit } from '@angular/core';
 import { Tag } from '../models/sockets/tag-sock.model';
+import { removeNodeFromTree } from '../utils/helpers';
 
 @Injectable({
   providedIn: 'root'
@@ -261,9 +262,11 @@ export class ProjectService implements OnInit {
     this.saveData();
     this.tabs.tabs.find(el => el.id === packet.blueprint.id).refreshView();
   }
-  public removeBlueprintNode(packet: RemoveNodeReq) {
-    const index = this.getBlueprint(packet.blueprint).nodes.findIndex(el => el.id == packet.id);
-    this.getBlueprint(packet.blueprint).nodes.splice(index, 1);
+  public removeBlueprintNode(packet: RemoveNodeIn) {
+    const blueprint = this.getBlueprint(packet.blueprintId);
+    const data = removeNodeFromTree(packet.nodeId, blueprint.nodes.map(el => el.id), blueprint.relationships.map(el => [el.parentId, el.childId, el.id]));
+    blueprint.nodes = blueprint.nodes.filter(el => !data.nodes.includes(el.id));
+    blueprint.relationships = blueprint.relationships.filter(el => !data.rels.includes(el.id));
     this.saveData();
   }
   public addBlueprintRelation(packet: CreateRelationReq) {

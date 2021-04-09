@@ -111,12 +111,13 @@ export class CreateNodeReq {
     public user: string
   ) { }
 }
-export class RemoveNodeReq {
+export class RemoveNodeIn {
   constructor(
-    public id: number,
-    public blueprint: number
+    public nodeId: number,
+    public blueprintId: number
   ) {}
 }
+export class RemoveNodeOut extends RemoveNodeIn { }
 export class CreateRelationReq {
   constructor(
     public blueprint: number,

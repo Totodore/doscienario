@@ -47,7 +47,7 @@ export class NodeComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     if (!this.initialized) {
-      this.viewport = document.querySelector("app-blueprint > .wrapper");
+      this.viewport = document.querySelector("app-blueprint > .outer-wrapper > .wrapper");
       this.addRelBtn.nativeElement.addEventListener("mouseenter", () => this.mouseHoverButton = true);
       this.addRelBtn.nativeElement.addEventListener("mouseleave", () => this.mouseHoverButton = false);
       this.initialized = true;

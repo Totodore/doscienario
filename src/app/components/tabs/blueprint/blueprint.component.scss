@@ -1,3 +1,30 @@
+.outer-wrapper {
+  position: relative;
+  button {
+    z-index: 1000000000;
+    cursor: pointer;
+    color: #b0bec5;
+    border-radius: 25px;
+    background-color: #323232;
+    position: absolute;
+    box-shadow: 0 0 8px -3px rgb(0 0 0 / 50%);
+    &.top {
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    &.bottom {
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    &.right {
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+}
 .wrapper {
   min-width: 100%;
   min-height: calc(100vh - 53px);

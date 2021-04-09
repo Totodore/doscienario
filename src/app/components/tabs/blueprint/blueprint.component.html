@@ -1,12 +1,23 @@
-<div class="wrapper" *ngIf="show" #wrapper>
-  <canvas #viewport *ngIf="blueprint"></canvas>
-  <div class="overlay" *ngIf="blueprint" #overlay>
-    <app-node class="root" #rootEl [data]="root" (relationBegin)="beginRelation(rootEl, $event)"></app-node>
-    <app-node #nodeEl *ngFor="let node of nodes"
-      [style.left.px]="node.x" [style.top]="'calc(50% + ' + node.y + 'px)'"
-      [data]="node" (dragMove)="onDragMove($event)" (relationBegin)="beginRelation(nodeEl, $event)"
-      (dragStart)="onDragStart(nodeEl)" (dragEnd)="onDragEnd(nodeEl, $event)" (remove)="onRemove(nodeEl)"></app-node>
-    <app-node *ngIf="blueprintHandler.ghostNode" class="skeleton" [style.left.px]="blueprintHandler.ghostNode[0]" [style.top.px]="blueprintHandler.ghostNode[1]"></app-node>
+<div class="outer-wrapper">
+  <button mat-icon-button class="bottom">
+    <mat-icon>keyboard_arrow_down</mat-icon>
+  </button>
+  <button mat-icon-button class="right">
+    <mat-icon>keyboard_arrow_right</mat-icon>
+  </button>
+  <button mat-icon-button class="top">
+    <mat-icon>expand_less</mat-icon>
+  </button>
+  <div class="wrapper" *ngIf="show" #wrapper>
+    <canvas #viewport *ngIf="blueprint"></canvas>
+    <div class="overlay" *ngIf="blueprint" #overlay>
+      <app-node class="root" #rootEl [data]="root" (relationBegin)="beginRelation(rootEl, $event)"></app-node>
+      <app-node #nodeEl *ngFor="let node of nodes"
+        [style.left.px]="node.x" [style.top]="'calc(50% + ' + node.y + 'px)'"
+        [data]="node" (dragMove)="onDragMove($event)" (relationBegin)="beginRelation(nodeEl, $event)"
+        (dragStart)="onDragStart(nodeEl)" (dragEnd)="onDragEnd(nodeEl, $event)" (remove)="onRemove(nodeEl)"></app-node>
+      <app-node *ngIf="blueprintHandler.ghostNode" class="skeleton" [style.left.px]="blueprintHandler.ghostNode[0]" [style.top.px]="blueprintHandler.ghostNode[1]"></app-node>
+    </div>
+    <h1 *ngIf="!blueprint">Chargement du document...</h1>
   </div>
-  <h1 *ngIf="!blueprint">Chargement du document...</h1>
 </div>

@@ -48,7 +48,7 @@ export class BlueprintService {
     this.docId = docId;
     const [w, h] = [
       Math.max(this.wrapper.clientWidth, this.project.openBlueprints[tabId].nodes.reduce((prev, curr) => prev > curr.x ? prev : curr.x, 0) + 530),
-      Math.max(this.wrapper.clientHeight, this.project.openBlueprints[tabId].nodes.reduce((prev, curr) => prev > curr.y ? prev : curr.y, 0) + 530),
+      Math.max(this.wrapper.clientHeight, this.project.openBlueprints[tabId].nodes.reduce((prev, curr) => prev > Math.abs(curr.y) ? prev : Math.abs(curr.y), 0) + 530),
     ]
     this.context = this.canvas.getContext("2d");
     this.canvas.width = w;
@@ -57,6 +57,7 @@ export class BlueprintService {
     this.canvas.style.height = h + "px";
     this.overlay.style.width = w + "px";
     this.overlay.style.height = h + "px";
+    this.wrapper.scrollTop += this.wrapper.scrollTopMax / 2;
     this.wrapper.addEventListener("scroll", () => this.onScroll());
     this.wrapper.addEventListener("mousemove", (e) => this.onMouseMove(e));
     this.wrapper.addEventListener("click", (e) => this.onClick(e));

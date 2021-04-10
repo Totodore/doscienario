@@ -33,7 +33,7 @@ export class BlueprintService {
   private docId: number;
 
   public ghostNode: Tuple;
-
+  public scrollPoles: Set<Poles> = new Set();
 
   constructor(
     private readonly project: ProjectService,
@@ -46,9 +46,18 @@ export class BlueprintService {
     this.wrapper = wrapper;
     this.overlay = overlay;
     this.docId = docId;
+    this.configSize();
+    this.wrapper.addEventListener("scroll", () => this.onScroll());
+    this.wrapper.addEventListener("mousemove", (e) => this.onMouseMove(e));
+    this.wrapper.addEventListener("click", (e) => this.onClick(e));
+    this.wrapper.addEventListener("resize", () => this.configSize());
+    this.drawRelations();
+  }
+
+  private configSize() {
     const [w, h] = [
-      Math.max(this.wrapper.clientWidth, this.project.openBlueprints[tabId].nodes.reduce((prev, curr) => prev > curr.x ? prev : curr.x, 0) + 530),
-      Math.max(this.wrapper.clientHeight, this.project.openBlueprints[tabId].nodes.reduce((prev, curr) => prev > Math.abs(curr.y) ? prev : Math.abs(curr.y), 0) + 530),
+      Math.max(this.wrapper.clientWidth, this.project.openBlueprints[this.tabId].nodes.reduce((prev, curr) => prev > curr.x ? prev : curr.x, 0) + 530),
+      Math.max(this.wrapper.clientHeight, this.project.openBlueprints[this.tabId].nodes.reduce((prev, curr) => prev > Math.abs(curr.y) ? prev : Math.abs(curr.y), 0) + 530),
     ]
     this.context = this.canvas.getContext("2d");
     this.canvas.width = w;
@@ -58,11 +67,6 @@ export class BlueprintService {
     this.overlay.style.width = w + "px";
     this.overlay.style.height = h + "px";
     this.wrapper.scrollTop += this.wrapper.scrollTopMax / 2;
-    this.wrapper.addEventListener("scroll", () => this.onScroll());
-    this.wrapper.addEventListener("mousemove", (e) => this.onMouseMove(e));
-    this.wrapper.addEventListener("click", (e) => this.onClick(e));
-
-    this.drawRelations();
   }
 
   /**
@@ -72,6 +76,15 @@ export class BlueprintService {
     if (this.drawState === "drawing") {
       this.drawGhostNodeAndRel(this.mousePos);
     }
+    if (this.wrapper.scrollTop < 20)
+      this.scrollPoles.add("north");
+    else this.scrollPoles.delete("north");
+    if (this.wrapper.scrollTop > this.wrapper.scrollTopMax - 20)
+      this.scrollPoles.add("south");
+    else this.scrollPoles.delete("south");
+    if (this.wrapper.scrollLeft > this.wrapper.scrollLeftMax - 20)
+      this.scrollPoles.add("east");
+    else this.scrollPoles.delete("east");
   }
   /**
    * Mouse Move event
@@ -186,19 +199,13 @@ export class BlueprintService {
    * AddaptViewport to Mouse (increase viewport and scroll)
    */
   private adaptViewport(treshold: Poles[]) {
-    if (treshold.includes("north")) {
-      if (this.wrapper.scrollTop === 0)
-        this.updateViewPortSize([0, 10]);
+    if (treshold.includes("north"))
       this.wrapper.scrollBy({ top: - 10, behavior: 'auto' });
-    } if (treshold.includes("south")) {
-      if (this.wrapper.isMaxScrollTop)
-        this.updateViewPortSize([0, 10]);
+    if (treshold.includes("south"))
       this.wrapper.scrollBy({ top: 10, behavior: 'auto' });
-    } if (treshold.includes("east")) {
-      if (this.wrapper.isMaxScrollLeft)
-        this.updateViewPortSize([10, 0]);
+    if (treshold.includes("east"))
       this.wrapper.scrollBy({ left: 10, behavior: 'auto' });
-    } if (treshold.includes("west"))
+    if (treshold.includes("west"))
       this.wrapper.scrollBy({ left: - 10, behavior: 'auto' });
   }
 
@@ -221,17 +228,17 @@ export class BlueprintService {
   /**
    * Update the size of the viewport
    */
-  private updateViewPortSize(size: Tuple) {
-    this.canvas.width += size[0];
-    this.canvas.height += size[1] * 2;
+  public widenViewport(pole: Poles) {
+    this.canvas.width += pole === "east" ? 500 : 0;
+    this.canvas.height += pole === "north" || pole === "south" ? 1000 : 0;
     this.canvas.style.width = this.canvas.width + "px";
     this.canvas.style.height = this.canvas.height + "px";
     this.overlay.style.width = this.canvas.width + "px";
     this.overlay.style.height = this.canvas.height + "px";
-    if (this.drawingOriginPos) {
-      this.drawingOriginPos[1] += size[1] / 2;
-      this.ghostNode[1] += size[1] / 2;
-    }
+    if (pole === "north" || pole === "south")
+      this.wrapper.scrollTop += 500;
+    // else if (pole === "south")
+      // this.wrapper.scrollTop -= 500;
   }
 
   public onDragStart(node: NodeComponent) {

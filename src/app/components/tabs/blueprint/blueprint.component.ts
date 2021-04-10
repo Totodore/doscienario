@@ -94,7 +94,11 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
       this.socket.socket.emit(Flags.REMOVE_NODE, new RemoveNodeOut(el.data.id, this.id));
       this.blueprintHandler.drawRelations();
     });
+  }
 
+  onWiden(pole: Poles) {
+    this.blueprintHandler.widenViewport(pole);
+    this.blueprintHandler.drawRelations();
   }
 
   get blueprint(): Blueprint {

@@ -1,11 +1,11 @@
 <div class="outer-wrapper">
-  <button mat-icon-button class="bottom">
+  <button *ngIf="blueprintHandler.scrollPoles.has('south')" mat-icon-button class="bottom" (click)="onWiden('south')">
     <mat-icon>keyboard_arrow_down</mat-icon>
   </button>
-  <button mat-icon-button class="right">
+  <button *ngIf="blueprintHandler.scrollPoles.has('east')" mat-icon-button class="right" (click)="onWiden('east')">
     <mat-icon>keyboard_arrow_right</mat-icon>
   </button>
-  <button mat-icon-button class="top">
+  <button *ngIf="blueprintHandler.scrollPoles.has('north')" mat-icon-button class="top" (click)="onWiden('north')">
     <mat-icon>expand_less</mat-icon>
   </button>
   <div class="wrapper" *ngIf="show" #wrapper>

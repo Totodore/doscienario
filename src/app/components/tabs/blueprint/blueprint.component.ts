@@ -34,7 +34,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   public tabId: string;
   public show: boolean;
 
-  public readonly type: TabTypes.BLUEPRINT;
+  public readonly type = TabTypes.BLUEPRINT;
 
   constructor(
     private readonly dialog: MatDialog,

@@ -1,0 +1,28 @@
+.wrapper {
+  padding: 0;
+  text-align: center;
+  margin-bottom: 10px;
+  mat-form-field, .btns {
+    width: 100%;
+    input {
+      color: whitesmoke;
+    }
+    ::ng-deep {
+      .mat-form-field-wrapper {
+        padding-bottom: 5px;
+      }
+    }
+  }
+  .btns {
+    display: flex;
+    button {
+      flex-grow: 1;
+    }
+    .add-tags {
+      margin-right: 5px;
+    }
+    .remove-blueprint {
+      border-color: red;
+    }
+  }
+}

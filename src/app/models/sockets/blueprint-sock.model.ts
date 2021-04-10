@@ -118,6 +118,12 @@ export class RemoveNodeIn {
   ) {}
 }
 export class RemoveNodeOut extends RemoveNodeIn { }
+export class RenameBlueprintOut {
+  constructor(
+    public id: number,
+    public title: string
+  ) {}
+}
 export class CreateRelationReq {
   constructor(
     public blueprint: number,

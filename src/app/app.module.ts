@@ -48,6 +48,7 @@ import { TagsManagerComponent } from './components/tabs/tags-manager/tags-manage
 import { MAT_COLOR_FORMATS, NgxMatColorPickerModule, NGX_MAT_COLOR_FORMATS } from '@angular-material-components/color-picker';
 import { ConfirmComponent } from './components/utils/confirm/confirm.component';
 import { SearchResultsComponent } from './components/views/board/nav-bar/search-results/search-results.component';
+import { BlueprintOptionsComponent } from './components/views/board/nav-bar/blueprint-options/blueprint-options.component';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -75,7 +76,7 @@ import { SearchResultsComponent } from './components/views/board/nav-bar/search-
     SearchResultsComponent,
     BlueprintComponent,
     NodeComponent,
-
+    BlueprintOptionsComponent
   ],
   imports: [
     ReactiveFormsModule,

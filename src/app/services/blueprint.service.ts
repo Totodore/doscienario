@@ -47,6 +47,7 @@ export class BlueprintService {
     this.overlay = overlay;
     this.docId = docId;
     this.configSize();
+    this.onScroll();
     this.wrapper.addEventListener("scroll", () => this.onScroll());
     this.wrapper.addEventListener("mousemove", (e) => this.onMouseMove(e));
     this.wrapper.addEventListener("click", (e) => this.onClick(e));

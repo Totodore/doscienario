@@ -3,6 +3,7 @@ import { WelcomeTabComponent } from './../../../tabs/welcome-tab/welcome-tab.com
 import { ProjectService } from 'src/app/services/project.service';
 import { TabService } from './../../../../services/tab.service';
 import { Component, OnInit } from '@angular/core';
+import { TabTypes } from 'src/app/models/tab-element.model';
 
 @Component({
   selector: 'app-nav-bar',
@@ -15,11 +16,14 @@ export class NavBarComponent {
   public results: SearchResults;
   constructor(
     public readonly tabs: TabService,
-    private readonly project: ProjectService
   ) { }
 
-  get hasOpenedTab(): boolean {
-    return this.tabs.displayedTab != null && this.project.openDocs[this.tabs.displayedTab[1].tabId] != null;
+  get hasOpenedDoc(): boolean {
+    return this.tabs.displayedTab?.[1]?.type === TabTypes.DOCUMENT;
+  }
+
+  get hasOpenedBlueprint(): boolean {
+    return this.tabs.displayedTab?.[1]?.type === TabTypes.BLUEPRINT;
   }
 
 }

@@ -40,7 +40,7 @@ export class BlueprintOptionsComponent {
 
   deleteBlueprint() {
     const dialog = this.dialog.open(ConfirmComponent, {
-      data: "Supprimer le blueprint ?"
+      data: "Supprimer l'arbre ?"
     });
     dialog.componentInstance.confirm.subscribe(() => {
       dialog.close();

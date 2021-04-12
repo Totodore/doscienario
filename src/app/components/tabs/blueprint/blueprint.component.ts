@@ -51,6 +51,14 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
     }
   }
 
+  onFocus() {
+
+  }
+
+  onUnFocus() {
+    this.initialized = false;
+  }
+
   refreshView() {
     this.blueprintHandler.drawRelations();
   }

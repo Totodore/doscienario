@@ -1,7 +1,9 @@
+import { DataType } from './../default.model';
 import { GetProjectRes, ProjectUserRes } from "../api/project.model";
 import { Tag } from "./tag-sock.model";
+import { DataModel } from "../default.model";
 
-export class Blueprint {
+export class Blueprint extends DataModel {
   id: number;
 
   name: string;
@@ -21,6 +23,11 @@ export class Blueprint {
   lastEditor: ProjectUserRes;
 
   lastEditing: Date;
+
+  x: number;
+  y: number;
+
+  readonly type = DataType.Blueprint;
 }
 
 export class Node {

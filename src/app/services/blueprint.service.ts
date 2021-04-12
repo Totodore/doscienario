@@ -144,8 +144,14 @@ export class BlueprintService {
     this.ghostNode = [ex, ey];
   }
 
-  public drawRelations() {
+  public drawRelations(canvas?: HTMLCanvasElement, wrapper?: HTMLDivElement, overlay?: HTMLElement) {
     const blueprint = this.project.openBlueprints[this.tabId];
+    if (canvas && wrapper && overlay) {
+      this.canvas = canvas;
+      this.wrapper = wrapper;
+      this.overlay = overlay;
+      this.context = canvas.getContext("2d");
+    }
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.drawGrid();
     for (const rel of blueprint.relationships) {

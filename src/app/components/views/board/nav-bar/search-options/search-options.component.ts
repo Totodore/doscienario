@@ -33,7 +33,7 @@ export class SearchOptionsComponent implements OnInit {
     }
     this.progress.show();
     this.queryCount++;
-    this.workerManager.postMessage('search', [this.searchQuery, [this.project.tags, this.project.docs]]);
+    this.workerManager.postMessage('search', [this.searchQuery, [this.project.tags, this.project.docs, this.project.blueprints]]);
   }
 
   public onSearch(data: SearchResults) {

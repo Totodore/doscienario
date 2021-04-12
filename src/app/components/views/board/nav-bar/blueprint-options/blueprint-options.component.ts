@@ -57,8 +57,8 @@ export class BlueprintOptionsComponent {
     return this.tabs.displayedTab[1].id;
   }
   get docTags(): Tag[] {
-    const tagIds = this.blueprint.tags.map(el => el.id);
-    return this.project.tags.filter(el => tagIds.includes(el.id));
+    const tagIds = this.blueprint.tags?.map(el => el.id);
+    return this.project.tags.filter(el => tagIds?.includes(el.id));
   }
   get tabId(): string {
     return this.tabs.displayedTab[1].tabId;

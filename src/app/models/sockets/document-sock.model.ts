@@ -1,5 +1,6 @@
 import { GetProjectDocumentRes } from "../api/project.model";
 import { UserDetailsRes } from "../api/user.model";
+import { DataType } from "../default.model";
 import { Tag } from "./tag-sock.model";
 
 export interface DocumentModel {
@@ -15,6 +16,7 @@ export interface DocumentModel {
   changes: Map<number, Change[]>;
   lastChangeId: number;
   clientUpdateId?: number;
+  readonly type: DataType.Document;
 }
 export interface DocumentRes {
   doc: DocumentModel;

@@ -231,6 +231,7 @@ export class ProjectService implements OnInit {
       const docId = this.openBlueprints[id].id;
       delete this.openBlueprints[id];
       this.data.blueprints.splice(this.docs.findIndex(el => el.id == docId), 1);
+      console.log(this.blueprints);
     } else if (typeof id === 'number') {
       for (const tabId in this.openBlueprints) {
         if (this.openBlueprints[tabId].id === id) {

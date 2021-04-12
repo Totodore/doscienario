@@ -103,10 +103,14 @@ export class TabService {
       this.removeTab(index);
   }
   public showTab(index: number) {
-    for (const tab of this.tabs)
-      tab.show = false;
-    if (this.tabs[index])
+    if (this.displayedTab?.[1]) {
+      this.displayedTab[1].onUnFocus?.();
+      this.displayedTab[1].show = false;
+    }
+    if (this.tabs[index]) {
       this.tabs[index].show = true;
+      this.displayedTab[1].onFocus?.();
+    }
   }
   public closeAllTab() {
     const tabLength = this._tabs.length;

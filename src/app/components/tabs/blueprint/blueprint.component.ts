@@ -52,11 +52,10 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   }
 
   onFocus() {
-
-  }
-
-  onUnFocus() {
-    this.initialized = false;
+    if (this.initialized)
+      window.setTimeout(() =>
+        this.blueprintHandler.init(this.canvas.nativeElement, this.wrapper.nativeElement, this.overlay.nativeElement, this.tabId, this.id)
+      );
   }
 
   refreshView() {

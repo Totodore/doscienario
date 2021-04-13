@@ -244,8 +244,10 @@ export class BlueprintService {
     this.overlay.style.height = this.canvas.height + "px";
     if (pole === "north" || pole === "south")
       this.wrapper.scrollTop += 500;
-    // else if (pole === "south")
-      // this.wrapper.scrollTop -= 500;
+    if (this.drawState === "drawing" && (pole === "north" || pole === "south"))
+      this.drawingOriginPos[1] += 500;
+    else if (this.drawState === "dragging" && pole === "east")
+      this.drawingOriginPos[0] += 500;
   }
 
   public onDragStart(node: NodeComponent) {

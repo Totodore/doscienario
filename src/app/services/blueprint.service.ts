@@ -14,14 +14,14 @@ export class BlueprintService {
 
   private readonly enableSkeleton = false;
 
-  private drawState: DrawStates = "none";
+  public drawState: DrawStates = "none";
   private drawingOriginPos: Tuple;
 
   private ghostSize: Tuple;
   private mousePos: Tuple;
   private scrollIntervalId: number;
   private tresholdMousePole: Poles[];
-  private parentGhost: NodeComponent;
+  public parentGhost: NodeComponent;
 
   private draggedNode: NodeComponent;
   private draggedRelationships: Relationship[];
@@ -200,6 +200,21 @@ export class BlueprintService {
     this.drawingOriginPos = e;
     this.ghostNode = e;
     this.parentGhost = parent;
+  }
+  public bindRelation(child: NodeComponent, anchorPos: Tuple) {
+    if (this.drawState === "drawing") {
+      this.socket.socket.emit(Flags.CREATE_RELATION, new Relationship({
+        parentId: this.parentGhost.data.id,
+        childId: child.data.id,
+        blueprint: this.project.openBlueprints[this.tabId],
+        ex: anchorPos[0] + this.wrapper.scrollLeft,
+        ey: anchorPos[1] + this.wrapper.scrollTop - this.overlay.clientHeight / 2 - 48,
+        ox: this.drawingOriginPos[0],
+        oy: this.drawingOriginPos[1] - this.overlay.clientHeight / 2
+      }));
+      this.ghostNode = null;
+      this.drawState = "none";
+    }
   }
 
   /**

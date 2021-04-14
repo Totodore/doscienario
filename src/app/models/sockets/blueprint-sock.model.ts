@@ -58,15 +58,11 @@ export class Node {
   tags: Tag[];
 }
 
-export class Relationship {
+export class Relationship extends DataModel {
   id: number;
-
-  parentId: number
-
+  parentId: number;
   childId: number;
-
   blueprint: Blueprint;
-
   ox: number;
   oy: number;
   ex: number;

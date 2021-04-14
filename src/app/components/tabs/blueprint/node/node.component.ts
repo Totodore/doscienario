@@ -1,7 +1,10 @@
+import { TabService } from './../../../../services/tab.service';
+import { BlueprintService } from './../../../../services/blueprint.service';
 import { Node } from './../../../../models/sockets/blueprint-sock.model';
 import { Component, Input, OnInit, Output, EventEmitter, HostListener, ViewChild, ElementRef, OnDestroy, AfterViewInit } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { Y } from '@angular/cdk/keycodes';
+import { ProjectService } from 'src/app/services/project.service';
 @Component({
   selector: 'app-node',
   templateUrl: './node.component.html',
@@ -14,6 +17,9 @@ export class NodeComponent implements AfterViewInit {
 
   @Output()
   private readonly relationBegin = new EventEmitter<[number, number]>();
+
+  @Output()
+  private readonly relationBind = new EventEmitter<[number, number]>();
 
   @Output()
   private readonly dragStart = new EventEmitter<[number, number]>();
@@ -43,7 +49,11 @@ export class NodeComponent implements AfterViewInit {
   private initialized: boolean;
   private dragOrigin: [number, number];
 
-  constructor() { }
+  constructor(
+    private readonly blueprintHandler: BlueprintService,
+    private readonly project: ProjectService,
+    private readonly tabs: TabService
+  ) { }
 
   ngAfterViewInit(): void {
     if (!this.initialized) {
@@ -56,8 +66,13 @@ export class NodeComponent implements AfterViewInit {
 
   onAddRelButton(icon: MatIcon, e: Event) {
     e.stopImmediatePropagation();
+    const rels = this.project.getBlueprint(this.tabs.displayedTab[1].id).relationships.filter(el => el.childId === this.data.id);
     const rect = (icon._elementRef.nativeElement as HTMLElement).getBoundingClientRect();
-    this.relationBegin.emit([rect.x + rect.width / 2, rect.y + rect.height / 2]);
+    if (this.blueprintHandler.drawState === "drawing" && this.blueprintHandler.parentGhost !== this && !rels.find(el => el.parentId === this.blueprintHandler.parentGhost.data.id)) {
+      this.relationBind.emit([rect.x + rect.width / 2, rect.y + rect.height / 2]);
+    } else {
+      this.relationBegin.emit([rect.x + rect.width / 2, rect.y + rect.height / 2]);
+    }
   }
 
   onRemoveClick(e: Event) {

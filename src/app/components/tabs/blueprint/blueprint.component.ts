@@ -87,6 +87,9 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   beginRelation(parent: NodeComponent, e: [number, number]) {
     this.blueprintHandler.beginGhostRelation(parent, e);
   }
+  bindRelation(child: NodeComponent, anchorPos: [number, number]) {
+    this.blueprintHandler.bindRelation(child, anchorPos);
+  }
 
   onRemove(el: NodeComponent) {
     const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer ce noeud et tous ses enfants ?" });

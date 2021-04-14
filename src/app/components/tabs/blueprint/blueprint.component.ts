@@ -92,7 +92,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   }
 
   onRemove(el: NodeComponent) {
-    const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer ce noeud et tous ses enfants ?" });
+    const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer ce noeud et tous ses enfants orphelins ?" });
     dialog.componentInstance.confirm.subscribe(() => {
       dialog.close();
       const data = removeNodeFromTree(el.data.id,

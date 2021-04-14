@@ -13,13 +13,22 @@ export function sortByRelevance<T>(a: T, b: T, needle: string, accessor?: (el: T
   else
     return 0;
 }
+/**
+ * Get all rels to delete
+ * Get all nodes to delete (if a node has no parent relationship)
+ */
 export function removeNodeFromTree(id: number, nodes: number[], rels: Tuple[]): RemoveObj {
   const removeRels = nodeIterate(id, rels);
+  //add parent rels of the deleted node
   removeRels.push(...rels.filter(rel => rel[1] === id).map(el => el[2]));
-  const removeNodes = nodes.filter(node => removeRels.map(el => rels.find(rel => rel[2] === el)[1]).includes(node));
-  return { rels: removeRels, nodes: removeNodes};
+  const keepingRelsChildId = rels.filter(el => !removeRels.includes(el[2])).map(el => el[1]);
+  //if a node has no parent relation we remove it
+  const removeNodes = nodes.filter(node => !keepingRelsChildId.includes(node));
+  return { rels: removeRels, nodes: removeNodes };
 }
-
+/**
+ * @returns all relationships to delete
+ */
 function nodeIterate(parentId: number, rels: Tuple[]): number[] {
   const removeRels: number[] = [];
   for (const rel of rels) {

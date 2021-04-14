@@ -1,3 +1,4 @@
+import { BlueprintComponent } from './../../tabs/blueprint/blueprint.component';
 import { TabService } from './../../../services/tab.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ProgressService } from './../../../services/progress.service';
@@ -6,7 +7,7 @@ import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material
 import { SocketService } from './../../../services/socket.service';
 import { Component, HostListener, OnInit } from '@angular/core';
 import { DocumentComponent } from '../../tabs/document/document.component';
-import { N, W } from '@angular/cdk/keycodes';
+import { B, N, W } from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'app-board',
@@ -57,6 +58,10 @@ export class BoardComponent implements OnInit {
         e.preventDefault();
         e.stopImmediatePropagation();
         this.tabs.pushTab(DocumentComponent, false, null);
+      case B:
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        this.tabs.pushTab(BlueprintComponent, false, null);
       default:
         break;
     }

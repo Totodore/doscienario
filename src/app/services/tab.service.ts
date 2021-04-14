@@ -72,12 +72,12 @@ export class TabService {
   /**
    * If index is not given, it remove the current tab
    */
-  public removeTab(index?: number) {
-    index ??= this.displayedTab[0];
-    if (this.tabs[index].onClose)
-      this.tabs[index].onClose();
-    if (this.tabs[index].show && this.tabs.length > 1)
+  public removeTab(index = this.displayedTab[0]) {
+    this.tabs[index].onClose?.();
+    if (this.tabs[index].show && this.tabs.length > 1) {
       (this.tabs[index - 1] ?? this.tabs[this.tabs.length - 1]).show = true;
+      (this.tabs[index - 1] ?? this.tabs[this.tabs.length - 1]).onFocus?.();
+    }
     this.removeTabToStorage(this._tabs[index][0], this._tabs[index][1]?.id);
     this.rootViewContainer.remove(index);
     this._tabs.splice(index, 1);

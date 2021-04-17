@@ -222,13 +222,13 @@ export class BlueprintService {
    * AddaptViewport to Mouse (increase viewport and scroll)
    */
   private adaptViewport(treshold: Poles[]) {
-    if (treshold.includes("north"))
+    if (treshold.includes("north") && this.wrapper.scrollTop > 10)
       this.wrapper.scrollBy({ top: - 10, behavior: 'auto' });
-    if (treshold.includes("south"))
+    if (treshold.includes("south") && this.wrapper.scrollTop + 20 < this.wrapper.scrollTopMax)
       this.wrapper.scrollBy({ top: 10, behavior: 'auto' });
-    if (treshold.includes("east"))
+    if (treshold.includes("east") && this.wrapper.scrollLeft + 20 < this.wrapper.scrollLeftMax)
       this.wrapper.scrollBy({ left: 10, behavior: 'auto' });
-    if (treshold.includes("west"))
+    if (treshold.includes("west") &&  this.wrapper.scrollLeft > 10)
       this.wrapper.scrollBy({ left: - 10, behavior: 'auto' });
   }
 

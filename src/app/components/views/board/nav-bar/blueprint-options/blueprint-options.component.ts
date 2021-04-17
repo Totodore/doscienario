@@ -1,3 +1,4 @@
+import { BlueprintService } from './../../../../../services/blueprint.service';
 import { Blueprint, RenameBlueprintOut } from './../../../../../models/sockets/blueprint-sock.model';
 import { ConfirmComponent } from './../../../../utils/confirm/confirm.component';
 import { Tag } from 'src/app/models/sockets/tag-sock.model';
@@ -22,7 +23,8 @@ export class BlueprintOptionsComponent {
     private readonly tabs: TabService,
     private readonly project: ProjectService,
     private readonly socket: SocketService,
-    private readonly dialog: MatDialog
+    private readonly dialog: MatDialog,
+    private readonly blueprintHandler: BlueprintService
   ) { }
 
   onRename() {
@@ -36,6 +38,10 @@ export class BlueprintOptionsComponent {
       maxWidth: "90%",
       maxHeight: "90%"
     });
+  }
+
+  autoPosBlueprint() {
+    this.blueprintHandler.autoPos();
   }
 
   deleteBlueprint() {

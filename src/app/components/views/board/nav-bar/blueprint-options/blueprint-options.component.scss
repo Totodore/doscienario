@@ -13,16 +13,32 @@
       }
     }
   }
-  .btns {
+  .blueprint-tags {
+    margin-bottom: 10px;
+    .btns {
+      display: flex;
+      button {
+        flex-grow: 1;
+      }
+      .add-tags {
+        margin-right: 5px;
+      }
+      .remove-blueprint {
+        border-color: red;
+      }
+    }
+  }
+  .blueprint-options {
+    margin-top: 10px;
     display: flex;
+    justify-content: space-evenly;
     button {
-      flex-grow: 1;
-    }
-    .add-tags {
-      margin-right: 5px;
-    }
-    .remove-blueprint {
-      border-color: red;
+      height: 45px;
+      width: 45px;
+      line-height: 45px;
+      mat-icon {
+        font-size: 25px;
+      }
     }
   }
 }

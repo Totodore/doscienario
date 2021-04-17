@@ -1,3 +1,6 @@
+import { Node } from './../models/sockets/blueprint-sock.model';
+import { Relationship } from "../models/sockets/blueprint-sock.model";
+
 export function setImmediate(callback: (...args: any) => void, ...args: any) {
   setTimeout(callback, 0, args);
 }
@@ -39,9 +42,57 @@ function nodeIterate(parentId: number, rels: Tuple[]): number[] {
   return removeRels;
 }
 
+/**
+ * Autoposition a whole blueprint according to its structure
+ */
+export function autoposNode(nodes: Node[], rels: Relationship[], margin: Tuple) {
+  let depthLevel = 0;
+  const root = nodes.find(el => el.isRoot);
+  // const depth = findDepth(root, rels, nodes);
+  console.log(findNodesByLevel(root, rels, nodes, 1));
+}
+
+/**
+ * Algorithm to find the depth of a tree
+ * For each child of a node we take the child with the bigger depth and we return it
+ */
+function findDepth(root: Node, rels: Relationship[], nodes: Node[]): number {
+  const childs = findChildNodes(root, rels, nodes);
+  let childDepth = -1;
+  for (const child of childs) {
+    const h = findDepth(child, rels, nodes);
+    console.log("root:", root, h);
+    if (h > childDepth)
+      childDepth = h;
+  }
+  return childDepth + 1;
+}
+
+function findParentNodes(node: Node, rels: Relationship[], nodes: Node[]): Node[] {
+  return rels.filter(el => el.childId === node.id).map(el => nodes.find(node => node.id === el?.parentId));
+}
+function findChildNodes(node: Node, rels: Relationship[], nodes: Node[]): Node[] {
+  return rels.filter(el => el.parentId === node.id).map(el => nodes.find(node => node.id === el?.childId));
+}
+/**
+ * Todo: Demander à léo pour faire marcher cette merde de nodes by level
+ */
+function findNodesByLevel(root: Node, rels: Relationship[], nodes: Node[], level: number): Node[] {
+  const childs = findChildNodes(root, rels, nodes);
+  let childDepth = -1;
+  for (const child of childs) {
+    const h = findDepth(child, rels, nodes);
+    // console.log("root:", root, h);
+    if (h > childDepth)
+      childDepth = h;
+  }
+  if (childDepth + 1 === level)
+    return childs;
+  else return findNodesByLevel(root, rels, nodes, level);
+}
 interface RemoveObj {
   nodes: number[];
   rels: number[];
 }
 // 0: parent, 1: child, 2: id
-type Tuple = [number, number, number];
+type Tuple = [number, number, number?];

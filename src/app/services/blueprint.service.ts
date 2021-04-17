@@ -5,6 +5,7 @@ import { ProjectService } from './project.service';
 import { Injectable } from '@angular/core';
 import { NodeComponent, Poles } from '../components/tabs/blueprint/node/node.component';
 import { CreateNodeReq, Node } from "../models/sockets/blueprint-sock.model";
+import { autoposNode } from '../utils/helpers';
 @Injectable({
   providedIn: 'root'
 })
@@ -332,6 +333,11 @@ export class BlueprintService {
     this.context.lineTo(o[0] + s[0], o[1] - s[1] + half);
     this.context.stroke();
     this.context.closePath();
+  }
+  public autoPos() {
+    const nodes = this.project.openBlueprints[this.tabId].nodes;
+    const rels = this.project.openBlueprints[this.tabId].relationships;
+    autoposNode(nodes, rels, [20, 40]);
   }
 }
 

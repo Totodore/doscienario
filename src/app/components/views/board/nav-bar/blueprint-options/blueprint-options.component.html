@@ -13,4 +13,10 @@
       <button mat-stroked-button class="remove-blueprint" [style]="docTags?.length ? 'margin-top: 10px' : ''" (click)="deleteBlueprint()" color="accent">Supprimer l'arbre</button>
     </div>
   </div>
+  <mat-divider></mat-divider>
+  <div class="blueprint-options">
+    <button mat-stroked-button (click)="autoPosBlueprint()">
+      <mat-icon color="accent" style="transform: rotateZ(90deg);">filter_list</mat-icon>
+    </button>
+  </div>
 </div>

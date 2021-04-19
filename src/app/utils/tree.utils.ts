@@ -62,20 +62,18 @@ export function findParentRels(node: Node, rels: Relationship[]): Relationship[]
 /** 
  * Find all nodes from a specified level 
  */
-export function findNodesByLevel(root: Node, rels: Relationship[], nodes: Node[], level: number, currentLevel = 0): Node[] {
-  const customNodes = nodes.map(node => _createCustomNode(node));
-  _findNodesLevels(_createCustomNode(root), rels, customNodes, level, currentLevel);
+export function findNodesByLevel(root: Node, rels: Relationship[], nodes: Node[], level: number, currentLevel = 0, customNodes: NodeLevelStruct[] = _findNodesLevels(_createCustomNode(root), rels, nodes.map(node => _createCustomNode(node)), level, currentLevel)): Node[] {
   return customNodes.filter(node => node.levels.has(level)).map(node => node.node);
 }
 function _findChildNodesForLevel(node: Node, rels: Relationship[], nodes: { [key: number]: NodeLevelStruct }): NodeLevelStruct[] {
   return rels.filter(el => el.parentId === node.id).map(el => nodes[el.childId]);
 }
 
-function _createCustomNode(node: Node): NodeLevelStruct {
+export function _createCustomNode(node: Node): NodeLevelStruct {
   return { levels: new Set<number>(), node };
 }
 
-function _findNodesLevels(root: NodeLevelStruct, rels: Relationship[], nodes: NodeLevelStruct[], maxLevel: number, currentLevel = 0) {
+export function _findNodesLevels(root: NodeLevelStruct, rels: Relationship[], nodes: NodeLevelStruct[], maxLevel: number, currentLevel = 0) {
   //@ts-ignore
   const nodesById = Object.fromEntries(nodes.map(node => [node.node.id, node]));
   if (root.levels.size === 0)
@@ -83,7 +81,7 @@ function _findNodesLevels(root: NodeLevelStruct, rels: Relationship[], nodes: No
   
   const childs = _findChildNodesForLevel(root.node, rels, nodesById);
   for (let child of childs) {
-    let keepGoing = false;
+    let keepGoing = maxLevel === -1;
     for (let level of root.levels) {
       child.levels.add(level+1);
       keepGoing ||= level+1 < maxLevel;
@@ -91,6 +89,8 @@ function _findNodesLevels(root: NodeLevelStruct, rels: Relationship[], nodes: No
     if(keepGoing)
       _findNodesLevels(child, rels, nodes, maxLevel);
   }
+  
+  return nodes;
 }
 
 // function findBestOrder(nodes: Node[], rels: Relationship[], o: Tuple, margin: Tuple) {

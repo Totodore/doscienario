@@ -56,6 +56,9 @@ export class Node {
   blueprint: Blueprint;
 
   tags: Tag[];
+
+  height?: number;
+  width?: number;
 }
 
 export class Relationship extends DataModel {

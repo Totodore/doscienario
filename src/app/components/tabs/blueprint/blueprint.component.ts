@@ -6,12 +6,11 @@ import { SocketService } from './../../../services/socket.service';
 import { Blueprint, Node, RemoveNodeOut } from './../../../models/sockets/blueprint-sock.model';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { ProjectService } from './../../../services/project.service';
-import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy, Provider, Type, ViewEncapsulation, AfterViewInit, AfterViewChecked, HostListener } from '@angular/core';
-import { CdkDrag, CdkDragEnd, CdkDragMove, CdkDragStart } from '@angular/cdk/drag-drop';
+import { Component, ViewChild, ElementRef, AfterViewChecked, ViewChildren, QueryList } from '@angular/core';
 import { v4 as uuid4 } from "uuid";
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { Poles, NodeComponent } from './node/node.component';
-import { removeNodeFromTree } from 'src/app/utils/helpers';
+import { removeNodeFromTree } from 'src/app/utils/tree.utils';
 
 
 @Component({
@@ -30,6 +29,12 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   @ViewChild("overlay", { static: false })
   public overlay: ElementRef<HTMLDListElement>;
 
+  @ViewChild("rootEl", { static: false })
+  public rootEl: NodeComponent;
+
+  @ViewChildren("nodeEl")
+  public nodeEls: QueryList<NodeComponent>;
+
   public initialized = false;
   public tabId: string;
   public show: boolean;
@@ -46,7 +51,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
 
   ngAfterViewChecked() {
     if (this.canvas && this.tabId && !this.initialized) {
-      this.blueprintHandler.init(this.canvas.nativeElement, this.wrapper.nativeElement, this.overlay.nativeElement, this.tabId, this.id);
+      this.blueprintHandler.init(this);
       this.initialized = true;
     }
   }
@@ -54,7 +59,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   onFocus() {
     if (this.initialized)
       window.setTimeout(() =>
-        this.blueprintHandler.init(this.canvas.nativeElement, this.wrapper.nativeElement, this.overlay.nativeElement, this.tabId, this.id)
+        this.blueprintHandler.init(this)
       );
   }
 
@@ -109,6 +114,10 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   onWiden(pole: Poles) {
     this.blueprintHandler.widenViewport(pole);
     this.blueprintHandler.drawRelations();
+  }
+
+  public getNodeEl(id: number): NodeComponent {
+    return this.nodeEls.find(el => el.data.id === id) || this.rootEl.data.id === id ? this.rootEl : null;
   }
 
   get blueprint(): Blueprint {

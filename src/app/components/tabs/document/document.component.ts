@@ -1,7 +1,6 @@
+import { DocumentWorkerService } from './../../../services/document-worker.service';
 import { ApiService } from 'src/app/services/api.service';
 import { TabService } from './../../../services/tab.service';
-import { SnackbarService } from './../../../services/snackbar.service';
-import { WorkerManagerService } from '../../../services/worker-manager.service';
 import { Change, DocumentModel } from './../../../models/sockets/document-sock.model';
 import { ProgressService } from 'src/app/services/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
@@ -68,7 +67,7 @@ export class DocumentComponent implements ITabElement, OnDestroy {
     private readonly project: ProjectService,
     private readonly progress: ProgressService,
     private readonly tabs: TabService,
-    private readonly worker: WorkerManagerService,
+    private readonly docWorker: DocumentWorkerService,
     private readonly api: ApiService
   ) { }
 
@@ -80,12 +79,12 @@ export class DocumentComponent implements ITabElement, OnDestroy {
     this.tabId = uuid4();
     this.progress.show();
     this.socket.socket.emit(Flags.OPEN_DOC, [this.tabId, id]);
-    this.worker.addEventListener<Change[]>(`diff-${this.tabId}`, (data) => this.onDocParsed(data));
+    this.docWorker.worker.addEventListener<Change[]>(`diff-${this.tabId}`, (data) => this.onDocParsed(data));
     return this.tabId;
   }
 
   ngOnDestroy() {
-    this.worker.removeEventListener(`diff-${this.tabId}`);
+    this.docWorker.worker.removeEventListener(`diff-${this.tabId}`);
   }
 
   editorLoaded(editor: CKEditor5.Editor): void {
@@ -108,7 +107,7 @@ export class DocumentComponent implements ITabElement, OnDestroy {
       const change: Change = [2, null, data];
       this.socket.updateDocument(this.id, this.tabId, [change], this.doc.lastChangeId, ++this.doc.clientUpdateId);
     } else {
-      this.worker.postMessage<[string, string]>(`diff-${this.tabId}`, [this.content, data]);
+      this.docWorker.worker.postMessage<[string, string]>(`diff-${this.tabId}`, [this.content, data]);
       this.progressWatcher();
     }
     this.content = data;

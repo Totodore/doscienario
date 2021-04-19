@@ -6,7 +6,7 @@ import { DocumentModel, DocumentRes, Change, WriteDocumentRes, OpenDocumentRes }
 import { GetProjectRes, ProjectUserRes, GetProjectDocumentRes, SearchQueryRes } from './../models/api/project.model';
 import { Injectable, OnInit } from '@angular/core';
 import { Tag } from '../models/sockets/tag-sock.model';
-import { removeNodeFromTree } from '../utils/helpers';
+import { removeNodeFromTree } from '../utils/tree.utils';
 
 @Injectable({
   providedIn: 'root'

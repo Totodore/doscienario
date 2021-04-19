@@ -1,35 +1,15 @@
-import { Blueprint } from './models/sockets/blueprint-sock.model';
-import { GetProjectDocumentRes, SearchResults } from './models/api/project.model';
-import { Tag } from './models/sockets/tag-sock.model';
-import { Change } from './models/sockets/document-sock.model';
-import * as diff from "diff";
-import { sortByRelevance } from './utils/helpers';
-/// <reference lib="webworker" />
 
+import { Blueprint } from '../models/sockets/blueprint-sock.model';
+import { GetProjectDocumentRes, SearchResults } from '../models/api/project.model';
+import { Tag } from '../models/sockets/tag-sock.model';
+import { sortByRelevance } from '../utils/helpers';
+
+/// <reference lib="webworker" />
 addEventListener('message', (e: MessageEvent<[string, any] | string>) => {
-  if (e.data == "hello")
-    console.log("Worker started");
-  else if (e.data[0].startsWith("diff"))
-    //@ts-ignore
-    postMessage([e.data[0], computeDiff(e.data[1])]);
-  else if (e.data[0] == 'search')
+  if (e.data[0] == 'search')
     //@ts-ignore
     postMessage([e.data[0], search(...e.data[1])]);
 });
-
-function computeDiff([oldContent, newContent]: [string, string]): Change[] {
-  let changes: Change[] = [];
-  let i = 0;
-  // console.log("Computing diff from thread...");
-  for (const change of diff.diffChars(oldContent, newContent)) {
-    if (change.added)
-      changes.push([1, i, change.value]);
-    else if (change.removed)
-      changes.push([-1, i, change.value]);
-    i += change.count;
-  }
-  return changes;
-}
 
 function search(needle: string, data: [Tag[], GetProjectDocumentRes[], Blueprint[]]): SearchResults {
   let tags: Tag[] = [];

@@ -1,4 +1,4 @@
-import { WorkerManagerService } from './../../../../../services/worker-manager.service';
+import { WorkerManager, WorkerType } from './../../../../../utils/worker-manager.utils';
 import { ProgressService } from 'src/app/services/progress.service';
 import { SearchResults } from './../../../../../models/api/project.model';
 import { ProjectService } from './../../../../../services/project.service';
@@ -17,13 +17,15 @@ export class SearchOptionsComponent implements OnInit {
 
   @Output() public results: EventEmitter<SearchResults> = new EventEmitter<SearchResults>();
 
+  private searchWorker: WorkerManager;
   constructor(
     private readonly project: ProjectService,
     private readonly progress: ProgressService,
-    private readonly workerManager: WorkerManagerService
   ) { }
+
+  
   ngOnInit(): void {
-    this.workerManager.addEventListener('search', (data: SearchResults) => this.onSearch(data));
+    this.searchWorker = new WorkerManager(WorkerType.Search);
   }
 
   public async search() {
@@ -33,15 +35,13 @@ export class SearchOptionsComponent implements OnInit {
     }
     this.progress.show();
     this.queryCount++;
-    this.workerManager.postMessage('search', [this.searchQuery, [this.project.tags, this.project.docs, this.project.blueprints]]);
-  }
-
-  public onSearch(data: SearchResults) {
+    const data = await this.searchWorker.postAsyncMessage<SearchResults>('search', [this.searchQuery, [this.project.tags, this.project.docs, this.project.blueprints]]);
     this.results.emit(data);
     this.queryCount--;
     if (this.queryCount == 0)
       this.progress.hide();
   }
+
   public onChipClick(state: "doc" | "tag") {
     if (this.sortState.includes(state))
       this.sortState.splice(this.sortState.indexOf(state), 1);

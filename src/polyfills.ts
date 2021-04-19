@@ -77,7 +77,18 @@ Array.prototype.equals = function<T = any>(this: Array<T>, array: Array<T>) {
   }
   return true;
 }
-
+/** 
+ * Compute the factorial of a number (!x)
+ * If the number is < 0 it returns -1
+ */
+Math.factorial = (num: number) => {
+  if (num < 0) 
+    return -1;
+  else if (num == 0) 
+    return 1;
+  else
+    return (num * Math.factorial(num - 1));
+}
 
 /** IE11 requires the following for NgClass support on SVG elements */
 // import 'classlist.js';  // Run `npm install --save classlist.js`.

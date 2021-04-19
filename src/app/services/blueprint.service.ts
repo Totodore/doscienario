@@ -352,8 +352,8 @@ export class BlueprintService {
   public async autoPos() {
     console.time("a");
     this.progress.show();
-    const nodes = this.project.openBlueprints[this.tabId].nodes;
-    const rels = this.project.openBlueprints[this.tabId].relationships;
+    let nodes = this.project.openBlueprints[this.tabId].nodes;
+    let rels = this.project.openBlueprints[this.tabId].relationships;
     const margin: Vector = [100, 50];
     for (const node of nodes) {
       const el = this.component.getNodeEl(node.id).wrapper.nativeElement;
@@ -366,8 +366,8 @@ export class BlueprintService {
       console.timeEnd("a");
       return;
     }
-    this.project.openBlueprints[this.tabId].nodes = data[0];
-    this.project.openBlueprints[this.tabId].relationships = data[1];
+    this.project.openBlueprints[this.tabId].nodes = nodes = data[0];
+    this.project.openBlueprints[this.tabId].relationships = rels = data[1];
 
     this.configSize();
     this.drawRelations();

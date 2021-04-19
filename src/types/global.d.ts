@@ -7,6 +7,7 @@ declare global {
 
   interface Array<T> {
     equals<T>(this: Array<T>, array1: Array<T>): boolean;
+    // includes<T>(this: Array<T>, el: T, custom?: (el: T, arr) => ): boolean;
   }
 
   interface HTMLElement {
@@ -15,4 +16,9 @@ declare global {
     isMaxScrollTop: boolean;
     isMaxScrollLeft: boolean;
   }
+
+  interface Math {
+    factorial(num: number): number;
+  }
 }
+export type Vector = [number, number];

@@ -1,11 +1,15 @@
+import { ProgressService } from './progress.service';
+import { SnackbarService } from './snackbar.service';
+import { WorkerManager, WorkerType } from './../utils/worker-manager.utils';
+import { Vector } from './../../types/global.d';
+import { BlueprintComponent } from './../components/tabs/blueprint/blueprint.component';
 import { CreateNodeRes, Relationship, Blueprint, PlaceNodeOut } from './../models/sockets/blueprint-sock.model';
 import { Flags } from './../models/sockets/flags.enum';
 import { SocketService } from './socket.service';
 import { ProjectService } from './project.service';
 import { Injectable } from '@angular/core';
 import { NodeComponent, Poles } from '../components/tabs/blueprint/node/node.component';
-import { CreateNodeReq, Node } from "../models/sockets/blueprint-sock.model";
-import { autoposNode } from '../utils/helpers';
+import { Node } from "../models/sockets/blueprint-sock.model";
 @Injectable({
   providedIn: 'root'
 })
@@ -32,21 +36,28 @@ export class BlueprintService {
   private overlay: HTMLElement;
   private tabId: string;
   private docId: number;
+  private component: BlueprintComponent;
+  private blueprintWorker: WorkerManager;
 
   public ghostNode: Tuple;
   public scrollPoles: Set<Poles> = new Set();
 
   constructor(
     private readonly project: ProjectService,
-    private readonly socket: SocketService
-  ) { }
+    private readonly socket: SocketService,
+    private readonly snack: SnackbarService,
+    private readonly progress: ProgressService
+  ) {
+    this.blueprintWorker = new WorkerManager(WorkerType.Blueprint);
+  }
 
-  public init(canvas: HTMLCanvasElement, wrapper: HTMLElement, overlay: HTMLElement, tabId: string, docId: number) {
-    this.tabId = tabId;
-    this.canvas = canvas;
-    this.wrapper = wrapper;
-    this.overlay = overlay;
-    this.docId = docId;
+  public init(component: BlueprintComponent) {
+    this.component = component;
+    this.tabId = component.tabId;
+    this.canvas = component.canvas.nativeElement;
+    this.wrapper = component.wrapper.nativeElement;
+    this.overlay = component.overlay.nativeElement;
+    this.docId = component.id;
     this.configSize();
     this.onScroll();
     this.wrapper.addEventListener("scroll", () => this.onScroll());
@@ -334,10 +345,38 @@ export class BlueprintService {
     this.context.stroke();
     this.context.closePath();
   }
-  public autoPos() {
+
+  /** 
+   * Method to autoPositionate each node and relations 
+   */
+  public async autoPos() {
+    console.time("a");
+    this.progress.show();
     const nodes = this.project.openBlueprints[this.tabId].nodes;
     const rels = this.project.openBlueprints[this.tabId].relationships;
-    autoposNode(nodes, rels, [20, 40]);
+    const margin: Vector = [100, 50];
+    for (const node of nodes) {
+      const el = this.component.getNodeEl(node.id).wrapper.nativeElement;
+      node.width = el.clientWidth;
+      node.height = el.clientHeight;
+    }
+    const data: [Node[], Relationship[]] = await this.blueprintWorker.postAsyncMessage(`autopos-${this.tabId}`, [nodes, rels, margin]);
+    if (!data) {
+      this.snack.snack("Ouups ! Impossible d'agencer cet arbre");
+      console.timeEnd("a");
+      return;
+    }
+    this.project.openBlueprints[this.tabId].nodes = data[0];
+    this.project.openBlueprints[this.tabId].relationships = data[1];
+
+    this.configSize();
+    this.drawRelations();
+    console.timeEnd("a");
+    this.progress.hide();
+    for (const rel of rels)
+      this.socket.socket.emit(Flags.PLACE_RELATIONSHIP, rel);
+    for (const node of nodes)
+      this.socket.socket.emit(Flags.PLACE_NODE, new PlaceNodeOut(this.docId, node.id, [node.x, node.y]));
   }
 }
 

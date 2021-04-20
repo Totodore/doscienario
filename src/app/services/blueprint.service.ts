@@ -21,10 +21,10 @@ export class BlueprintService {
   private readonly enableSkeleton = false;
 
   public drawState: DrawStates = "none";
-  private drawingOriginPos: Tuple;
+  private drawingOriginPos: Vector;
 
-  private ghostSize: Tuple;
-  private mousePos: Tuple;
+  private ghostSize: Vector;
+  private mousePos: Vector;
   private scrollIntervalId: number;
   private tresholdMousePole: Poles[];
   public parentGhost: NodeComponent;
@@ -40,8 +40,9 @@ export class BlueprintService {
   private component: BlueprintComponent;
   private blueprintWorker: WorkerManager;
 
-  public ghostNode: Tuple;
+  public ghostNode: Vector;
   public scrollPoles: Set<Poles> = new Set();
+  public scale = 1;
 
   constructor(
     private readonly project: ProjectService,
@@ -143,7 +144,7 @@ export class BlueprintService {
    * Draw a ghost node on the canvas that follow the mouse
    * Use bezier curve to draw relations
    */
-  private drawGhostNodeAndRel(pos: Tuple) {
+  private drawGhostNodeAndRel(pos: Vector) {
     let [ox, oy] = this.drawingOriginPos;
     let [ex, ey] = [pos[0], pos[1] - 48];
     ex += this.wrapper.scrollLeft;
@@ -160,6 +161,7 @@ export class BlueprintService {
   public drawRelations() {
     const blueprint = this.project.openBlueprints[this.tabId];
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.context.scale(1, 1);
     this.drawGrid();
     for (const rel of blueprint.relationships) {
       this.drawCurve([rel.ox, rel.oy - 48], [rel.ex, rel.ey]);
@@ -183,7 +185,7 @@ export class BlueprintService {
     this.context.closePath();
   }
 
-  private drawCurve(o: Tuple, e: Tuple, rel = true) {
+  private drawCurve(o: Vector, e: Vector, rel = true) {
     this.context.lineWidth = 1;
     const [ox, oy] = o;
     const [ex, ey] = e;
@@ -199,7 +201,7 @@ export class BlueprintService {
     this.drawSkeleton([ox, oy], [w, h], [p1x, p1y, p2x, p2y], rel);
   }
 
-  public beginGhostRelation(parent: NodeComponent, e: Tuple) {
+  public beginGhostRelation(parent: NodeComponent, e: Vector) {
     e[0] += this.wrapper.scrollLeft;
     e[1] += this.wrapper.scrollTop;
     this.drawState = "drawing";
@@ -208,7 +210,7 @@ export class BlueprintService {
     this.ghostNode = e;
     this.parentGhost = parent;
   }
-  public bindRelation(child: NodeComponent, anchorPos: Tuple) {
+  public bindRelation(child: NodeComponent, anchorPos: Vector) {
     if (this.drawState === "drawing") {
       this.socket.socket.emit(Flags.CREATE_RELATION, new Relationship({
         parentId: this.parentGhost.data.id,
@@ -241,7 +243,7 @@ export class BlueprintService {
   /**
    * Detect if the mouse is in a Pole
    */
-  private tresholdMouse(pos: Tuple): Poles[] {
+  private tresholdMouse(pos: Vector): Poles[] {
     const treshold = 48;
     const poles: Poles[] = [];
     if (pos[1] - 48 < treshold)
@@ -279,7 +281,7 @@ export class BlueprintService {
       .filter(el => el.childId === node.data.id || el.parentId === node.data.id)
       .map(el => Object.assign({}, el));
   }
-  public onDragMove(offset: Tuple) {
+  public onDragMove(offset: Vector) {
     for (const rel of this.project.openBlueprints[this.tabId].relationships) {
       const oldRel = this.draggedRelationships.find(el => el.id === rel.id);
       // console.log(oldRel, offset);
@@ -313,7 +315,7 @@ export class BlueprintService {
   /**
    * Draw the skeleton if the option is enabled
    */
-  private drawSkeleton(o: Tuple, s: Tuple, p: [number, number, number, number], rel: boolean) {
+  private drawSkeleton(o: Vector, s: Vector, p: [number, number, number, number], rel: boolean) {
     if (!this.enableSkeleton)
       return;
     const half = rel ? this.overlay.clientHeight / 2 : 0;
@@ -376,4 +378,3 @@ export class BlueprintService {
 }
 
 type DrawStates = "drawing" | "dragging" | "none";
-type Tuple = [number, number];

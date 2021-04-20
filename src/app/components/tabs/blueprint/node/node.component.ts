@@ -95,6 +95,8 @@ export class NodeComponent implements AfterViewInit {
   }
 
   onDragStart(e: MouseEvent) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
     this.dragOrigin = [
       Math.min(e.x + this.viewport.scrollLeft - this.wrapper.nativeElement.parentElement.clientWidth),
       Math.min(e.y + this.viewport.scrollTop - 48 + (this.wrapper.nativeElement.parentElement.clientHeight / 2)),
@@ -108,6 +110,8 @@ export class NodeComponent implements AfterViewInit {
    * Emit the distance between the origin and the drag
    */
   onDragMove(e: MouseEvent) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
     const x = Math.min(e.x + this.viewport.scrollLeft - this.wrapper.nativeElement.parentElement.clientWidth);
     const y = Math.min(e.y + this.viewport.scrollTop - 48 + (this.wrapper.nativeElement.parentElement.clientHeight / 2));
     this.wrapper.nativeElement.parentElement.style.left = x + "px";
@@ -119,6 +123,8 @@ export class NodeComponent implements AfterViewInit {
    * Emit the last position
    */
   onDragEnd(e: MouseEvent) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
     const x = Math.min(e.x + this.viewport.scrollLeft - this.wrapper.nativeElement.parentElement.clientWidth);
     const y = Math.min(e.y + this.viewport.scrollTop - 48 + (this.wrapper.nativeElement.parentElement.clientHeight / 2));
     window.removeEventListener("mousemove", this.onMove);

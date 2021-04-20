@@ -8,9 +8,14 @@
   <button *ngIf="blueprintHandler.scrollPoles.has('north')" mat-icon-button class="top" (click)="onWiden('north')">
     <mat-icon>expand_less</mat-icon>
   </button>
-  <div class="wrapper" #wrapper>
+  <div class="wrapper" #wrapper [class.grabbing]="dragging">
     <canvas #viewport *ngIf="blueprint"></canvas>
-    <div class="overlay" *ngIf="blueprint" #overlay>
+    <div class="overlay" *ngIf="blueprint" #overlay 
+			[style]="'transform: scale('+blueprintHandler.scale+')'" 
+			(mousedown)="onMouseDown($event)" 
+			(mouseup)="onMouseUp($event)" 
+			(mousemove)="onMouseMove($event)">
+
       <app-node class="root" #rootEl [data]="root" (relationBegin)="beginRelation(rootEl, $event)"></app-node>
       <app-node #nodeEl *ngFor="let node of nodes"
         [style.left.px]="node.x" [style.top]="'calc(50% + ' + node.y + 'px)'"

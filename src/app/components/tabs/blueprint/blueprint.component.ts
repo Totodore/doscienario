@@ -38,6 +38,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   public initialized = false;
   public tabId: string;
   public show: boolean;
+  public dragging = false;
 
   public readonly type = TabTypes.BLUEPRINT;
 
@@ -112,6 +113,24 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
     });
   }
 
+  onMouseDown(e: MouseEvent) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    this.dragging = true;
+  }
+  onMouseUp(e: MouseEvent) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    this.dragging = false;
+  }
+  onMouseMove(e: MouseEvent) {
+    if (this.dragging) {
+      e.stopImmediatePropagation();
+      e.preventDefault();
+      this.wrapper.nativeElement.scrollTop -= e.movementY;
+      this.wrapper.nativeElement.scrollLeft -= e.movementX;
+    }
+  }
   onWiden(pole: Poles) {
     this.blueprintHandler.widenViewport(pole);
     this.blueprintHandler.drawRelations();

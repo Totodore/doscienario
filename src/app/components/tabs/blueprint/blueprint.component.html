@@ -11,7 +11,7 @@
   <div class="wrapper" #wrapper [class.grabbing]="dragging">
     <canvas #viewport *ngIf="blueprint"></canvas>
     <div class="overlay" *ngIf="blueprint" #overlay 
-			[style]="'transform: scale('+blueprintHandler.scale+')'" 
+			[style]="'transform: scale('+blueprintHandler.scale+'); transform-origin:'+blueprintHandler.scaleOrigin[0]+'px '+blueprintHandler.scaleOrigin[1]+'px;'" 
 			(mousedown)="onMouseDown($event)" 
 			(mouseup)="onMouseUp($event)" 
 			(mousemove)="onMouseMove($event)">

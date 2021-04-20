@@ -43,6 +43,7 @@ export class BlueprintService {
   public ghostNode: Vector;
   public scrollPoles: Set<Poles> = new Set();
   public scale = 1;
+  public scaleOrigin: Vector = [0, 0];
 
   constructor(
     private readonly project: ProjectService,
@@ -64,6 +65,7 @@ export class BlueprintService {
     this.onScroll();
     this.wrapper.addEventListener("scroll", () => this.onScroll());
     this.wrapper.addEventListener("mousemove", (e) => this.onMouseMove(e));
+    this.wrapper.addEventListener("wheel", (e) => this.onWheel(e));
     this.wrapper.addEventListener("click", (e) => this.onClick(e));
     this.wrapper.addEventListener("resize", () => this.configSize());
     this.drawRelations();
@@ -100,6 +102,15 @@ export class BlueprintService {
     if (this.wrapper.scrollLeft > this.wrapper.scrollLeftMax - 20)
       this.scrollPoles.add("east");
     else this.scrollPoles.delete("east");
+  }
+
+  private onWheel(e: WheelEvent) {
+    e.preventDefault();
+    if (this.scale > 0.01 && this.scale < 50) {
+      this.scale += e.deltaY / 1000;
+      this.scaleOrigin = [e.x + this.wrapper.clientLeft, e.y + this.wrapper.clientTop];
+      this.drawRelations();
+    }
   }
   /**
    * Mouse Move event
@@ -161,7 +172,8 @@ export class BlueprintService {
   public drawRelations() {
     const blueprint = this.project.openBlueprints[this.tabId];
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.context.scale(1, 1);
+    this.context.setTransform(this.scale, 0, 0, this.scale, -this.scaleOrigin[0], this.scaleOrigin[1]);
+    // this.context.setTransform(this.scale, 0, 0, this.scale, -this.canvas.width / 2, -this.canvas.height / 2);
     this.drawGrid();
     for (const rel of blueprint.relationships) {
       this.drawCurve([rel.ox, rel.oy - 48], [rel.ex, rel.ey]);

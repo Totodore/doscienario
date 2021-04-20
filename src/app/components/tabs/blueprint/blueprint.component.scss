@@ -61,6 +61,7 @@
     top: 0px;
     left: 0px;
     z-index: 10;
+		transform-origin: center;
     app-node {
       position: absolute;
       transform: translateY(-50%);

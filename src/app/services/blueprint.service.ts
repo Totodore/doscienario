@@ -10,6 +10,7 @@ import { ProjectService } from './project.service';
 import { Injectable } from '@angular/core';
 import { NodeComponent, Poles } from '../components/tabs/blueprint/node/node.component';
 import { Node } from "../models/sockets/blueprint-sock.model";
+import { findLevelByNode } from '../utils/tree.utils';
 @Injectable({
   providedIn: 'root'
 })
@@ -79,7 +80,7 @@ export class BlueprintService {
     this.canvas.style.height = h + "px";
     this.overlay.style.width = w + "px";
     this.overlay.style.height = h + "px";
-    this.wrapper.scrollTop += this.wrapper.scrollTopMax / 2;
+    this.wrapper.scrollTop = this.wrapper.scrollTopMax / 2;
   }
 
   /**
@@ -156,14 +157,8 @@ export class BlueprintService {
     this.ghostNode = [ex, ey];
   }
 
-  public drawRelations(canvas?: HTMLCanvasElement, wrapper?: HTMLDivElement, overlay?: HTMLElement) {
+  public drawRelations() {
     const blueprint = this.project.openBlueprints[this.tabId];
-    if (canvas && wrapper && overlay) {
-      this.canvas = canvas;
-      this.wrapper = wrapper;
-      this.overlay = overlay;
-      this.context = canvas.getContext("2d");
-    }
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.drawGrid();
     for (const rel of blueprint.relationships) {

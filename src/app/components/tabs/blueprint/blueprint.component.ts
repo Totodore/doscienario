@@ -10,7 +10,7 @@ import { Component, ViewChild, ElementRef, AfterViewChecked, ViewChildren, Query
 import { v4 as uuid4 } from "uuid";
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { Poles, NodeComponent } from './node/node.component';
-import { removeNodeFromTree } from 'src/app/utils/tree.utils';
+import { findLevelByNode, findNodesByLevel, removeNodeFromTree } from 'src/app/utils/tree.utils';
 
 
 @Component({
@@ -58,9 +58,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
 
   onFocus() {
     if (this.initialized)
-      window.setTimeout(() =>
-        this.blueprintHandler.init(this)
-      );
+      window.setTimeout(() => this.blueprintHandler.init(this));
   }
 
   refreshView() {
@@ -93,7 +91,10 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
     this.blueprintHandler.beginGhostRelation(parent, e);
   }
   bindRelation(child: NodeComponent, anchorPos: [number, number]) {
-    this.blueprintHandler.bindRelation(child, anchorPos);
+    const childLevel = findLevelByNode(child.data, this.root, this.nodes, this.blueprint.relationships);
+    const parentLevel = findLevelByNode(this.blueprintHandler.parentGhost.data, this.root, this.nodes, this.blueprint.relationships);
+    if (childLevel > parentLevel)
+      this.blueprintHandler.bindRelation(child, anchorPos);
   }
 
   onRemove(el: NodeComponent) {

@@ -1,3 +1,4 @@
+import { NodeStruct } from './../utils/tree.utils';
 import { findChildRels, findDepth, findNodesByLevel, findParentRels, _findNodesLevels, _createCustomNode } from '../utils/tree.utils';
 import { Vector } from './../../types/global.d';
 import { Node, Relationship } from './../models/sockets/blueprint-sock.model';
@@ -18,6 +19,7 @@ addEventListener('message', (e: MessageEvent<[string, any] | string>) => {
   }
 });
 
+type RelationshipCache = { [key: number]: Relationship[] };
 
 function autoPosBlueprint(nodes: Node[], rels: Relationship[], margin: Vector): [Node[], Relationship[]] {
   //@ts-ignore
@@ -27,11 +29,10 @@ function autoPosBlueprint(nodes: Node[], rels: Relationship[], margin: Vector): 
   const depth = findDepth(root, rels, nodesData);
 
   const nodesLevelCache = _findNodesLevels(_createCustomNode(root), rels, nodes.map(node => _createCustomNode(node)), -1, 0);
-
   //@ts-ignore
-  const childCache: { [key: number]: Relationship[] } = Object.fromEntries(nodes.map(node => [node.id, []]));
+  const childCache: RelationshipCache = Object.fromEntries(nodes.map(node => [node.id, []]));
   //@ts-ignore
-  const parentCache: { [key: number]: Relationship[] } = Object.fromEntries(nodes.map(node => [node.id, []]));
+  const parentCache: RelationshipCache = Object.fromEntries(nodes.map(node => [node.id, []]));
   for (let rel of rels) {
     childCache[rel.parentId].push(rel);
     parentCache[rel.childId].push(rel);
@@ -53,16 +54,14 @@ function autoPosBlueprint(nodes: Node[], rels: Relationship[], margin: Vector): 
     let bestPermutation: number[], bestDistance: number = Infinity;
 
     //@ts-ignore
-    const clonedNodesById: { [key: number]: Node } = Object.fromEntries(clonedNodes.map(node => [node.id, node]));
+    const clonedNodesById: NodeStruct = Object.fromEntries(clonedNodes.map(node => [node.id, node]));
     
     //We simulate all the permutation to find the best one
     for (const permutation of permute(clonedNodes.map(el => el.id))) {
       //For each cloned siblings
       let distance = 0;
       for (let k = 0; k < permutation.length; k++) {
-        const node = clonedNodesById[permutation[k]];
-        const previousNode = clonedNodesById[permutation[k - 1]];
-        distance += getParentRelDistance(node, [ox, oy], margin, clonedRels, childCache, parentCache, previousNode);
+        distance += getParentRelDistance(clonedNodesById[permutation[k]], [ox, oy], margin, childCache, parentCache, clonedNodesById[permutation[k - 1]]);
         if (distance >= bestDistance)
           break;
       }
@@ -73,7 +72,7 @@ function autoPosBlueprint(nodes: Node[], rels: Relationship[], margin: Vector): 
     }
     els.sort((a, b) => bestPermutation.indexOf(a.id) - bestPermutation.indexOf(b.id));
     for (let j = 0; j < els.length; j++)
-      getParentRelDistance(els[j], [ox, oy], margin, rels, childCache, parentCache, els[j - 1]);
+      getParentRelDistance(els[j], [ox, oy], margin, childCache, parentCache, els[j - 1]);
   }
   return [nodes, rels];
 }
@@ -100,7 +99,7 @@ function* permute(permutation: number[]) {
   }
 }
 
-function getParentRelDistance(node: Node, o: [number, number?], margin: Vector, rels: Relationship[], childsRelsCache: { [key: number]: Relationship[] }, parentsRelsCache: { [key: number]: Relationship[] }, previousNode?: Node): number {
+function getParentRelDistance(node: Node, o: Vector, margin: Vector, childsRelsCache: { [key: number]: Relationship[] }, parentsRelsCache: { [key: number]: Relationship[] }, previousNode?: Node): number {
   //We save the old pos to make a delta
   let [oldX, oldY] = [node.x, node.y];
   //We set x origin and we set dynamically y origin :

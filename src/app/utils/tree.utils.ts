@@ -62,7 +62,14 @@ export function findParentRels(node: Node, rels: Relationship[]): Relationship[]
 /** 
  * Find all nodes from a specified level 
  */
-export function findNodesByLevel(root: Node, rels: Relationship[], nodes: Node[], level: number, currentLevel = 0, customNodes: NodeLevelStruct[] = _findNodesLevels(_createCustomNode(root), rels, nodes.map(node => _createCustomNode(node)), level, currentLevel)): Node[] {
+export function findNodesByLevel(
+  root: Node,
+  rels: Relationship[],
+  nodes: Node[],
+  level: number,
+  currentLevel = 0,
+  customNodes: NodeLevelStruct[] = _findNodesLevels(_createCustomNode(root), rels, nodes.map(node => _createCustomNode(node)), level, currentLevel)
+): Node[] {
   return customNodes.filter(node => node.levels.has(level)).map(node => node.node);
 }
 function _findChildNodesForLevel(node: Node, rels: Relationship[], nodes: { [key: number]: NodeLevelStruct }): NodeLevelStruct[] {
@@ -93,6 +100,18 @@ export function _findNodesLevels(root: NodeLevelStruct, rels: Relationship[], no
   return nodes;
 }
 
+export function findLevelByNode(node: Node, root: Node, nodes: Node[], rels: Relationship[]): number {
+  let i = 0;
+  const nodesLevelCache = _findNodesLevels(_createCustomNode(root), rels, nodes.map(node => _createCustomNode(node)), -1, 0);
+  //@ts-ignore
+  const nodeCache: NodeStruct = Object.fromEntries(nodes.map(el => [el.id, el]));
+  for (;i < findDepth(root, rels, nodeCache); i++) {
+    const els = findNodesByLevel(root, rels, nodes, i, 0, nodesLevelCache);
+    if (els.includes(node))
+      break;
+  }
+  return i;
+}
 // function findBestOrder(nodes: Node[], rels: Relationship[], o: Tuple, margin: Tuple) {
 //   const usedStates: number[][] = Array(nodes.length);
 //   const rest: number[] = nodes.map(el => el.id);  //Queue
@@ -137,4 +156,5 @@ interface RemoveObj {
 // 0: parent, 1: child, 2: id
 type Tuple = [number, number, number?];
 export type NodeStruct = { [id: number]: Node };
+export type RelationshipStruct = { [id: number]: Relationship };
 type NodeLevelStruct = { levels: Set<number>, node: Node };

@@ -18,8 +18,8 @@
       <app-node class="root" #rootEl [data]="root" (relationBegin)="beginRelation(rootEl, $event)"></app-node>
       <app-node #nodeEl *ngFor="let node of nodes"
         [style.left.px]="node.x" [style.top]="'calc(50% + ' + node.y + 'px)'"
-        [data]="node" (dragMove)="onDragMove($event)" (relationBegin)="beginRelation(nodeEl, $event)"
-        (dragStart)="onDragStart(nodeEl)" (dragEnd)="onDragEnd(nodeEl, $event)" (remove)="onRemove(nodeEl)" (relationBind)="bindRelation(nodeEl, $event)"></app-node>
+        [data]="node" (relationBegin)="beginRelation(nodeEl, $event)"
+        (remove)="onRemove(nodeEl)" (relationBind)="bindRelation(nodeEl, $event)"></app-node>
       <app-node *ngIf="blueprintHandler.ghostNode" class="skeleton" [style.left.px]="blueprintHandler.ghostNode[0]" [style.top.px]="blueprintHandler.ghostNode[1]"></app-node>
     </div>
     <h1 *ngIf="!blueprint">Chargement du document...</h1>

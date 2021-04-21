@@ -39,6 +39,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   public tabId: string;
   public show: boolean;
   public dragging = false;
+  public magnetMode = true;
 
   public readonly type = TabTypes.BLUEPRINT;
 
@@ -77,16 +78,6 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
     this.progress.hide();
   }
 
-
-  onDragStart(el: NodeComponent) {
-    this.blueprintHandler.onDragStart(el);
-  }
-  onDragEnd(el: NodeComponent, pos: [number, number]) {
-    this.blueprintHandler.onDragEnd(el.data, pos);
-  }
-  onDragMove(pos: [number, number]) {
-    this.blueprintHandler.onDragMove(pos);
-  }
 
   beginRelation(parent: NodeComponent, e: [number, number]) {
     this.blueprintHandler.beginGhostRelation(parent, e);

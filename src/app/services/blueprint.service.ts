@@ -10,6 +10,7 @@ import { ProjectService } from './project.service';
 import { Injectable } from '@angular/core';
 import { NodeComponent, Poles } from '../components/tabs/blueprint/node/node.component';
 import { Node } from "../models/sockets/blueprint-sock.model";
+import { findChildRels, findParentRels } from '../utils/tree.utils';
 @Injectable({
   providedIn: 'root'
 })
@@ -24,16 +25,14 @@ export class BlueprintService {
 
   private ghostSize: Vector;
   private mousePos: Vector;
+  private magnetLines: Vector<Vector>[] = [];
   private scrollIntervalId: number;
   private tresholdMousePole: Poles[];
   public parentGhost: NodeComponent;
 
-  private draggedNode: NodeComponent;
-  private draggedRelationships: Relationship[];
-
-  private canvas: HTMLCanvasElement;
+  public canvas: HTMLCanvasElement;
+  public overlay: HTMLElement;
   private wrapper: HTMLElement;
-  private overlay: HTMLElement;
   private tabId: string;
   private docId: number;
   private component: BlueprintComponent;
@@ -73,8 +72,8 @@ export class BlueprintService {
 
   private configSize() {
     const [w, h] = [
-      Math.max(this.wrapper.clientWidth, this.project.openBlueprints[this.tabId].nodes.reduce((prev, curr) => prev > curr.x ? prev : curr.x, 0) + 530),
-      Math.max(this.wrapper.clientHeight, this.project.openBlueprints[this.tabId].nodes.reduce((prev, curr) => prev > Math.abs(curr.y) ? prev : Math.abs(curr.y), 0) + 530),
+      Math.max(this.wrapper.clientWidth, this.component.nodes.reduce((prev, curr) => prev > curr.x ? prev : curr.x, 0) + 530),
+      Math.max(this.wrapper.clientHeight, this.component.nodes.reduce((prev, curr) => prev > Math.abs(curr.y) ? prev : Math.abs(curr.y), 0) + 530),
     ]
     this.context = this.canvas.getContext("2d");
     this.canvas.width = w;
@@ -179,17 +178,18 @@ export class BlueprintService {
   }
 
   public drawRelations() {
-    const blueprint = this.project.openBlueprints[this.tabId];
+    const blueprint = this.component.blueprint;
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.overlay.style.transformOrigin = `${this.scaleOrigin[0]}px ${this.scaleOrigin[1]}px`;
     this.overlay.style.transform = `scale(${this.scale})`;
-    // this.overlay.style.zoom = this.scale.toString();
     const bbox = this.overlay.getBoundingClientRect();
     this.context.setTransform(this.scale, 0, 0, this.scale, bbox.left + this.wrapper.scrollLeft, bbox.top + this.wrapper.scrollTop - 48);
     this.drawGrid();
     for (const rel of blueprint.relationships) {
       this.drawCurve([rel.ox, rel.oy - 48], [rel.ex, rel.ey]);
     }
+    if (this.component.magnetMode)
+      this.drawMagnets();
   }
   private drawGrid(step = 80) {
     this.context.strokeStyle = "#ffffff1f";
@@ -204,6 +204,18 @@ export class BlueprintService {
     for (let i = 0; i <= this.canvas.width; i += step) {
       this.context.moveTo(i, 0);
       this.context.lineTo(i, this.canvas.height);
+    }
+    this.context.stroke();
+    this.context.closePath();
+  }
+  private drawMagnets() {
+    this.context.lineWidth = 1;
+    this.context.strokeStyle = "#ff0000";
+    this.context.beginPath();
+    const half = this.canvas.height / 2.
+    for (const [o, e] of this.magnetLines) {
+      this.context.moveTo(o[0] + 48, o[1] + half + 48);
+      this.context.lineTo(e[0] + 48, e[1] + half + 48);
     }
     this.context.stroke();
     this.context.closePath();
@@ -248,7 +260,7 @@ export class BlueprintService {
       this.socket.socket.emit(Flags.CREATE_RELATION, new Relationship({
         parentId: this.parentGhost.data.id,
         childId: child.data.id,
-        blueprint: this.project.openBlueprints[this.tabId],
+        blueprint: this.component.blueprint,
         ex: anchorPos[0] + this.wrapper.scrollLeft,
         ey: anchorPos[1] + this.wrapper.scrollTop - this.overlay.clientHeight / 2 - 48,
         ox: this.drawingOriginPos[0],
@@ -307,42 +319,35 @@ export class BlueprintService {
       this.drawingOriginPos[0] += 500;
   }
 
-  public onDragStart(node: NodeComponent) {
+  public onDragStart() {
     this.drawState = "dragging";
-    this.draggedNode = node;
-    this.draggedRelationships = this.project.openBlueprints[this.tabId].relationships
-      .filter(el => el.childId === node.data.id || el.parentId === node.data.id)
-      .map(el => Object.assign({}, el));
   }
-  public onDragMove(offset: Vector) {
-    for (const rel of this.project.openBlueprints[this.tabId].relationships) {
-      const oldRel = this.draggedRelationships.find(el => el.id === rel.id);
-      // console.log(oldRel, offset);
-      if (rel.childId === this.draggedNode.data.id) {
-        rel.ex = oldRel.ex - offset[0];
-        rel.ey = oldRel.ey - offset[1];
-      } else if (rel.parentId === this.draggedNode.data.id) {
-        rel.ox = oldRel.ox - offset[0];
-        rel.oy = oldRel.oy - offset[1];
-      }
+  public onDragMove(offset: Vector, node: Node) {
+    const parentRel = findParentRels(node, this.component.blueprint.relationships);
+    const childRel = findChildRels(node, this.component.blueprint.relationships);
+    for (const rel of parentRel) {
+      rel.ex -= offset[0];
+      rel.ey -= offset[1];
     }
+    for (const rel of childRel) {
+      rel.ox -= offset[0];
+      rel.oy -= offset[1];
+    }
+    node.x -= offset[0];
+    node.y -= offset[1];
     this.drawRelations();
   }
   public onDragEnd(node: Node, pos: [number, number]) {
-    const blueprint = this.project.openBlueprints[this.tabId];
-    const nodeData = blueprint.nodes.find(el => el.id === node.id);
-    nodeData.x -= pos[0];
-    nodeData.y -= pos[1];
-    for (const rel of blueprint.relationships) {
+    const nodeData = this.component.nodes.find(el => el.id === node.id);
+    this.onDragMove(pos, node);
+    for (const rel of this.component.blueprint.relationships) {
       if (rel.childId === node.id) {
         this.socket.socket.emit(Flags.PLACE_RELATIONSHIP, rel);
-      } else if (rel.parentId === this.draggedNode.data.id) {
+      } else if (rel.parentId === node.id) {
         this.socket.socket.emit(Flags.PLACE_RELATIONSHIP, rel);
       }
     }
     this.socket.socket.emit(Flags.PLACE_NODE, new PlaceNodeOut(this.docId, node.id, [nodeData.x, nodeData.y]));
-    this.draggedNode = null;
-    this.draggedRelationships = null;
     this.drawState = "none";
   }
   /**
@@ -382,8 +387,8 @@ export class BlueprintService {
   public async autoPos() {
     console.time("a");
     this.progress.show();
-    let nodes = this.project.openBlueprints[this.tabId].nodes;
-    let rels = this.project.openBlueprints[this.tabId].relationships;
+    let nodes = this.component.nodes;
+    let rels = this.component.blueprint.relationships;
     const margin: Vector = [100, 50];
     for (const node of nodes) {
       const el = this.component.getNodeEl(node.id).wrapper.nativeElement;
@@ -408,6 +413,18 @@ export class BlueprintService {
     for (const node of nodes)
       this.socket.socket.emit(Flags.PLACE_NODE, new PlaceNodeOut(this.docId, node.id, [node.x, node.y]));
   }
+
+  public nodeMagnetMove([ex, ey]: Vector, movingNode: Node) {
+    this.magnetLines = [];
+    ex += movingNode.x;
+    ey += movingNode.y;
+    // console.log(ex, ey);
+    for (const node of this.component.nodes) {
+      if (Math.abs(ex - node.x) < 25) {
+        this.magnetLines.push([[ex, ey], [movingNode.x, movingNode.y]]);
+      }
+    }
+  } 
 }
 
 type DrawStates = "drawing" | "dragging" | "none";

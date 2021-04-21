@@ -119,8 +119,6 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
     this.dragging = true;
   }
   onMouseUp(e: MouseEvent) {
-    e.stopImmediatePropagation();
-    e.preventDefault();
     this.dragging = false;
   }
   onMouseMove(e: MouseEvent) {

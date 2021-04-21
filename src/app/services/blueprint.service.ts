@@ -10,7 +10,6 @@ import { ProjectService } from './project.service';
 import { Injectable } from '@angular/core';
 import { NodeComponent, Poles } from '../components/tabs/blueprint/node/node.component';
 import { Node } from "../models/sockets/blueprint-sock.model";
-import { findLevelByNode } from '../utils/tree.utils';
 @Injectable({
   providedIn: 'root'
 })
@@ -44,6 +43,7 @@ export class BlueprintService {
   public scrollPoles: Set<Poles> = new Set();
   public scale = 1;
   public scaleOrigin: Vector = [0, 0];
+  public scrollMode = true;
 
   constructor(
     private readonly project: ProjectService,
@@ -65,7 +65,7 @@ export class BlueprintService {
     this.onScroll();
     this.wrapper.addEventListener("scroll", () => this.onScroll());
     this.wrapper.addEventListener("mousemove", (e) => this.onMouseMove(e));
-    this.wrapper.addEventListener("wheel", (e) => this.onWheel(e));
+    this.wrapper.addEventListener("wheel", (e) => this.onWheel(e), { passive: false });
     this.wrapper.addEventListener("click", (e) => this.onClick(e));
     this.wrapper.addEventListener("resize", () => this.configSize());
     this.drawRelations();
@@ -105,12 +105,13 @@ export class BlueprintService {
   }
 
   private onWheel(e: WheelEvent) {
+    const bbox = this.overlay.getBoundingClientRect();
+    if ((this.scrollMode && !e.ctrlKey) || (e.deltaY < 0 && bbox.height < this.wrapper.clientHeight) || (e.deltaY > 0 && this.scale >= 1))
+      return;
     e.preventDefault();
-    if (this.scale > 0.01 && this.scale < 50) {
-      this.scale += e.deltaY / 1000;
-      this.scaleOrigin = [e.x + this.wrapper.clientLeft, e.y + this.wrapper.clientTop];
-      this.drawRelations();
-    }
+    this.scale += e.deltaY / 1000;
+    this.scaleOrigin = [e.clientX + this.wrapper.scrollLeft, e.clientY + this.wrapper.scrollTop];
+    this.drawRelations();
   }
   /**
    * Mouse Move event
@@ -172,8 +173,11 @@ export class BlueprintService {
   public drawRelations() {
     const blueprint = this.project.openBlueprints[this.tabId];
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.context.setTransform(this.scale, 0, 0, this.scale, -this.scaleOrigin[0], this.scaleOrigin[1]);
-    // this.context.setTransform(this.scale, 0, 0, this.scale, -this.canvas.width / 2, -this.canvas.height / 2);
+    this.overlay.style.transformOrigin = `${this.scaleOrigin[0]}px ${this.scaleOrigin[1]}px`;
+    this.overlay.style.transform = `scale(${this.scale})`;
+    // this.overlay.style.zoom = this.scale.toString();
+    const bbox = this.overlay.getBoundingClientRect();
+    this.context.setTransform(this.scale, 0, 0, this.scale, bbox.left + this.wrapper.scrollLeft, bbox.top + this.wrapper.scrollTop - 48);
     this.drawGrid();
     for (const rel of blueprint.relationships) {
       this.drawCurve([rel.ox, rel.oy - 48], [rel.ex, rel.ey]);
@@ -204,10 +208,19 @@ export class BlueprintService {
     const [w, h] = [-(ox - ex), oy - ey];
     const [p1x, p1y, p2x, p2y] = [ox + w / 2, oy, ox + w / 2, ey];
     const half = rel ? this.overlay.clientHeight / 2 : 0;
+    // const [leftScale, topScale] = [- this.overlay.getBoundingClientRect().left / 2 - this.wrapper.scrollLeft / 2, - this.overlay.getBoundingClientRect().top - this.wrapper.scrollTop - 48];
+    const [leftScale, topScale] = [0, 0];
     this.context.strokeStyle = "#b0bec5";
     this.context.beginPath();
-    this.context.moveTo(ox, oy + half);
-    this.context.bezierCurveTo(p1x, p1y + half, p2x, p2y + half, ex, ey + half);
+    this.context.moveTo(ox + leftScale, oy + half + topScale);
+    this.context.bezierCurveTo(
+      p1x + leftScale,
+      p1y + half + topScale,
+      p2x + leftScale,
+      p2y + half + topScale,
+      ex + leftScale,
+      ey + half + topScale,
+    );
     this.context.stroke();
     this.context.closePath();
     this.drawSkeleton([ox, oy], [w, h], [p1x, p1y, p2x, p2y], rel);

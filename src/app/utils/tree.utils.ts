@@ -1,3 +1,4 @@
+import { Vector } from './../../types/global.d';
 import { Node } from './../models/sockets/blueprint-sock.model';
 import { Relationship } from "../models/sockets/blueprint-sock.model";
 

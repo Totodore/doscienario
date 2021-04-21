@@ -104,13 +104,21 @@ export class BlueprintService {
     else this.scrollPoles.delete("east");
   }
 
-  private onWheel(e: WheelEvent) {
+  public onWheel(e: WheelEvent | number): void {
     const bbox = this.overlay.getBoundingClientRect();
-    if ((this.scrollMode && !e.ctrlKey) || (e.deltaY < 0 && bbox.height < this.wrapper.clientHeight) || (e.deltaY > 0 && this.scale >= 1))
-      return;
-    e.preventDefault();
-    this.scale += e.deltaY / 1000;
-    this.scaleOrigin = [e.clientX + this.wrapper.scrollLeft, e.clientY + this.wrapper.scrollTop];
+    if (typeof e === "number") {
+      if (e > 1 || (bbox.height < this.wrapper.clientHeight && e < this.scale))
+        return;
+      this.scale = e;
+      this.scaleOrigin = [this.canvas.width / 2, this.canvas.height / 2];
+    } else {
+      if ((this.scrollMode && !e.ctrlKey) || (e.deltaY < 0 && bbox.height < this.wrapper.clientHeight) || (e.deltaY > 0 && this.scale >= 1))
+        return;
+      e.preventDefault();
+      this.scale += e.deltaY / 1000;
+      this.scale = this.scale > 1 ? 1 : this.scale;
+      this.scaleOrigin = [e.clientX + this.wrapper.scrollLeft, e.clientY + this.wrapper.scrollTop];
+    }
     this.drawRelations();
   }
   /**

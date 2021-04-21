@@ -11,6 +11,7 @@ import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { RenameDocumentReq } from 'src/app/models/sockets/document-sock.model';
 import { EditTagsComponent } from 'src/app/components/utils/edit-tags/edit-tags.component';
+import { DOWN_ARROW, UP_ARROW } from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'app-blueprint-options',
@@ -31,6 +32,18 @@ export class BlueprintOptionsComponent {
     this.project.renameBlueprint(this.tabId, this.blueprint.name);
     this.socket.socket.emit(Flags.RENAME_BLUEPRINT, new RenameBlueprintOut(this.blueprintId, this.blueprint.name));
   }
+  onZoom(e: KeyboardEvent, val: string) {
+    let ratio: number;
+    e.preventDefault();
+    if (e.keyCode == DOWN_ARROW) {
+      ratio = parseFloat(val) - 1;
+    } else if (e.keyCode == UP_ARROW) {
+      ratio = parseFloat(val) + 1;
+    } else return;
+    this.blueprintHandler.onWheel(ratio / 100);
+    console.log(val);
+  }
+
   openTagEdit() {
     this.dialog.open(EditTagsComponent, {
       data: this.tabId,

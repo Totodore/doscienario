@@ -18,5 +18,9 @@
     <button mat-stroked-button (click)="autoPosBlueprint()">
       <mat-icon color="accent" style="transform: rotateZ(90deg);">filter_list</mat-icon>
     </button>
+		<mat-form-field color="accent" class="zoom">
+			<mat-label>Zoom</mat-label>
+			<input type="text" #zoom matInput (keydown)="onZoom($event, zoom.value)" [ngModel]="(blueprintHandler.scale * 100).toFixed() + '%'">
+		</mat-form-field>
   </div>
 </div>

@@ -41,7 +41,6 @@ export class BlueprintOptionsComponent {
       ratio = parseFloat(val) + 1;
     } else return;
     this.blueprintHandler.onWheel(ratio / 100);
-    console.log(val);
   }
 
   openTagEdit() {

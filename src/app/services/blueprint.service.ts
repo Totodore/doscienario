@@ -387,7 +387,7 @@ export class BlueprintService {
   public async autoPos() {
     console.time("a");
     this.progress.show();
-    let nodes = this.component.nodes;
+    let nodes = this.component.blueprint.nodes;
     let rels = this.component.blueprint.relationships;
     const margin: Vector = [100, 50];
     for (const node of nodes) {

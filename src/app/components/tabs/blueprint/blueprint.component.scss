@@ -62,6 +62,12 @@
     left: 0px;
     z-index: 10;
 		transform-origin: center;
+		&.dragging {
+	    cursor: move;
+			app-node {
+				pointer-events: none;
+			}
+		}
     app-node {
       position: absolute;
       transform: translateY(-50%);

@@ -11,6 +11,7 @@
   <div class="wrapper" #wrapper [class.grabbing]="dragging">
     <canvas #viewport *ngIf="blueprint"></canvas>
     <div class="overlay" *ngIf="blueprint" #overlay 
+			[class.dragging]="blueprintHandler.drawState == 'dragging'"
 			(mousedown)="onMouseDown($event)" 
 			(mouseup)="onMouseUp($event)" 
 			(mousemove)="onMouseMove($event)">

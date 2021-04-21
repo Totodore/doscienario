@@ -86,7 +86,6 @@ export class NodeComponent implements AfterViewInit {
   onDragStart(e: MouseEvent) {
     e.preventDefault();
     e.stopImmediatePropagation();
-    this.wrapper.nativeElement.parentElement.style.pointerEvents = "none";
     this.blueprintHandler.overlay.addEventListener("mousemove", this.onMove);
     this.blueprintHandler.overlay.addEventListener("mouseup", this.onUp);
     this.blueprintHandler.onDragStart();
@@ -96,10 +95,14 @@ export class NodeComponent implements AfterViewInit {
    * Emit the distance between the origin and the drag
    */
   onDragMove(e: MouseEvent) {
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    const x = Math.min(e.offsetX - this.wrapper.nativeElement.parentElement.clientWidth, this.blueprintHandler.overlay.clientWidth);
-    const y = e.offsetY + (this.wrapper.nativeElement.parentElement.clientHeight / 2) - this.blueprintHandler.overlay.clientHeight / 2;
+    let x = Math.min(
+      Math.max(e.offsetX - this.wrapper.nativeElement.parentElement.clientWidth, 48),
+      this.blueprintHandler.overlay.clientWidth - this.wrapper.nativeElement.clientWidth
+    );
+    let y = Math.min(
+      e.offsetY + (this.wrapper.nativeElement.parentElement.clientHeight / 2),
+      this.blueprintHandler.overlay.clientHeight - this.wrapper.nativeElement.clientHeight
+    ) - this.blueprintHandler.overlay.clientHeight / 2;
     const delta: Vector = [this.data.x - x, this.data.y - y];
     this.blueprintHandler.nodeMagnetMove(delta, this.data);
     this.blueprintHandler.onDragMove(delta, this.data);
@@ -117,7 +120,6 @@ export class NodeComponent implements AfterViewInit {
     this.blueprintHandler.overlay.removeEventListener("mousemove", this.onMove);
     this.blueprintHandler.overlay.removeEventListener("mouseup", this.onUp);
     this.blueprintHandler.onDragEnd(this.data, delta);
-    this.wrapper.nativeElement.parentElement.style.pointerEvents = "all";
   }
 }
 export type Poles = "north" | "east" | "south" | "west";

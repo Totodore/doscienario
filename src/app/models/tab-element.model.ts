@@ -1,3 +1,4 @@
+import { BlueprintService } from './../services/blueprint.service';
 import { Component } from "@angular/core";
 
 export interface ITabElement extends Component {
@@ -12,6 +13,7 @@ export interface ITabElement extends Component {
   refreshView?: () => void;
   onFocus?: () => void;
   onUnFocus?: () => void;
+  blueprintHandler?: BlueprintService;
 }
 
 export enum TabTypes {

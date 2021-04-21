@@ -1,3 +1,5 @@
+import { BlueprintService } from './blueprint.service';
+import { findLevelByNode } from 'src/app/utils/tree.utils';
 import { TabService } from './tab.service';
 import { Blueprint, SendBlueprintReq, OpenBlueprintReq, CreateNodeReq, CreateRelationReq, RemoveRelationReq, PlaceNodeOut, PlaceNodeIn, Relationship, RemoveNodeIn } from './../models/sockets/blueprint-sock.model';
 import { Router } from '@angular/router';
@@ -7,6 +9,7 @@ import { GetProjectRes, ProjectUserRes, GetProjectDocumentRes, SearchQueryRes } 
 import { Injectable, OnInit } from '@angular/core';
 import { Tag } from '../models/sockets/tag-sock.model';
 import { removeNodeFromTree } from '../utils/tree.utils';
+import { TabTypes } from '../models/tab-element.model';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +21,7 @@ export class ProjectService implements OnInit {
 
   constructor(
     private readonly router: Router,
-    private readonly tabs: TabService
+    private readonly tabs: TabService,
   ) {}
   ngOnInit(): void {
     console.log("test");
@@ -243,9 +246,15 @@ export class ProjectService implements OnInit {
     }
     this.saveData();
   }
-  public addBlueprintNode(packet: CreateNodeReq) {
+  public async addBlueprintNode(packet: CreateNodeReq) {
     this.getBlueprint(packet.node.blueprint.id).nodes.push(packet.node);
-    this.saveData();
+    if (this.tabs.displayedTab[1].type === TabTypes.BLUEPRINT && this.tabs.displayedTab[1].id === packet.node.blueprint.id && packet.user === this.owner.id) {
+      window.setTimeout(async () => {
+        await this.tabs.displayedTab[1].blueprintHandler.autoPos(packet.node);
+        this.saveData();
+      }, 0);
+    } else
+      this.saveData();
   }
   public placeBlueprintNode(packet: PlaceNodeIn) {
     const node = this.getBlueprint(packet.blueprintId).nodes.find(el => el.id === packet.id);

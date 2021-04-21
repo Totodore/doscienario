@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { BlueprintService } from './../../../services/blueprint.service';
 import { ProgressService } from './../../../services/progress.service';
 import { SocketService } from './../../../services/socket.service';
-import { Blueprint, Node, RemoveNodeOut } from './../../../models/sockets/blueprint-sock.model';
+import { Blueprint, Node, RemoveNodeOut, Relationship } from './../../../models/sockets/blueprint-sock.model';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { ProjectService } from './../../../services/project.service';
 import { Component, ViewChild, ElementRef, AfterViewChecked, ViewChildren, QueryList } from '@angular/core';
@@ -39,7 +39,8 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   public tabId: string;
   public show: boolean;
   public dragging = false;
-  public magnetMode = true;
+  public magnetMode = false;
+  public autoMode = true;
 
   public readonly type = TabTypes.BLUEPRINT;
 
@@ -137,6 +138,15 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   }
   get nodes(): Node[] {
     return this.blueprint?.nodes?.filter(el => !el.isRoot);
+  }
+  get rels(): Relationship[] {
+    return this.blueprint.relationships;
+  }
+  set nodes(nodes: Node[]) {
+    this.project.openBlueprints[this.tabId].nodes = nodes;
+  }
+  set rels(rels: Relationship[]) {
+    this.project.openBlueprints[this.tabId].relationships = rels;
   }
 
   get title(): string {

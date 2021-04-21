@@ -45,7 +45,6 @@ export class BlueprintService {
   public scrollMode = true;
 
   constructor(
-    private readonly project: ProjectService,
     private readonly socket: SocketService,
     private readonly snack: SnackbarService,
     private readonly progress: ProgressService
@@ -68,6 +67,7 @@ export class BlueprintService {
     this.wrapper.addEventListener("click", (e) => this.onClick(e));
     this.wrapper.addEventListener("resize", () => this.configSize());
     this.drawRelations();
+    this.wrapper.scrollTop = this.wrapper.scrollTopMax / 2;
   }
 
   private configSize() {
@@ -82,7 +82,6 @@ export class BlueprintService {
     this.canvas.style.height = h + "px";
     this.overlay.style.width = w + "px";
     this.overlay.style.height = h + "px";
-    this.wrapper.scrollTop = this.wrapper.scrollTopMax / 2;
   }
 
   /**
@@ -178,14 +177,13 @@ export class BlueprintService {
   }
 
   public drawRelations() {
-    const blueprint = this.component.blueprint;
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.overlay.style.transformOrigin = `${this.scaleOrigin[0]}px ${this.scaleOrigin[1]}px`;
     this.overlay.style.transform = `scale(${this.scale})`;
     const bbox = this.overlay.getBoundingClientRect();
     this.context.setTransform(this.scale, 0, 0, this.scale, bbox.left + this.wrapper.scrollLeft, bbox.top + this.wrapper.scrollTop - 48);
     this.drawGrid();
-    for (const rel of blueprint.relationships) {
+    for (const rel of this.component.rels) {
       this.drawCurve([rel.ox, rel.oy - 48], [rel.ex, rel.ey]);
     }
     if (this.component.magnetMode)
@@ -212,7 +210,7 @@ export class BlueprintService {
     this.context.lineWidth = 1;
     this.context.strokeStyle = "#ff0000";
     this.context.beginPath();
-    const half = this.canvas.height / 2.
+    const half = this.canvas.height / 2
     for (const [o, e] of this.magnetLines) {
       this.context.moveTo(o[0] + 48, o[1] + half + 48);
       this.context.lineTo(e[0] + 48, e[1] + half + 48);
@@ -246,14 +244,25 @@ export class BlueprintService {
     this.drawSkeleton([ox, oy], [w, h], [p1x, p1y, p2x, p2y], rel);
   }
 
-  public beginGhostRelation(parent: NodeComponent, e: Vector) {
+  public async beginGhostRelation(parent: NodeComponent, e: Vector) {
     e[0] += this.wrapper.scrollLeft;
     e[1] += this.wrapper.scrollTop;
-    this.drawState = "drawing";
-    this.ghostSize = [parent.wrapper.nativeElement.clientWidth, parent.wrapper.nativeElement.clientHeight];
-    this.drawingOriginPos = e;
-    this.ghostNode = e;
-    this.parentGhost = parent;
+    if (this.component.autoMode) {
+      this.socket.socket.emit(Flags.CREATE_NODE, new CreateNodeRes(
+        parent.data.id,
+        this.docId,
+        e[0] + 100,
+        e[1] - this.overlay.clientHeight / 2,
+        e[0],
+        e[1] - this.overlay.clientHeight / 2
+      ));
+    } else {
+      this.drawState = "drawing";
+      this.ghostSize = [parent.wrapper.nativeElement.clientWidth, parent.wrapper.nativeElement.clientHeight];
+      this.drawingOriginPos = e;
+      this.ghostNode = e;
+      this.parentGhost = parent;
+    }
   }
   public bindRelation(child: NodeComponent, anchorPos: Vector) {
     if (this.drawState === "drawing") {
@@ -323,8 +332,8 @@ export class BlueprintService {
     this.drawState = "dragging";
   }
   public onDragMove(offset: Vector, node: Node) {
-    const parentRel = findParentRels(node, this.component.blueprint.relationships);
-    const childRel = findChildRels(node, this.component.blueprint.relationships);
+    const parentRel = findParentRels(node, this.component.rels);
+    const childRel = findChildRels(node, this.component.rels);
     for (const rel of parentRel) {
       rel.ex -= offset[0];
       rel.ey -= offset[1];
@@ -340,7 +349,7 @@ export class BlueprintService {
   public onDragEnd(node: Node, pos: [number, number]) {
     const nodeData = this.component.nodes.find(el => el.id === node.id);
     this.onDragMove(pos, node);
-    for (const rel of this.component.blueprint.relationships) {
+    for (const rel of this.component.rels) {
       if (rel.childId === node.id) {
         this.socket.socket.emit(Flags.PLACE_RELATIONSHIP, rel);
       } else if (rel.parentId === node.id) {
@@ -382,27 +391,28 @@ export class BlueprintService {
   }
 
   /** 
-   * Method to autoPositionate each node and relations 
+   * Method to autoPositionate each node and relations.
+   * If a node is provided only this node level will be autopos
    */
-  public async autoPos() {
+  public async autoPos(node?: Node) {
     console.time("a");
     this.progress.show();
-    let nodes = this.component.blueprint.nodes;
-    let rels = this.component.blueprint.relationships;
+    let nodes = [...this.component.nodes, this.component.root];
+    let rels = this.component.rels;
     const margin: Vector = [100, 50];
     for (const node of nodes) {
       const el = this.component.getNodeEl(node.id).wrapper.nativeElement;
       node.width = el.clientWidth;
       node.height = el.clientHeight;
     }
-    const data: [Node[], Relationship[]] = await this.blueprintWorker.postAsyncMessage(`autopos-${this.tabId}`, [nodes, rels, margin]);
+    const data: [Node[], Relationship[]] = await this.blueprintWorker.postAsyncMessage(`autopos-${this.tabId}`, [nodes, rels, margin, node]);
     if (!data) {
       this.snack.snack("Ouups ! Impossible d'agencer cet arbre");
       console.timeEnd("a");
       return;
     }
-    this.project.openBlueprints[this.tabId].nodes = nodes = data[0];
-    this.project.openBlueprints[this.tabId].relationships = rels = data[1];
+    this.component.nodes = nodes = data[0];
+    this.component.rels = rels = data[1];
 
     this.configSize();
     this.drawRelations();
@@ -415,15 +425,15 @@ export class BlueprintService {
   }
 
   public nodeMagnetMove([ex, ey]: Vector, movingNode: Node) {
-    this.magnetLines = [];
-    ex += movingNode.x;
-    ey += movingNode.y;
+    // this.magnetLines = [];
+    // ex += movingNode.x;
+    // ey += movingNode.y;
     // console.log(ex, ey);
-    for (const node of this.component.nodes) {
-      if (Math.abs(ex - node.x) < 25) {
-        this.magnetLines.push([[ex, ey], [movingNode.x, movingNode.y]]);
-      }
-    }
+    // for (const node of this.component.nodes) {
+    //   if (Math.abs(ex - node.x) < 25) {
+    //     this.magnetLines.push([[ex, ey], [movingNode.x, movingNode.y]]);
+    //   }
+    // }
   } 
 }
 

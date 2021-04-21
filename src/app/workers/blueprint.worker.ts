@@ -1,3 +1,4 @@
+import { findLevelByNode } from 'src/app/utils/tree.utils';
 import { NodeStruct } from './../utils/tree.utils';
 import { findChildRels, findDepth, findNodesByLevel, findParentRels, _findNodesLevels, _createCustomNode } from '../utils/tree.utils';
 import { Vector } from './../../types/global.d';
@@ -21,12 +22,13 @@ addEventListener('message', (e: MessageEvent<[string, any] | string>) => {
 
 type RelationshipCache = { [key: number]: Relationship[] };
 
-function autoPosBlueprint(nodes: Node[], rels: Relationship[], margin: Vector): [Node[], Relationship[]] {
+function autoPosBlueprint(nodes: Node[], rels: Relationship[], margin: Vector, node?: Node): [Node[], Relationship[]] {
   //@ts-ignore
   const nodesData: NodeStruct = Object.fromEntries(nodes.map(el => [el.id, el]));
   const root = nodes.find(el => el.isRoot);
+  const nodeLevel = findLevelByNode(node, root, nodes, rels);
   //We get the depth of the blueprint
-  const depth = findDepth(root, rels, nodesData);
+  const depth = nodeLevel || findDepth(root, rels, nodesData);
 
   const nodesLevelCache = _findNodesLevels(_createCustomNode(root), rels, nodes.map(node => _createCustomNode(node)), -1, 0);
   //@ts-ignore
@@ -39,7 +41,7 @@ function autoPosBlueprint(nodes: Node[], rels: Relationship[], margin: Vector): 
   }
 
   //Foreach level we get all the nodes and their parents
-  for (let i = 1; i < depth + 1; i++) {
+  for (let i = nodeLevel || 1; i < depth + 1; i++) {
     let els = findNodesByLevel(root, rels, nodes, i, 0, nodesLevelCache);
     const parents = i > 1 ? findNodesByLevel(root, rels, nodes, i - 1, 0, nodesLevelCache) : [root];
 
@@ -50,7 +52,6 @@ function autoPosBlueprint(nodes: Node[], rels: Relationship[], margin: Vector): 
 
     //We clones the nodes and the rels to make a simulation
     const clonedNodes: Node[] = Object.create(els);
-    const clonedRels: Relationship[] = Object.create(rels);
     let bestPermutation: number[], bestDistance: number = Infinity;
 
     //@ts-ignore

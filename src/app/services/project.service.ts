@@ -20,6 +20,8 @@ export class ProjectService implements OnInit {
   public openDocs: { [k: string]: DocumentModel } = {};
   public openBlueprints: { [k: string]: Blueprint } = {};
 
+  public updateSearch: () => void;
+
   constructor(
     private readonly router: Router,
     private readonly tabs: TabService,
@@ -80,6 +82,7 @@ export class ProjectService implements OnInit {
     this.openDocs[packet.reqId] = packet.doc;
     if (!this.data.documents.find(el => el.id == packet.doc.id)) {
       this.data.documents.push(packet.doc);
+      this.updateSearch();
       this.saveData();
     }
   }
@@ -90,6 +93,7 @@ export class ProjectService implements OnInit {
     if (!this.data.documents.find(el => el.id == packet.doc.id)) {
       this.data.documents.push(packet.doc);
       this.saveData();
+      this.updateSearch();
     }
   }
 
@@ -156,12 +160,14 @@ export class ProjectService implements OnInit {
     const doc = Object.values(this.openDocs).find(el => el.id == docId);
     if (doc)
       doc.title = title;
+    this.updateSearch();
     this.saveData();
   }
   public renameDoc(tabId: string, title: string) {
     this.openDocs[tabId].title = title;
     const docId = this.openDocs[tabId].id;
     this.data.documents.find(el => el.id == docId).title = title;
+    this.updateSearch();
     this.saveData();
   }
   /**
@@ -182,6 +188,7 @@ export class ProjectService implements OnInit {
       }
       this.data.documents.splice(this.docs.findIndex(el => el.id == id), 1);
     }
+    this.updateSearch();
     this.saveData();
   }
   public updateDocTags(tabId: string, tags: Tag[]) {
@@ -197,6 +204,7 @@ export class ProjectService implements OnInit {
     if (!this.data.blueprints.find(el => el.id == packet.blueprint.id)) {
       this.data.blueprints.push(packet.blueprint);
       this.saveData();
+      this.updateSearch();
     }
   }
   /**
@@ -206,6 +214,7 @@ export class ProjectService implements OnInit {
     if (!this.data.blueprints.find(el => el.id == packet.blueprint.id)) {
       this.data.blueprints.push(packet.blueprint);
       this.saveData();
+      this.updateSearch();
     }
   }
 
@@ -219,12 +228,14 @@ export class ProjectService implements OnInit {
     if (doc)
       doc.title = title;
     this.saveData();
+    this.updateSearch();
   }
   public renameBlueprint(tabId: string, title: string) {
     this.openBlueprints[tabId].name = title;
     const docId = this.openBlueprints[tabId].id;
     this.data.blueprints.find(el => el.id == docId).name = title;
     this.saveData();
+    this.updateSearch();
   }
   /**
    * Remove a blueprint from its tab id or docId
@@ -235,7 +246,6 @@ export class ProjectService implements OnInit {
       const docId = this.openBlueprints[id].id;
       delete this.openBlueprints[id];
       this.data.blueprints.splice(this.docs.findIndex(el => el.id == docId), 1);
-      console.log(this.blueprints);
     } else if (typeof id === 'number') {
       for (const tabId in this.openBlueprints) {
         if (this.openBlueprints[tabId].id === id) {
@@ -246,6 +256,7 @@ export class ProjectService implements OnInit {
       this.data.blueprints.splice(this.blueprints.findIndex(el => el.id == id), 1);
     }
     this.saveData();
+    this.updateSearch();
   }
   public async addBlueprintNode(packet: CreateNodeReq) {
     this.getBlueprint(packet.node.blueprint.id).nodes.push(packet.node);

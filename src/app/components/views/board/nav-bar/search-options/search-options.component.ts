@@ -26,6 +26,7 @@ export class SearchOptionsComponent implements OnInit {
   
   ngOnInit(): void {
     this.searchWorker = new WorkerManager(WorkerType.Search);
+    this.project.updateSearch = () => this.search();
   }
 
   public async search() {

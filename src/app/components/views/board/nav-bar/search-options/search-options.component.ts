@@ -30,7 +30,7 @@ export class SearchOptionsComponent implements OnInit {
   }
 
   public async search() {
-    if (this.searchQuery.length < 2 && this.searchQuery !== '*') {
+    if (!this.searchQuery || (this.searchQuery.length < 2 && this.searchQuery !== '*')) {
       this.results.emit(null);
       return;
     }

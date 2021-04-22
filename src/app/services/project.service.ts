@@ -15,7 +15,7 @@ import { BlueprintComponent } from '../components/tabs/blueprint/blueprint.compo
 @Injectable({
   providedIn: 'root'
 })
-export class ProjectService implements OnInit {
+export class ProjectService {
 
   public openDocs: { [k: string]: DocumentModel } = {};
   public openBlueprints: { [k: string]: Blueprint } = {};
@@ -26,9 +26,6 @@ export class ProjectService implements OnInit {
     private readonly router: Router,
     private readonly tabs: TabService,
   ) {}
-  ngOnInit(): void {
-    console.log("test");
-  }
 
   private data: GetProjectRes = JSON.parse(localStorage.getItem("project-data"));
   public async loadData(data: GetProjectRes) {

@@ -199,6 +199,19 @@ button:focus {
   }
   scrollbar-width: thin;
   overflow-x: auto !important;
+	.mat-tab-label {
+		padding: 0 !important;
+		min-width: 0 !important;
+		justify-content: flex-start !important;
+		.mat-tab-label-content {
+			justify-content: space-between;
+			padding-left: 15px;
+			.mat-icon-button {
+				padding: 0 !important;
+				margin-left: 5px;
+			}
+		}
+	}
 }
 .toggle-btn.on {
 	border: solid 2px #b0bec5 !important;

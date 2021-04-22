@@ -6,7 +6,7 @@ import { SocketService } from './../../../services/socket.service';
 import { Blueprint, Node, RemoveNodeOut, Relationship } from './../../../models/sockets/blueprint-sock.model';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { ProjectService } from './../../../services/project.service';
-import { Component, ViewChild, ElementRef, AfterViewChecked, ViewChildren, QueryList } from '@angular/core';
+import { Component, ViewChild, ElementRef, AfterViewChecked, ViewChildren, QueryList, OnInit } from '@angular/core';
 import { v4 as uuid4 } from "uuid";
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { Poles, NodeComponent } from './node/node.component';
@@ -18,7 +18,7 @@ import { findLevelByNode, findNodesByLevel, removeNodeFromTree } from 'src/app/u
   templateUrl: './blueprint.component.html',
   styleUrls: ['./blueprint.component.scss']
 })
-export class BlueprintComponent implements ITabElement, AfterViewChecked {
+export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit {
 
   @ViewChild("viewport", { static: false })
   public canvas: ElementRef<HTMLCanvasElement>;
@@ -40,8 +40,8 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   public show: boolean;
   public dragging = false;
   public magnetMode = false;
-  public autoMode = true;
-  public gridMode = true;
+  public autoMode: boolean;
+  public gridMode: boolean;
 
   public readonly type = TabTypes.BLUEPRINT;
 
@@ -52,6 +52,11 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
     private readonly progress: ProgressService,
     public readonly blueprintHandler: BlueprintService
   ) { }
+
+  ngOnInit() {
+    this.autoMode = this.project.autoMode;
+    this.gridMode = this.project.dispGrid;
+  }
 
   ngAfterViewChecked() {
     if (this.canvas && this.tabId && !this.initialized) {

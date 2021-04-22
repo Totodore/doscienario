@@ -340,6 +340,18 @@ export class ProjectService implements OnInit {
   public get blueprints(): Blueprint[] {
     return this.data.blueprints;
   }
+  public get dispGrid(): boolean {
+    return localStorage.getItem("disp-grid") !== "false";
+  }
+  public set dispGrid(opt: boolean) {
+    localStorage.setItem("disp-grid", String(opt));
+  }
+  public get autoMode(): boolean {
+    return localStorage.getItem("auto-mode") !== "false";
+  }
+  public set autoMode(opt: boolean) {
+    localStorage.setItem("auto-mode", String(opt));
+  }
   public getDoc(docId: number) {
     return Object.values(this.openDocs).find(el => el.id == docId);
   }

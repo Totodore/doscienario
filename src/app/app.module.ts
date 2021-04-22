@@ -49,6 +49,7 @@ import { MAT_COLOR_FORMATS, NgxMatColorPickerModule, NGX_MAT_COLOR_FORMATS } fro
 import { ConfirmComponent } from './components/utils/confirm/confirm.component';
 import { SearchResultsComponent } from './components/views/board/nav-bar/search-results/search-results.component';
 import { BlueprintOptionsComponent } from './components/views/board/nav-bar/blueprint-options/blueprint-options.component';
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -101,7 +102,8 @@ import { BlueprintOptionsComponent } from './components/views/board/nav-bar/blue
     CKEditorModule,
     NgxMatColorPickerModule,
     MatRippleModule,
-    DragDropModule
+    DragDropModule,
+    MatSlideToggleModule
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: appearance },

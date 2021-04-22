@@ -31,11 +31,11 @@ export class BlueprintService {
   public parentGhost: NodeComponent;
 
   public canvas: HTMLCanvasElement;
+  public component: BlueprintComponent;
   public overlay: HTMLElement;
   private wrapper: HTMLElement;
   private tabId: string;
   private docId: number;
-  private component: BlueprintComponent;
   private blueprintWorker: WorkerManager;
 
   public ghostNode: Vector;
@@ -182,7 +182,8 @@ export class BlueprintService {
     this.overlay.style.transform = `scale(${this.scale})`;
     const bbox = this.overlay.getBoundingClientRect();
     this.context.setTransform(this.scale, 0, 0, this.scale, bbox.left + this.wrapper.scrollLeft, bbox.top + this.wrapper.scrollTop - 48);
-    this.drawGrid();
+    if (this.component.gridMode)
+      this.drawGrid();
     for (const rel of this.component.rels) {
       this.drawCurve([rel.ox, rel.oy - 48], [rel.ex, rel.ey]);
     }
@@ -244,23 +245,25 @@ export class BlueprintService {
     this.drawSkeleton([ox, oy], [w, h], [p1x, p1y, p2x, p2y], rel);
   }
 
-  public async beginGhostRelation(parent: NodeComponent, e: Vector) {
-    e[0] += this.wrapper.scrollLeft;
-    e[1] += this.wrapper.scrollTop;
-    if (this.component.autoMode) {
+  public async beginGhostRelation(parent: NodeComponent, e: [number, number, boolean?]) {
+    const pos: Vector = [e[0], e[1]];
+    const rightClick = e[2] || false;
+    pos[0] += this.wrapper.scrollLeft;
+    pos[1] += this.wrapper.scrollTop;
+    if (this.component.autoMode && !rightClick) {
       this.socket.socket.emit(Flags.CREATE_NODE, new CreateNodeRes(
         parent.data.id,
         this.docId,
-        e[0] + 100,
-        e[1] - this.overlay.clientHeight / 2,
-        e[0],
-        e[1] - this.overlay.clientHeight / 2
+        pos[0] + 100,
+        pos[1] - this.overlay.clientHeight / 2,
+        pos[0],
+        pos[1] - this.overlay.clientHeight / 2
       ));
     } else {
       this.drawState = "drawing";
       this.ghostSize = [parent.wrapper.nativeElement.clientWidth, parent.wrapper.nativeElement.clientHeight];
-      this.drawingOriginPos = e;
-      this.ghostNode = e;
+      this.drawingOriginPos = pos;
+      this.ghostNode = pos;
       this.parentGhost = parent;
     }
   }

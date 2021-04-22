@@ -13,7 +13,6 @@ export interface ITabElement extends Component {
   refreshView?: () => void;
   onFocus?: () => void;
   onUnFocus?: () => void;
-  blueprintHandler?: BlueprintService;
 }
 
 export enum TabTypes {

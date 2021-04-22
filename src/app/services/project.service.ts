@@ -10,6 +10,7 @@ import { Injectable, OnInit } from '@angular/core';
 import { Tag } from '../models/sockets/tag-sock.model';
 import { removeNodeFromTree } from '../utils/tree.utils';
 import { TabTypes } from '../models/tab-element.model';
+import { BlueprintComponent } from '../components/tabs/blueprint/blueprint.component';
 
 @Injectable({
   providedIn: 'root'
@@ -250,7 +251,7 @@ export class ProjectService implements OnInit {
     this.getBlueprint(packet.node.blueprint.id).nodes.push(packet.node);
     if (this.tabs.displayedTab[1].type === TabTypes.BLUEPRINT && this.tabs.displayedTab[1].id === packet.node.blueprint.id && packet.user === this.owner.id) {
       window.setTimeout(async () => {
-        await this.tabs.displayedTab[1].blueprintHandler.autoPos(packet.node);
+        await (this.tabs.displayedTab[1] as BlueprintComponent).blueprintHandler.autoPos(packet.node);
         this.saveData();
       }, 0);
     } else

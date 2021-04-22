@@ -197,3 +197,6 @@ button:focus {
   scrollbar-width: thin;
   overflow-x: auto !important;
 }
+.toggle-btn.on {
+	border: solid 2px #b0bec5 !important;
+}

@@ -41,6 +41,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   public dragging = false;
   public magnetMode = false;
   public autoMode = true;
+  public gridMode = true;
 
   public readonly type = TabTypes.BLUEPRINT;
 
@@ -80,7 +81,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked {
   }
 
 
-  beginRelation(parent: NodeComponent, e: [number, number]) {
+  beginRelation(parent: NodeComponent, e: [number, number, boolean?]) {
     this.blueprintHandler.beginGhostRelation(parent, e);
   }
   bindRelation(child: NodeComponent, anchorPos: [number, number]) {

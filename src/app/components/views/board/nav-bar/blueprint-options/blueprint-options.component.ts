@@ -12,6 +12,7 @@ import { Flags } from 'src/app/models/sockets/flags.enum';
 import { RenameDocumentReq } from 'src/app/models/sockets/document-sock.model';
 import { EditTagsComponent } from 'src/app/components/utils/edit-tags/edit-tags.component';
 import { DOWN_ARROW, UP_ARROW } from '@angular/cdk/keycodes';
+import { BlueprintComponent } from 'src/app/components/tabs/blueprint/blueprint.component';
 
 @Component({
   selector: 'app-blueprint-options',
@@ -56,6 +57,14 @@ export class BlueprintOptionsComponent {
     this.blueprintHandler.autoPos();
   }
 
+  toggleAutoMode() {
+    this.component.autoMode = !this.component.autoMode;
+  }
+  toggleGrid() {
+    this.component.gridMode = !this.component.gridMode;
+    this.component.blueprintHandler.drawRelations();
+  }
+
   deleteBlueprint() {
     const dialog = this.dialog.open(ConfirmComponent, {
       data: "Supprimer l'arbre ?"
@@ -80,5 +89,8 @@ export class BlueprintOptionsComponent {
   }
   get tabId(): string {
     return this.tabs.displayedTab[1].tabId;
+  }
+  get component(): BlueprintComponent {
+    return this.tabs.displayedTab[1] as BlueprintComponent;
   }
 }

@@ -266,7 +266,9 @@ export class ProjectService {
     this.getBlueprint(packet.node.blueprint.id).nodes.push(packet.node);
     if (this.tabs.displayedTab[1].type === TabTypes.BLUEPRINT && this.tabs.displayedTab[1].id === packet.node.blueprint.id && packet.user === this.owner.id) {
       window.setTimeout(async () => {
-        await (this.tabs.displayedTab[1] as BlueprintComponent).blueprintHandler.autoPos(packet.node);
+        const component = this.tabs.displayedTab[1] as BlueprintComponent;
+        if (component.autoMode)
+          await component.blueprintHandler.autoPos(packet.node);
         this.saveData();
       }, 0);
     } else

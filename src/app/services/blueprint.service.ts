@@ -416,7 +416,6 @@ export class BlueprintService {
     }
     this.component.nodes = nodes = data[0];
     this.component.rels = rels = data[1];
-
     this.configSize();
     this.drawRelations();
     console.timeEnd("a");

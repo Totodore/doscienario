@@ -55,11 +55,12 @@ export class NodeComponent implements AfterViewInit {
 
   onAddRelButton(icon: MatIcon, e: Event, rightClick = false) {
     e.preventDefault();
+    e.stopImmediatePropagation();
     const rels = this.project.getBlueprint(this.tabs.displayedTab[1].id).relationships.filter(el => el.childId === this.data.id);
     const rect = (icon._elementRef.nativeElement as HTMLElement).getBoundingClientRect();
     if (this.blueprintHandler.drawState === "drawing" && this.blueprintHandler.parentGhost !== this && !rels.find(el => el.parentId === this.blueprintHandler.parentGhost.data.id)) {
       this.relationBind.emit([rect.x + rect.width / 2, rect.y + rect.height / 2]);
-    } else if ((rightClick && !this.blueprintHandler.component.autoMode) || this.blueprintHandler.component.autoMode) {
+    } else {
       this.relationBegin.emit([rect.x + rect.width / 2, rect.y + rect.height / 2, rightClick]);
     }
   }

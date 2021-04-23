@@ -26,7 +26,7 @@ function autoPosBlueprint(nodes: Node[], rels: Relationship[], margin: Vector, n
   //@ts-ignore
   const nodesData: NodeStruct = Object.fromEntries(nodes.map(el => [el.id, el]));
   const root = nodes.find(el => el.isRoot);
-  const nodeLevel = findLevelByNode(node, root, nodes, rels);
+  const nodeLevel = node ? findLevelByNode(node, root, nodes, rels) : null;
   //We get the depth of the blueprint
   const depth = nodeLevel || findDepth(root, rels, nodesData);
 

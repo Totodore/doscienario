@@ -1,4 +1,4 @@
-import { BlueprintService } from './../services/blueprint.service';
+import { Vector } from './../../types/global.d';
 import { Component } from "@angular/core";
 
 export interface ITabElement extends Component {
@@ -13,6 +13,14 @@ export interface ITabElement extends Component {
   refreshView?: () => void;
   onFocus?: () => void;
   onUnFocus?: () => void;
+}
+
+export interface TabSaveModel {
+  tab: number;
+  projectId: number;
+  id?: number;
+  tabId?: string;
+  scrollPos?: Vector
 }
 
 export enum TabTypes {

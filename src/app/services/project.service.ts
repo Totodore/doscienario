@@ -25,7 +25,7 @@ export class ProjectService {
   constructor(
     private readonly router: Router,
     private readonly tabs: TabService,
-  ) {}
+  ) { }
 
   private data: GetProjectRes = JSON.parse(localStorage.getItem("project-data"));
   public async loadData(data: GetProjectRes) {
@@ -309,7 +309,7 @@ export class ProjectService {
   public exit() {
     localStorage.removeItem("project-data");
     localStorage.removeItem("project");
-    localStorage.removeItem("tabs");
+    // localStorage.removeItem("tabs");
     this.router.navigateByUrl("/menu");
   }
 

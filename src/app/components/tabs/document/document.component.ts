@@ -109,7 +109,7 @@ export class DocumentComponent implements ITabElement, OnDestroy {
     this.content = this.doc.content;
   }
   public onUnFocus() {
-    this.scroll = [this.contentElement.scrollLeft, this.contentElement.scrollTop];
+    this.scroll = [this.contentElement?.scrollLeft, this.contentElement?.scrollTop];
   }
 
   onChange(data: string) {

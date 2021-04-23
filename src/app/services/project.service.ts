@@ -192,6 +192,10 @@ export class ProjectService {
     this.openDocs[tabId].tags = tags;
     const docId = this.openDocs[tabId].id;
     this.data.documents.find(el => el.id == docId).tags = tags;
+    for (const tag of tags) {
+      if (!this.data.tags.find(el => el.name.toLowerCase() === tag.name.toLowerCase()))
+        this.data.tags.push(tag);
+    }
     this.saveData();
   }
 
@@ -300,6 +304,11 @@ export class ProjectService {
     this.openBlueprints[tabId].tags = tags;
     const docId = this.openBlueprints[tabId].id;
     this.data.blueprints.find(el => el.id == docId).tags = tags;
+    for (const tag of tags) {
+      if (!this.data.tags.find(el => el.name.toLowerCase() === tag.name.toLowerCase()))
+        this.data.tags.push(tag);
+    }
+    // console.log(this.data.blueprints.find(el => el.id == docId).tags.length, tags.length);
     this.saveData();
   }
 

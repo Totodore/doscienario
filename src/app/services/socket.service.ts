@@ -178,6 +178,27 @@ export class SocketService {
     this.tabs.removeTab(id);
     this.project.removeBlueprint(id);
   }
+  @EventHandler(Flags.TAG_ADD_BLUEPRINT)
+  onAddTagBlueprint(packet: AddTagDocumentRes) {
+    const projectTag = this.project.tags.find(el => el.name == packet.tag.name);
+    if (projectTag && projectTag.id == null)
+      this.project.updateProjectTag(packet.tag);
+    else if (!projectTag)
+      this.project.addProjectTag(packet.tag);
+    const doc = this.project.getBlueprint(packet.docId);
+    const tag = doc.tags.find(el => el.name == packet.tag.name);
+    if (tag)
+      doc.tags[doc.tags.indexOf(tag)] = packet.tag;
+    else
+      doc.tags.push(packet.tag);
+  }
+
+  @EventHandler(Flags.TAG_ADD_BLUEPRINT)
+  onRemoveTagBlueprint(packet: EditTagDocumentReq) {
+    const tags = this.project.getBlueprint(packet.docId).tags;
+    tags.splice(tags.findIndex(el => el.name == packet.name.toLowerCase()), 1);
+  }
+  
   @EventHandler(Flags.CREATE_NODE)
   onCreateNode(packet: CreateNodeReq) {
     this.project.addBlueprintNode(packet);

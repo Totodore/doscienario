@@ -1,9 +1,9 @@
 <h1 mat-dialog-title>
-  Editer les tags du document
+  Editer les tags du {{ data[1] == 0 ? 'Document' : 'Blueprint' }}
 </h1>
 
 <div mat-dialog-content style="text-align: center;">
-  <app-select-chip [addedEls]="docTagNames" [label]="'Editer les tags'"
+  <app-select-chip [addedEls]="elTagNames" [label]="'Editer les tags'"
     [data]="tagNames"
     [canAddData]="true"
     (els)="updateTags($event)"

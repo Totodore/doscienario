@@ -1,3 +1,4 @@
+import { TabTypes } from './../../../../../models/tab-element.model';
 import { ConfirmComponent } from './../../../../utils/confirm/confirm.component';
 import { Tag } from 'src/app/models/sockets/tag-sock.model';
 import { DocumentModel } from './../../../../../models/sockets/document-sock.model';
@@ -30,7 +31,7 @@ export class DocumentOptionsComponent {
   }
   openTagEdit() {
     this.dialog.open(EditTagsComponent, {
-      data: this.tabId,
+      data: [this.tabId, TabTypes.DOCUMENT],
       width: "600px",
       maxWidth: "90%",
       maxHeight: "90%"

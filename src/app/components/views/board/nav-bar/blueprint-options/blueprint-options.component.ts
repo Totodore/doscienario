@@ -1,3 +1,4 @@
+import { TabTypes } from './../../../../../models/tab-element.model';
 import { BlueprintService } from './../../../../../services/blueprint.service';
 import { Blueprint, RenameBlueprintOut } from './../../../../../models/sockets/blueprint-sock.model';
 import { ConfirmComponent } from './../../../../utils/confirm/confirm.component';
@@ -46,7 +47,7 @@ export class BlueprintOptionsComponent {
 
   openTagEdit() {
     this.dialog.open(EditTagsComponent, {
-      data: this.tabId,
+      data: [this.tabId, TabTypes.BLUEPRINT],
       width: "600px",
       maxWidth: "90%",
       maxHeight: "90%"

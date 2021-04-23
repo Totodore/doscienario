@@ -40,6 +40,14 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
   background-color: $grey-dark-color;
 }
+
+app-menu {
+	overflow: auto;
+	height: 100vh;
+	display: block;
+}
+
+//Ck Styling
 .ck-balloon-panel {
   border: none !important;
   @include mat-elevation(1);

@@ -45,7 +45,7 @@ export class TabService {
   public loadSavedTabs(projectId: number) {
     this.projectId = projectId;
     for (const tab of this.savedTabs) {
-      this.pushTab(this.availableTabs[tab.tab], false, tab.id, tab.scrollPos);
+      this.pushTab(this.availableTabs[tab.tab], false, tab.id);
       console.log("Loading saved tab :", this.availableTabs[tab.tab].name);
     }
   }
@@ -54,7 +54,7 @@ export class TabService {
    * Take an id, it can be a document id (number)
    * or a tab id
    */
-  public pushTab(tab: Type<ITabElement>, save = true, id?: number, scroll?: Vector) {
+  public pushTab(tab: Type<ITabElement>, save = true, id?: number) {
     if (this.displayedTab?.[1])
       this.displayedTab[1].show = false;
     let displayedIndex: number;
@@ -63,6 +63,7 @@ export class TabService {
       displayedIndex = componentIndex;
     else if (this._tabs.find(el => el[0].name === tab.name && el[1].type === TabTypes.STANDALONE))
       displayedIndex = this._tabs.findIndex(el => el[0].name === tab.name);
+    const savedTab = this.savedTabs.find(el => this.availableTabs.indexOf(tab) === el.tab && el.id === (id || el.id));
     console.log(displayedIndex >= 0 ? `Tab already exists : ${displayedIndex}` : `Creating new tab for ${tab.name}`);
     if (displayedIndex >= 0)
       this.showTab(displayedIndex);

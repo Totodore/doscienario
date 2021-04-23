@@ -1,3 +1,4 @@
+import { Vector } from './../../../../types/global.d';
 import { DocumentWorkerService } from './../../../services/document-worker.service';
 import { ApiService } from 'src/app/services/api.service';
 import { TabService } from './../../../services/tab.service';
@@ -6,9 +7,9 @@ import { ProgressService } from 'src/app/services/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { SocketService } from './../../../services/socket.service';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
-import { Component, Input, OnInit, Type, OnDestroy, ChangeDetectionStrategy, Provider, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnInit, Type, OnDestroy, ChangeDetectionStrategy, Provider, ViewEncapsulation, ViewChild, ElementRef } from '@angular/core';
 import * as CKEditor from "../../../../lib/ckeditor.js";
-import { CKEditor5 } from '@ckeditor/ckeditor5-angular';
+import { CKEditor5, CKEditorComponent } from '@ckeditor/ckeditor5-angular';
 import { v4 as uuid4 } from "uuid";
 import { Flags } from 'src/app/models/sockets/flags.enum';
 @Component({
@@ -22,6 +23,10 @@ export class DocumentComponent implements ITabElement, OnDestroy {
   public content: string = "";
   public tabId: string;
   public lastChangeId: number;
+  
+  @ViewChild("editorView", { static: false })
+  private editorView: ElementRef<HTMLElement>;
+  private contentElement: HTMLElement;
 
   public readonly type = TabTypes.DOCUMENT;
   public readonly editor: CKEditor5.EditorConstructor = CKEditor;
@@ -51,17 +56,18 @@ export class DocumentComponent implements ITabElement, OnDestroy {
     simpleUpload: {
       // The URL that the images are uploaded to.
       uploadUrl: `${this.api.root}/res/${this.project.id}/image`,
-
+      
       // Headers sent along with the XMLHttpRequest to the upload server.
       headers: {
-          Authorization: this.api.jwt
+        Authorization: this.api.jwt
       }
     }
   };
-
+  
   private displayProgress: boolean = false;
   private hasEdited: boolean = false;
-
+  private scroll: Vector;
+  
   constructor(
     private readonly socket: SocketService,
     private readonly project: ProjectService,
@@ -93,12 +99,17 @@ export class DocumentComponent implements ITabElement, OnDestroy {
       editor.ui.getEditableElement()
     );
     this.addTagsListener();
+    this.contentElement = this.editorView.nativeElement.querySelector(".ck-content");
+    this.contentElement.scrollTo({ left: this.scroll?.[0], top: this.scroll?.[1], behavior: "auto" });
     window.setInterval(() => this.hasEdited && this.addTagsListener(), 1000);
   }
-
+  
   loadedTab() {
     this.progress.hide();
     this.content = this.doc.content;
+  }
+  public onUnFocus() {
+    this.scroll = [this.contentElement.scrollLeft, this.contentElement.scrollTop];
   }
 
   onChange(data: string) {
@@ -121,6 +132,7 @@ export class DocumentComponent implements ITabElement, OnDestroy {
       this.socket.updateDocument(this.id, this.tabId, changes, this.doc.lastChangeId, ++this.doc.clientUpdateId);
     } catch (error) {   }
   }
+
 
   private progressWatcher() {
     this.displayProgress = true;

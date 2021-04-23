@@ -1,3 +1,4 @@
+import { Vector } from './../../../../types/global.d';
 import { ConfirmComponent } from './../../utils/confirm/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
 import { BlueprintService } from './../../../services/blueprint.service';
@@ -44,6 +45,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
   public gridMode: boolean;
 
   public readonly type = TabTypes.BLUEPRINT;
+  private scroll: Vector;
 
   constructor(
     private readonly dialog: MatDialog,
@@ -66,8 +68,15 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
   }
 
   onFocus() {
-    if (this.initialized)
-      window.setTimeout(() => this.blueprintHandler.init(this));
+    if (this.initialized) {
+      window.setTimeout(() => {
+        this.blueprintHandler.init(this);
+        this.wrapper.nativeElement.scrollTo({ left: this.scroll?.[0], top: this.scroll?.[1], behavior: "auto" });
+      });
+    }
+  }
+  onUnFocus() {
+    this.scroll = [this.wrapper.nativeElement.scrollLeft, this.wrapper.nativeElement.scrollTop];
   }
 
   refreshView() {

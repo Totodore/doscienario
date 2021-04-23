@@ -20,7 +20,6 @@ export interface TabSaveModel {
   projectId: number;
   id?: number;
   tabId?: string;
-  scrollPos?: Vector
 }
 
 export enum TabTypes {

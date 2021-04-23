@@ -56,17 +56,20 @@ export class ProjectService {
   }
   public addProjectTag(tag: Tag) {
     this.data.tags.push(tag);
+    this.updateSearch();
     this.saveData();
   }
   public removeProjectTag(name: string) {
     this.data.tags.splice(this.tags.findIndex(el => el.name === name), 1);
     for (const doc of this.data.documents)
       doc.tags.splice(doc.tags.findIndex(el => el.name === name), 1);
+    this.updateSearch();
     this.saveData();
   }
   public updateProjectTag(tag: Tag, newTag?: Tag) {
     const index = this.tags.findIndex(el => el.name === tag.name);
     this.data.tags[index] = newTag ?? tag;
+    this.updateSearch();
     this.saveData();
   }
 

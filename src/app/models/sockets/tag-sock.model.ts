@@ -8,16 +8,16 @@ export class Tag extends DataModel {
   constructor(
     name: string | DataModel,
     color?: string,
-    primary: boolean = false
+    primary?: boolean
   ) {
     if (typeof name !== "string") {
       super(name);
-      this.color = color;
-      this.primary = primary
     }
     else {
       super();
       this.name = name;
+      this.color = color;
+      this.primary = primary
     }
     this.type = DataType.Tag;
   }

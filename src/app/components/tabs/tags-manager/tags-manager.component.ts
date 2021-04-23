@@ -74,9 +74,15 @@ export class TagsManagerComponent implements ITabElement {
   }
 
   get docTags(): Tag[] {
-    return this.project.docs
+    return Array.from(new Set(this.project.docs
       .reduce<string[]>((prev, curr) => [...prev, ...curr.tags.map(el => el.name)], [])
       .map(el => this.project.tags.find(val => val.name === el))
-      .filter(el => el != null && !el.primary);
+      .filter(el => el != null && !el.primary)));
+  }
+  get blueprintTags(): Tag[] {
+    return Array.from(new Set(this.project.blueprints
+      .reduce<string[]>((prev, curr) => [...prev, ...curr.tags.map(el => el.name)], [])
+      .map(el => this.project.tags.find(val => val.name === el))
+      .filter(el => el != null && !el.primary)));
   }
 }

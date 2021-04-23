@@ -9,6 +9,15 @@ $grey-dark-color: #212121;
   [contenteditable] {
     outline: 0px solid transparent;
   }
+	scrollbar-width: thin !important;
+  &::-webkit-scrollbar {
+    height: 2px !important;
+    width: 2px !important;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, .35) !important;
+    border-radius: 30px !important;
+  }
 }
 
 html,
@@ -129,14 +138,6 @@ ckeditor {
   }
   .ck-content {
     overflow-y: auto !important;
-    scrollbar-width: thin !important;
-    &::-webkit-scrollbar {
-      width: 2px !important;
-    }
-    &::-webkit-scrollbar-thumb {
-      background-color: rgba(255, 255, 255, .35) !important;
-      border-radius: 30px !important;
-    }
     .mention {
       cursor: pointer !important;
     }

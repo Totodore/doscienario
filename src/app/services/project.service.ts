@@ -363,6 +363,12 @@ export class ProjectService {
   public set autoMode(opt: boolean) {
     localStorage.setItem("auto-mode", String(opt));
   }
+  public get zoomScroll() {
+    return localStorage.getItem("zoom-scroll") !== "false";
+  }
+  public set zoomScroll(opt: boolean) {
+    localStorage.setItem("zoom-scroll", String(opt));
+  }
   public getDoc(docId: number) {
     return Object.values(this.openDocs).find(el => el.id == docId);
   }

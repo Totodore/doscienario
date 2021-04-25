@@ -42,12 +42,12 @@ export class BlueprintService {
   public scrollPoles: Set<Poles> = new Set();
   public scale = 1;
   public scaleOrigin: Vector = [0, 0];
-  public scrollMode = true;
 
   constructor(
     private readonly socket: SocketService,
     private readonly snack: SnackbarService,
-    private readonly progress: ProgressService
+    private readonly progress: ProgressService,
+    private readonly project: ProjectService
   ) {
     this.blueprintWorker = new WorkerManager(WorkerType.Blueprint);
   }
@@ -110,8 +110,11 @@ export class BlueprintService {
       this.scale = e;
       this.scaleOrigin = [this.canvas.width / 2, this.canvas.height / 2];
     } else {
-      if ((this.scrollMode && !e.ctrlKey) || (e.deltaY < 0 && bbox.height < this.wrapper.clientHeight) || (e.deltaY > 0 && this.scale >= 1))
+      if ((!this.project.zoomScroll && !e.ctrlKey) || (e.deltaY < 0 && bbox.height < this.wrapper.clientHeight) || (e.deltaY > 0 && this.scale >= 1)) {
+        if (this.project.zoomScroll)
+          e.preventDefault();
         return;
+      }
       e.preventDefault();
       this.scale += e.deltaY / 1000;
       this.scale = this.scale > 1 ? 1 : this.scale;

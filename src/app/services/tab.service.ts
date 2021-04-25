@@ -48,6 +48,7 @@ export class TabService {
       this.pushTab(this.availableTabs[tab.tab], false, tab.id);
       console.log("Loading saved tab :", this.availableTabs[tab.tab].name);
     }
+    this.showTab(this.focusedTabIndex);
   }
 
   /**
@@ -108,7 +109,7 @@ export class TabService {
     if (index >= 0)
       this.removeTab(index);
   }
-  public showTab(index: number) {
+  public showTab(index: number, save = true) {
     if (this.displayedTab?.[1]) {
       this.displayedTab[1].onUnFocus?.();
       this.displayedTab[1].show = false;
@@ -117,11 +118,14 @@ export class TabService {
       this.tabs[index].show = true;
       this.tabs[index].onFocus?.();
     }
+    if (save)
+      this.focusedTabIndex = index;
   }
   public closeAllTab() {
     const tabLength = this._tabs.length;
     for (let i = 0; i < tabLength; i++)
       this.removeTab(0, false);
+    localStorage.removeItem("tab-index");
   }
 
   private addTabToStorage(tab: Type<ITabElement>, id?: number | string) {
@@ -160,5 +164,11 @@ export class TabService {
   }
   public get hasTabs(): boolean {
     return this._tabs.length > 0;
+  }
+  public get focusedTabIndex(): number {
+    return parseInt(localStorage.getItem("tab-index"));
+  }
+  public set focusedTabIndex(opt: number) {
+    localStorage.setItem("tab-index", opt.toString());
   }
 }

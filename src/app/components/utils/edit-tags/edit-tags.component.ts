@@ -25,7 +25,7 @@ export class EditTagsComponent {
     console.log(editedTags);
     const createdTags = editedTags.filter(el => !this.project.tags.find(value => el === value.name)).map(el => new Tag(el));
     const newTags = [...this.project.tags.filter(el => editedTags.includes(el.name)), ...createdTags];
-    const oldTags = this.el.tags;
+    const oldTags = this.el.tags ?? [];
     const diff = arrayDiff(oldTags, newTags, (a, b) => a.name === b.name);
     let docId: number;
     if (this.data[1] === TabTypes.DOCUMENT) {
@@ -64,7 +64,7 @@ export class EditTagsComponent {
     return this.project.tags?.map(el => el.name) ?? [];
   }
   get elTags() {
-    return this.el.tags;
+    return this.el.tags ?? [];
   }
   get elTagNames() {
     return this.elTags?.map(el => el.name) ?? [];

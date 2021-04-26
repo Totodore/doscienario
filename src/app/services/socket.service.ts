@@ -175,7 +175,7 @@ export class SocketService {
 
   @EventHandler(Flags.REMOVE_BLUEPRINT)
   onRemoveBlueprint(id: number) {
-    this.tabs.removeTab(id);
+    this.tabs.removeBlueprintTab(id);
     this.project.removeBlueprint(id);
   }
   @EventHandler(Flags.TAG_ADD_BLUEPRINT)

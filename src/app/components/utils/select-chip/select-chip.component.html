@@ -1,7 +1,7 @@
 <mat-form-field color="accent" style="width: 100%;">
   <mat-label>{{ label }}</mat-label>
   <mat-chip-list #chipList>
-    <mat-chip *ngFor="let el of addedEls" (removed)="removeEl(el)" (click)="click.emit(el)" [style]="'border: 2px solid #212121; border-color: #' + colors.get(el)">
+    <mat-chip *ngFor="let el of addedEls" (removed)="removeEl(el)" (click)="click.emit(el)" [style]="'border: 2px solid #616161; border-color: #' + colors.get(el)">
       {{ prefix + el }}
       <mat-icon matChipRemove>cancel</mat-icon>
     </mat-chip>

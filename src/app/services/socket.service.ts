@@ -1,4 +1,4 @@
-import { OpenBlueprintReq, SendBlueprintReq, CloseBlueprintReq, CreateNodeReq, RemoveNodeIn, CreateRelationReq, RemoveRelationReq, PlaceNodeIn, Relationship } from './../models/sockets/blueprint-sock.model';
+import { OpenBlueprintReq, SendBlueprintReq, CloseBlueprintReq, CreateNodeReq, RemoveNodeIn, CreateRelationReq, RemoveRelationReq, PlaceNodeIn, Relationship, EditSumarryIn, WriteNodeContentOut, WriteNodeContentIn } from './../models/sockets/blueprint-sock.model';
 import { Tag, UpdateTagColorReq, UpdateTagNameReq } from './../models/sockets/tag-sock.model';
 import { TabService } from './tab.service';
 import { WriteDocumentReq, Change, DocumentModel, DocumentRes, WriteDocumentRes, RenameDocumentRes, EditTagDocumentReq, AddTagDocumentRes, OpenDocumentRes } from './../models/sockets/document-sock.model';
@@ -223,5 +223,23 @@ export class SocketService {
   @EventHandler(Flags.REMOVE_RELATION)
   onRemoveRelation(packet: RemoveRelationReq) {
     this.project.removeBlueprintRelation(packet);
+  }
+
+  @EventHandler(Flags.SUMARRY_NODE)
+  onSumarryNode(packet: EditSumarryIn) {
+    this.project.setSumarryNode(packet);
+  }
+
+  
+  @EventHandler(Flags.CONTENT_NODE)
+  onUpdateNode(packet: WriteNodeContentIn) {
+    if (packet.userId != this.api.user.id)
+      this.project.updateNode(packet);
+  }
+
+  updateNode(nodeId: number, tabId: string, changes: Change[], blueprintId: number) {
+    const doc = this.project.openBlueprints[tabId].nodes.find(el => el.id === nodeId);
+    console.log("Updating blueprint node", nodeId, "tab", tabId);
+    this.socket.emit(Flags.CONTENT_NODE, new WriteNodeContentOut(changes, nodeId, this.api.user.id, blueprintId));
   }
 }

@@ -1,3 +1,4 @@
+import { Change } from './document-sock.model';
 import { DataType } from './../default.model';
 import { GetProjectRes, ProjectUserRes } from "../api/project.model";
 import { Tag } from "./tag-sock.model";
@@ -49,6 +50,8 @@ export class Node {
 
   content: string;
 
+  summary: string;
+  
   title: string;
 
   blueprintId: number;
@@ -57,8 +60,11 @@ export class Node {
 
   tags: Tag[];
 
+  locked: boolean;
+
   height?: number;
   width?: number;
+  changes?: Map<number, Change[]>;
 }
 
 export class Relationship extends DataModel {
@@ -142,3 +148,22 @@ export class RemoveRelationReq {
     public id: number
   ) {}
 }
+
+export class EditSumarryOut {
+  constructor(
+    public node: number,
+    public content: string,
+    public blueprint: number
+  ) {}
+}
+export type EditSumarryIn = EditSumarryOut;
+
+export class WriteNodeContentOut {
+  constructor(
+    public changes: Change[],
+    public nodeId: number,
+    public userId: string,
+    public blueprintId: number
+  ) {}
+}
+export type WriteNodeContentIn = WriteNodeContentOut;

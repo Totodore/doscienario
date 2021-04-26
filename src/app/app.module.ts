@@ -50,6 +50,7 @@ import { ConfirmComponent } from './components/utils/confirm/confirm.component';
 import { SearchResultsComponent } from './components/views/board/nav-bar/search-results/search-results.component';
 import { BlueprintOptionsComponent } from './components/views/board/nav-bar/blueprint-options/blueprint-options.component';
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import { NodeEditorComponent } from './components/tabs/blueprint/node/node-editor/node-editor.component';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -77,7 +78,8 @@ import { MatSlideToggleModule } from "@angular/material/slide-toggle";
     SearchResultsComponent,
     BlueprintComponent,
     NodeComponent,
-    BlueprintOptionsComponent
+    BlueprintOptionsComponent,
+    NodeEditorComponent
   ],
   imports: [
     ReactiveFormsModule,

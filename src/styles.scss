@@ -87,7 +87,7 @@ app-menu {
 }
 ckeditor {
   .ck-editor__editable_inline {
-    height: calc(99vh - 48px - 43px) !important;
+    height: calc(99vh - 48px - 43px);
     background-color: $grey-dark-color !important;
     color: whitesmoke !important;
     border: 1px solid rgba(255,255,255,.12) !important;
@@ -167,7 +167,16 @@ ckeditor {
 		p {
 			margin: 0 !important;
 		}
+		a {
+			color: #b0bec5 !important;
+		}
   }
+}
+//CK dialog editor styling
+#editor-dialog {
+	padding: 0;
+	background-color: #212121;
+	overflow: hidden;
 }
 
 button {

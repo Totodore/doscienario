@@ -1,5 +1,5 @@
 import { Vector } from './../../../../types/global.d';
-import { DocumentWorkerService } from './../../../services/document-worker.service';
+import { EditorWorkerService } from './../../../services/document-worker.service';
 import { ApiService } from 'src/app/services/api.service';
 import { TabService } from './../../../services/tab.service';
 import { Change, DocumentModel } from './../../../models/sockets/document-sock.model';
@@ -73,7 +73,7 @@ export class DocumentComponent implements ITabElement, OnDestroy {
     private readonly project: ProjectService,
     private readonly progress: ProgressService,
     private readonly tabs: TabService,
-    private readonly docWorker: DocumentWorkerService,
+    private readonly docWorker: EditorWorkerService,
     private readonly api: ApiService
   ) { }
 
@@ -147,7 +147,7 @@ export class DocumentComponent implements ITabElement, OnDestroy {
   }
 
   private addTagsListener() {
-    document.querySelectorAll(".ck-content .mention")
+    this.contentElement?.querySelectorAll(".ck-content .mention")
       .forEach((el: HTMLSpanElement) => el.onclick = () => this.onTagClick(el.getAttribute("data-mention")));
     this.hasEdited = false;
   }

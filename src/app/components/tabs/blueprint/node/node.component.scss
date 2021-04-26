@@ -7,7 +7,7 @@
   // backdrop-filter: blur(1.5px);
   transition: all 200ms;
   width: 250px;
-  padding-left: 8px;
+  padding: 0 8px;
   mat-form-field {
     width: 100%;
     height: 100%;
@@ -49,6 +49,19 @@
     left: -17px;
     box-shadow: 0 0 8px -3px rgb(0 0 0 / 50%);
   }
+	.notes {
+		// opacity: 0.6;
+    // visibility: hidden;
+    cursor: pointer;
+    color: #b0bec5;
+    padding: 4px;
+    border-radius: 7px;
+    transition: all 100ms;
+    // transform: scale(0.8);
+    bottom: 2px;
+    position: absolute;
+    right: 2px;
+	}
 
   .add-relation {
     opacity: 0.6;
@@ -98,7 +111,7 @@
         transform: scale(1) translateX(-50%);
       }
     }
-    .handle, .remove {
+    .handle, .remove, .notes {
       visibility: visible;
       opacity: 1;
       transform: scale(1);

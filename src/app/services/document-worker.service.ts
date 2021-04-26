@@ -4,12 +4,12 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
-export class DocumentWorkerService {
+export class EditorWorkerService {
 
   public worker: WorkerManager;
 
   constructor() {
-    this.worker = new WorkerManager(WorkerType.Document);
+    this.worker = new WorkerManager(WorkerType.Editor);
   }
 
 }

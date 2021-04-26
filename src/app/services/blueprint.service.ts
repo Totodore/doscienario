@@ -34,7 +34,7 @@ export class BlueprintService {
   public component: BlueprintComponent;
   public overlay: HTMLElement;
   private wrapper: HTMLElement;
-  private tabId: string;
+  public tabId: string;
   private docId: number;
   private blueprintWorker: WorkerManager;
 

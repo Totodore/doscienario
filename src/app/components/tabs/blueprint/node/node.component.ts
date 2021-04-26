@@ -1,11 +1,18 @@
+import { ProgressService } from './../../../../services/progress.service';
+import { NodeEditorComponent } from './node-editor/node-editor.component';
+import { MatDialog } from '@angular/material/dialog';
+import { Flags } from 'src/app/models/sockets/flags.enum';
+import { SocketService } from './../../../../services/socket.service';
 import { Vector } from './../../../../../types/global.d';
 import { TabService } from './../../../../services/tab.service';
 import { BlueprintService } from './../../../../services/blueprint.service';
-import { Node } from './../../../../models/sockets/blueprint-sock.model';
+import { Node, EditSumarryOut } from './../../../../models/sockets/blueprint-sock.model';
 import { Component, Input, OnInit, Output, EventEmitter, HostListener, ViewChild, ElementRef, OnDestroy, AfterViewInit } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { Y } from '@angular/cdk/keycodes';
 import { ProjectService } from 'src/app/services/project.service';
+import { EditorWorkerService } from 'src/app/services/document-worker.service';
+import { Change } from 'src/app/models/sockets/document-sock.model';
 @Component({
   selector: 'app-node',
   templateUrl: './node.component.html',
@@ -15,6 +22,9 @@ export class NodeComponent implements AfterViewInit {
 
   @Input()
   public data: Node;
+
+  @Input()
+  public blueprintId: number;
 
   @Output()
   private readonly relationBegin = new EventEmitter<[number, number, boolean?]>();
@@ -37,12 +47,17 @@ export class NodeComponent implements AfterViewInit {
   public btnAnchor: Poles = "north";
   public mouseHoverButton = false;
   private initialized: boolean;
+  private displayProgress = false;
 
 
   constructor(
     private readonly blueprintHandler: BlueprintService,
     private readonly project: ProjectService,
-    private readonly tabs: TabService
+    private readonly tabs: TabService,
+    private readonly socket: SocketService,
+    private readonly dialog: MatDialog,
+    private readonly progress: ProgressService,
+    private readonly editorWorker: EditorWorkerService,
   ) { }
 
   ngAfterViewInit(): void {
@@ -68,6 +83,46 @@ export class NodeComponent implements AfterViewInit {
   onRemoveClick(e: Event) {
     e.stopImmediatePropagation();
     this.remove.emit();
+  }
+  onChange(val: string) {
+    this.socket.socket.emit(Flags.SUMARRY_NODE, new EditSumarryOut(this.data.id, val, this.blueprintId));
+  }
+
+  openDetailsView() {
+    console.log(this.data.id, this.blueprintId);
+    const dialog = this.dialog.open(NodeEditorComponent, {
+      closeOnNavigation: false,
+      height: "90%",
+      width: "80%",
+      maxWidth: "100%",
+      id: "editor-dialog",
+      data: this.data.content
+    });
+    dialog.componentInstance.onChange.subscribe((e: string) => {
+      this.onContentData(e);
+    }, null, () => dialog.close());
+  }
+
+  async onContentData(val: string) {
+    const tabId = this.blueprintHandler.tabId;
+    if (Math.abs(val.length - this.data.content?.length) > 500) {
+      const change: Change = [2, null, val];
+      this.socket.updateNode(this.data.id, tabId, [change], this.blueprintId);
+    } else {
+      this.progressWatcher();
+      const changes = await this.editorWorker.worker.postAsyncMessage<Change[]>(`diff-${tabId}`, [this.data.content || "", val]);
+      this.displayProgress = false;
+      this.progress.hide();
+      try {
+        this.socket.updateNode(this.data.id, tabId, changes, this.blueprintId);
+      } catch (error) {   }
+    }
+    this.data.content = val;
+  }
+
+  private progressWatcher() {
+    this.displayProgress = true;
+    setTimeout(() => this.displayProgress && this.progress.show(), 1000);
   }
 
   @HostListener("mousemove", ['$event'])

@@ -5,9 +5,10 @@
               #autosize="cdkTextareaAutosize"
               cdkAutosizeMinRows="1"
               placeholder="Nouveau noeud"
+							[(ngModel)]="data.summary"
+							(ngModelChange)="onChange($event)"
     ></textarea>
   </mat-form-field>
-  <ng-content></ng-content>
   <span #addRel>
     <mat-icon 
 			#icon (click)="onAddRelButton(icon, $event)" 
@@ -17,4 +18,5 @@
   </span>
   <mat-icon class="handle" (mousedown)="onDragStart($event)">open_with</mat-icon>
   <mat-icon class="remove" (click)="onRemoveClick($event)">delete</mat-icon>
+  <mat-icon class="notes" (click)="openDetailsView()">notes</mat-icon>
 </div>

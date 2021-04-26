@@ -16,8 +16,8 @@ export class WorkerManager {
         case WorkerType.Blueprint:
           this.worker = new Worker("../workers/blueprint.worker", { type: 'module' });          
           break;
-        case WorkerType.Document:
-          this.worker = new Worker("../workers/document.worker", { type: 'module' });
+        case WorkerType.Editor:
+          this.worker = new Worker("../workers/editor.worker", { type: 'module' });
           break;
         case WorkerType.Search:
           this.worker = new Worker("../workers/search.worker", { type: 'module' });
@@ -73,6 +73,6 @@ export class WorkerManager {
 export type WorkerListener<Q> = (data: Q) => void;
 export enum WorkerType {
   Blueprint,
-  Document,
+  Editor,
   Search
 }

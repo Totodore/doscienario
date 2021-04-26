@@ -76,7 +76,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
     }
   }
   onUnFocus() {
-    this.scroll = [this.wrapper.nativeElement.scrollLeft, this.wrapper.nativeElement.scrollTop];
+    this.scroll = [this.wrapper?.nativeElement?.scrollLeft, this.wrapper?.nativeElement?.scrollTop];
   }
 
   refreshView() {
@@ -121,9 +121,11 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
   }
 
   onMouseDown(e: MouseEvent) {
-    e.stopImmediatePropagation();
-    e.preventDefault();
-    this.dragging = true;
+    if ((e.target as HTMLDivElement)?.classList.contains("overlay")) {
+      e.stopImmediatePropagation();
+      e.preventDefault();
+      this.dragging = true;
+    }
   }
   onMouseUp(e: MouseEvent) {
     this.dragging = false;

@@ -1,7 +1,7 @@
 import { BlueprintService } from './blueprint.service';
 import { findLevelByNode } from 'src/app/utils/tree.utils';
 import { TabService } from './tab.service';
-import { Blueprint, SendBlueprintReq, OpenBlueprintReq, CreateNodeReq, CreateRelationReq, RemoveRelationReq, PlaceNodeOut, PlaceNodeIn, Relationship, RemoveNodeIn } from './../models/sockets/blueprint-sock.model';
+import { Blueprint, SendBlueprintReq, OpenBlueprintReq, CreateNodeReq, CreateRelationReq, RemoveRelationReq, PlaceNodeOut, PlaceNodeIn, Relationship, RemoveNodeIn, EditSumarryIn, WriteNodeContentIn } from './../models/sockets/blueprint-sock.model';
 import { Router } from '@angular/router';
 import { ApiService } from './api.service';
 import { DocumentModel, DocumentRes, Change, WriteDocumentRes, OpenDocumentRes } from './../models/sockets/document-sock.model';
@@ -315,6 +315,32 @@ export class ProjectService {
     }
     // console.log(this.data.blueprints.find(el => el.id == docId).tags.length, tags.length);
     this.saveData();
+  }
+
+  public updateNode(packet: WriteNodeContentIn) {
+    const node = this.getBlueprint(packet.blueprintId).nodes.find(el => el.id === packet.nodeId);
+    let content = node.content;
+    let stepIndex: number = 0;
+    //Pour chaque nouveau changement on fait la mise à jour à partir du packet modifié par l'agorithme ci-dessus
+    for (const change of packet.changes) {
+      switch (change[0]) {
+        case 1:
+          content = content.insert(change[1] + stepIndex, change[2]);
+          break;
+        case -1:
+          content = content.delete(change[1] + stepIndex, change[2].length);
+          stepIndex -= change[2].length;
+          break;
+        case 2:
+          content = change[2];
+          stepIndex = change[2].length;
+        default: break;
+      }
+    }
+    node.content = content;
+  }
+  public setSumarryNode(packet: EditSumarryIn) {
+    this.getBlueprint(packet.blueprint).nodes.find(el => el.id === packet.node).summary = packet.content;
   }
 
   public saveData() {

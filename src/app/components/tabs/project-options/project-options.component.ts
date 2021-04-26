@@ -1,3 +1,4 @@
+import { TabService } from './../../../services/tab.service';
 import { TabTypes } from './../../../models/tab-element.model';
 import { ConfirmComponent } from './../../utils/confirm/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -17,11 +18,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 export class ProjectOptionsComponent implements ITabElement {
 
   constructor(
+    private readonly tabs: TabService,
     public readonly project: ProjectService,
     public readonly socket: SocketService,
     public readonly api: ApiService,
     public readonly snackbar: SnackbarService,
-    public readonly dialog: MatDialog
+    public readonly dialog: MatDialog,
   ) { }
 
   public title: string = "Options";
@@ -49,6 +51,7 @@ export class ProjectOptionsComponent implements ITabElement {
       dialog.close();
       try {
         await this.api.delete(`project/${this.project.id}`);
+        this.tabs.closeAllTab();
         localStorage.removeItem("tabs");
         this.project.exit();
       } catch (e) {

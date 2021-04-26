@@ -349,7 +349,7 @@ export class ProjectService {
   public exit() {
     localStorage.removeItem("project-data");
     localStorage.removeItem("project");
-    // localStorage.removeItem("tabs");
+    localStorage.removeItem("tab-index");
     this.router.navigateByUrl("/menu");
   }
 

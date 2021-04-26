@@ -89,7 +89,6 @@ export class NodeComponent implements AfterViewInit {
   }
 
   openDetailsView() {
-    console.log(this.data.id, this.blueprintId);
     const dialog = this.dialog.open(NodeEditorComponent, {
       closeOnNavigation: false,
       height: "90%",

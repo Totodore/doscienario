@@ -9,7 +9,7 @@ import { SocketService } from './../../../services/socket.service';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { Component, Input, OnInit, Type, OnDestroy, ChangeDetectionStrategy, Provider, ViewEncapsulation, ViewChild, ElementRef } from '@angular/core';
 import * as CKEditor from "../../../../lib/ckeditor.js";
-import { CKEditor5, CKEditorComponent } from '@ckeditor/ckeditor5-angular';
+import { CKEditor5, CKEditorComponent, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 import { v4 as uuid4 } from "uuid";
 import { Flags } from 'src/app/models/sockets/flags.enum';
 @Component({
@@ -112,7 +112,8 @@ export class DocumentComponent implements ITabElement, OnDestroy {
     this.scroll = [this.contentElement?.scrollLeft, this.contentElement?.scrollTop];
   }
 
-  onChange(data: string) {
+  onChange(e: ChangeEvent) {
+    const data = e.editor.getData();
     this.hasEdited = true;
     if (Math.abs(data.length - this.content.length) > 500) {
       const change: Change = [2, null, data];

@@ -2,8 +2,8 @@
 	<ckeditor
 		[editor]="editor"
 		[config]="editorCongig"
-		[(ngModel)]="data == null ? '' : data"
-		(ngModelChange)="onContentUpdate($event)"
+		[data]="data"
+		(change)="onContentUpdate($event)"
 		name="edit"
 		ngDefaultControl
 		(ready)="editorLoaded($event)"

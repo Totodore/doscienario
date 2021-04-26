@@ -58,14 +58,6 @@ app-menu {
   border-radius: 0 !important;
 
   overflow-y: auto !important;
-  scrollbar-width: thin !important;
-  &::-webkit-scrollbar {
-    width: 2px !important;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, .35) !important;
-    border-radius: 30px !important;
-  }
 
   .ck-list__item {
     .ck-button {
@@ -102,7 +94,7 @@ ckeditor {
     border-bottom: 1px solid rgba(255,255,255,.12) !important;
     color: #b0bec5 !important;
   }
-  button, .ck.ck-button.ck-on {
+  button:not(.ck-color-grid__tile), .ck.ck-button.ck-on:not(.ck-color-grid__tile) {
     background-color: $grey-dark-color !important;
     color: #b0bec5 !important;
     cursor: pointer !important;
@@ -113,7 +105,7 @@ ckeditor {
       box-shadow: none !important;
     }
   }
-  .ck.ck-button.ck-on {
+  .ck.ck-button.ck-on:not(.ck-color-grid__tile) {
     background-color: $grey-light-color !important;
     &:hover {
       background-color: $grey-light-color !important;
@@ -135,7 +127,7 @@ ckeditor {
     border-radius: 5px !important;
     background-color: $grey-dark-color !important;
     transition: all 200ms !important;
-    button {
+    button:not(.ck-color-grid__tile) {
       background-color: $grey-dark-color !important;
       cursor: pointer !important;
       transition: all 250ms !important;

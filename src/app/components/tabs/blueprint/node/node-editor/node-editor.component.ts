@@ -17,7 +17,7 @@ export class NodeEditorComponent implements OnInit {
   public readonly editorCongig: CKEditor5.Config = {
     toolbar: {
       items: [
-        "heading", "|", "bold", "italic", "Underline", "BlockQuote", "HorizontalLine","|",
+        "heading", "|", "bold", "italic", "Underline", "BlockQuote", "HorizontalLine", "FontColor", "|",
         "numberedList", "bulletedList", "|",
         "indent", "outdent", "|", "link",
         "undo", "redo"

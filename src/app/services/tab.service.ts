@@ -150,7 +150,7 @@ export class TabService {
     return (JSON.parse(localStorage.getItem("tabs")) as TabSaveModel[])?.filter(el => el.projectId === this.projectId) || [];
   }
   private addSavedTab(tab: TabSaveModel) {
-    const tabs: TabSaveModel[] = JSON.parse(localStorage.getItem("tabs"));
+    const tabs: TabSaveModel[] = JSON.parse(localStorage.getItem("tabs")) || [];
     tabs.push(tab);
     localStorage.setItem("tabs", JSON.stringify(tabs));
   }

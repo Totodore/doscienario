@@ -49,6 +49,7 @@ export class ProjectOptionsComponent implements ITabElement {
       dialog.close();
       try {
         await this.api.delete(`project/${this.project.id}`);
+        localStorage.removeItem("tabs");
         this.project.exit();
       } catch (e) {
         console.error(e);

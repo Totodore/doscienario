@@ -60,14 +60,17 @@ export class BoardComponent implements OnInit {
         e.preventDefault();
         e.stopImmediatePropagation();
         this.tabs.pushTab(DocumentComponent, false, null);
+        break;
       case B:
         e.preventDefault();
         e.stopImmediatePropagation();
         this.tabs.pushTab(BlueprintComponent, false, null);
+        break;
       case M:
         e.preventDefault();
         e.stopImmediatePropagation();
         this.tabs.pushTab(WelcomeTabComponent);
+        break;
       default:
         break;
     }

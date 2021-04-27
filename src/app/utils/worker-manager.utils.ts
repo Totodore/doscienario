@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-
+import { v4 as uuid } from "uuid";
 @Injectable({
   providedIn: 'root'
 })
@@ -45,13 +45,14 @@ export class WorkerManager {
     this.worker.postMessage([flag, message]);
   }
   postAsyncMessage<R, Q = unknown>(flag: string, message: Q): Promise<R> {
+    const eventFlag = flag + "-" + uuid();
     const promise = new Promise<R>((resolve, reject) => {
-      this.addEventListener(flag, (data: R) => {
+      this.addEventListener(eventFlag, (data: R) => {
         resolve(data);
-        this.removeEventListener(flag);
+        this.removeEventListener(eventFlag);
       });
     });
-    this.worker.postMessage([flag, message]);
+    this.worker.postMessage([eventFlag, message]);
     return promise;
   }
 

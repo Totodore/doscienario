@@ -13,18 +13,22 @@ import { Y } from '@angular/cdk/keycodes';
 import { ProjectService } from 'src/app/services/project.service';
 import { EditorWorkerService } from 'src/app/services/document-worker.service';
 import { Change } from 'src/app/models/sockets/document-sock.model';
+import { v4 } from 'uuid';
 @Component({
   selector: 'app-node',
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss']
 })
-export class NodeComponent implements AfterViewInit {
+export class NodeComponent implements AfterViewInit, OnInit {
 
   @Input()
   public data: Node;
 
   @Input()
   public blueprintId: number;
+
+  @Input()
+  public tabId: string;
 
   @Output()
   private readonly relationBegin = new EventEmitter<[number, number, boolean?]>();
@@ -47,6 +51,7 @@ export class NodeComponent implements AfterViewInit {
   public btnAnchor: Poles = "north";
   public mouseHoverButton = false;
   private initialized: boolean;
+  private nodeUuid = v4();
   private displayProgress = false;
 
 
@@ -59,6 +64,10 @@ export class NodeComponent implements AfterViewInit {
     private readonly progress: ProgressService,
     private readonly editorWorker: EditorWorkerService,
   ) { }
+  
+  ngOnInit() {
+    this.editorWorker.worker.addEventListener<Change[]>(`diff-${this.nodeUuid}`, (data) => this.onContentDataResult(data));
+  }
 
   ngAfterViewInit(): void {
     if (!this.initialized) {
@@ -103,20 +112,22 @@ export class NodeComponent implements AfterViewInit {
   }
 
   async onContentData(val: string) {
-    const tabId = this.blueprintHandler.tabId;
     if (Math.abs(val.length - this.data.content?.length) > 500) {
       const change: Change = [2, null, val];
-      this.socket.updateNode(this.data.id, tabId, [change], this.blueprintId);
+      this.socket.updateNode(this.data.id, this.tabId, [change], this.blueprintId);
     } else {
       this.progressWatcher();
-      const changes = await this.editorWorker.worker.postAsyncMessage<Change[]>(`diff-${tabId}`, [this.data.content || "", val]);
-      this.displayProgress = false;
-      this.progress.hide();
-      try {
-        this.socket.updateNode(this.data.id, tabId, changes, this.blueprintId);
-      } catch (error) {   }
+      this.editorWorker.worker.postMessage<Vector<string>>(`diff-${this.nodeUuid}`, [this.data.content || "", val]);
     }
     this.data.content = val;
+  }
+
+  private onContentDataResult(changes: Change[]) {
+    this.displayProgress = false;
+    this.progress.hide();
+    try {
+      this.socket.updateNode(this.data.id, this.tabId, changes, this.blueprintId);
+    } catch (error) {   }
   }
 
   private progressWatcher() {

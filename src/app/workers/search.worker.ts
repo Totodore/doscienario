@@ -6,7 +6,7 @@ import { sortByRelevance } from '../utils/helpers';
 
 /// <reference lib="webworker" />
 addEventListener('message', (e: MessageEvent<[string, any] | string>) => {
-  if (e.data[0] == 'search')
+  if (e.data[0].startsWith('search'))
     //@ts-ignore
     postMessage([e.data[0], search(...e.data[1])]);
 });

@@ -16,9 +16,9 @@
 			(mouseup)="onMouseUp($event)" 
 			(mousemove)="onMouseMove($event)">
 
-      <app-node [blueprintId]="id" class="root" #rootEl [data]="root" (relationBegin)="beginRelation(rootEl, $event)"></app-node>
+      <app-node [blueprintId]="id" [tabId]="tabId" class="root" #rootEl [data]="root" (relationBegin)="beginRelation(rootEl, $event)"></app-node>
       <app-node #nodeEl *ngFor="let node of nodes"
-				[blueprintId]="id"
+				[blueprintId]="id" [tabId]="tabId"
         [style.left.px]="node.x" [style.top]="'calc(50% + ' + node.y + 'px)'"
         [data]="node" (relationBegin)="beginRelation(nodeEl, $event)"
         (remove)="onRemove(nodeEl)" (relationBind)="bindRelation(nodeEl, $event)"></app-node>

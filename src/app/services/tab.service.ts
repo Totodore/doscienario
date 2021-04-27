@@ -59,12 +59,11 @@ export class TabService {
     if (this.displayedTab?.[1])
       this.displayedTab[1].show = false;
     let displayedIndex: number;
-    const componentIndex = this._tabs.findIndex(el => el[1].id === id && el[0].name === tab.name);
+    const componentIndex = this._tabs.findIndex(el => el[1].id === id && el[0] === tab);
     if (id && componentIndex >= 0)
       displayedIndex = componentIndex;
-    else if (this._tabs.find(el => el[0].name === tab.name && el[1].type === TabTypes.STANDALONE))
+    else if (this._tabs.find(el => el[0] === tab && el[1].type === TabTypes.STANDALONE))
       displayedIndex = this._tabs.findIndex(el => el[0].name === tab.name);
-    const savedTab = this.savedTabs.find(el => this.availableTabs.indexOf(tab) === el.tab && el.id === (id || el.id));
     console.log(displayedIndex >= 0 ? `Tab already exists : ${displayedIndex}` : `Creating new tab for ${tab.name}`);
     if (displayedIndex >= 0)
       this.showTab(displayedIndex);

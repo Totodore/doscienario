@@ -1,0 +1,121 @@
+.wrapper {
+  box-shadow: 0 0 8px -3px rgb(0 0 0 / 50%);
+  border: 1px solid currentColor;
+  border-color: rgba(255,255,255,.12);
+  border-radius: 8px;
+  background-color: #212121cc;
+  // backdrop-filter: blur(1.5px);
+  transition: all 200ms;
+  width: 250px;
+  padding: 0 8px;
+  mat-form-field {
+    width: 100%;
+    height: 100%;
+    textarea {
+      width: 100%;
+      height: 100%;
+      color: whitesmoke;
+    }
+  }
+
+  .handle {
+    opacity: 0.6;
+    visibility: hidden;
+    cursor: move;
+    color: #b0bec5;
+    padding: 4px;
+    border-radius: 25px;
+    background-color: #323232;
+    transition: all 100ms;
+    transform: scale(0.8);
+    top: -15px;
+    position: absolute;
+    right: -17px;
+    box-shadow: 0 0 8px -3px rgb(0 0 0 / 50%);
+  }
+  .remove {
+    opacity: 0.6;
+    visibility: hidden;
+    cursor: pointer;
+    color: #b0bec5;
+    padding: 4px;
+    border-radius: 25px;
+    background-color: #323232;
+    transition: all 100ms;
+    transform: scale(0.8);
+    color: rgb(150, 0, 0);
+    top: -15px;
+    position: absolute;
+    left: -17px;
+    box-shadow: 0 0 8px -3px rgb(0 0 0 / 50%);
+  }
+	.notes {
+		// opacity: 0.6;
+    // visibility: hidden;
+    cursor: pointer;
+    color: #b0bec5;
+    padding: 4px;
+    border-radius: 7px;
+    transition: all 100ms;
+    // transform: scale(0.8);
+    bottom: 2px;
+    position: absolute;
+    right: 2px;
+	}
+
+  .add-relation {
+    opacity: 0.6;
+    visibility: hidden;
+    cursor: pointer;
+    color: #b0bec5;
+    padding: 4px;
+    border-radius: 25px;
+    background-color: #323232;
+    transition: all 100ms;
+    position: absolute;
+    box-shadow: 0 0 8px -3px rgb(0 0 0 / 50%);
+
+    &.north {
+      top: -17px;
+      left: 50%;
+      transform: scale(0.8), translateX(-50%);
+    }
+    &.south {
+      bottom: -17px;
+      left: 50%;
+      transform: scale(0.8) translateX(-50%);
+    }
+    &.west {
+      left: -17px;
+      top: 50%;
+      transform: scale(0.8) translateY(-50%);
+    }
+    &.east {
+      right: -17px;
+      top: 50%;
+      transform: scale(0.8) translateY(-50%);
+    }
+  }
+
+  &:hover {
+    border-width: 2px;
+    border-color: #b0bec5;
+
+    .add-relation {
+      visibility: visible;
+      opacity: 1;
+      &.west, &.east {
+        transform: scale(1) translateY(-50%);
+      }
+      &.north, &.south {
+        transform: scale(1) translateX(-50%);
+      }
+    }
+    .handle, .remove, .notes {
+      visibility: visible;
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+}

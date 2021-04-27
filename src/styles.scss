@@ -9,6 +9,15 @@ $grey-dark-color: #212121;
   [contenteditable] {
     outline: 0px solid transparent;
   }
+	scrollbar-width: thin !important;
+  &::-webkit-scrollbar {
+    height: 2px !important;
+    width: 2px !important;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, .35) !important;
+    border-radius: 30px !important;
+  }
 }
 
 html,
@@ -31,6 +40,14 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
   background-color: $grey-dark-color;
 }
+
+app-menu {
+	overflow: auto;
+	height: 100vh;
+	display: block;
+}
+
+//Ck Styling
 .ck-balloon-panel {
   border: none !important;
   @include mat-elevation(1);
@@ -41,14 +58,6 @@ body {
   border-radius: 0 !important;
 
   overflow-y: auto !important;
-  scrollbar-width: thin !important;
-  &::-webkit-scrollbar {
-    width: 2px !important;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, .35) !important;
-    border-radius: 30px !important;
-  }
 
   .ck-list__item {
     .ck-button {
@@ -70,7 +79,7 @@ body {
 }
 ckeditor {
   .ck-editor__editable_inline {
-    height: calc(99vh - 48px - 43px) !important;
+    height: calc(99vh - 48px - 43px);
     background-color: $grey-dark-color !important;
     color: whitesmoke !important;
     border: 1px solid rgba(255,255,255,.12) !important;
@@ -85,7 +94,7 @@ ckeditor {
     border-bottom: 1px solid rgba(255,255,255,.12) !important;
     color: #b0bec5 !important;
   }
-  button, .ck.ck-button.ck-on {
+  button:not(.ck-color-grid__tile), .ck.ck-button.ck-on:not(.ck-color-grid__tile) {
     background-color: $grey-dark-color !important;
     color: #b0bec5 !important;
     cursor: pointer !important;
@@ -96,7 +105,7 @@ ckeditor {
       box-shadow: none !important;
     }
   }
-  .ck.ck-button.ck-on {
+  .ck.ck-button.ck-on:not(.ck-color-grid__tile) {
     background-color: $grey-light-color !important;
     &:hover {
       background-color: $grey-light-color !important;
@@ -118,7 +127,7 @@ ckeditor {
     border-radius: 5px !important;
     background-color: $grey-dark-color !important;
     transition: all 200ms !important;
-    button {
+    button:not(.ck-color-grid__tile) {
       background-color: $grey-dark-color !important;
       cursor: pointer !important;
       transition: all 250ms !important;
@@ -129,14 +138,6 @@ ckeditor {
   }
   .ck-content {
     overflow-y: auto !important;
-    scrollbar-width: thin !important;
-    &::-webkit-scrollbar {
-      width: 2px !important;
-    }
-    &::-webkit-scrollbar-thumb {
-      background-color: rgba(255, 255, 255, .35) !important;
-      border-radius: 30px !important;
-    }
     .mention {
       cursor: pointer !important;
     }
@@ -155,7 +156,19 @@ ckeditor {
     hr {
       height: 1px !important;
     }
+		p {
+			margin: 0 !important;
+		}
+		a {
+			color: #b0bec5 !important;
+		}
   }
+}
+//CK dialog editor styling
+#editor-dialog {
+	padding: 0;
+	background-color: #212121;
+	overflow: hidden;
 }
 
 button {
@@ -196,4 +209,20 @@ button:focus {
   }
   scrollbar-width: thin;
   overflow-x: auto !important;
+	.mat-tab-label {
+		padding: 0 !important;
+		min-width: 0 !important;
+		justify-content: flex-start !important;
+		.mat-tab-label-content {
+			justify-content: space-between;
+			padding-left: 15px;
+			.mat-icon-button {
+				padding: 0 !important;
+				margin-left: 5px;
+			}
+		}
+	}
+}
+.toggle-btn.on {
+	border: solid 2px #b0bec5 !important;
 }

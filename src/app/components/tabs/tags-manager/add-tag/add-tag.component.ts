@@ -40,10 +40,9 @@ export class AddTagComponent {
   }
 
   public addTag() {
-    if (!this.tagName || this.tagName.length == 0 || this.color == null)
+    if (!this.tagName || this.tagName.length == 0)
       this.snackbar.snack("Tag invalide !");
     else {
-      console.log(this.color.toHexString(false));
       const newTag = new Tag(this.tagName, this.color?.toHexString(false).substr(1), this.oldTag?.primary ?? true);
       if (this.modify) {
         this.project.updateProjectTag(this.oldTag, newTag);

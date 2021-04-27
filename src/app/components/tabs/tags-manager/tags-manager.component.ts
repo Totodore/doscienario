@@ -5,7 +5,7 @@ import { Tag } from 'src/app/models/sockets/tag-sock.model';
 import { AddTagComponent } from './add-tag/add-tag.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ProjectService } from './../../../services/project.service';
-import { ITabElement } from './../../../models/tab-element.model';
+import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { ChangeDetectionStrategy, Component, OnInit, Provider, Type, ViewEncapsulation } from '@angular/core';
 import { diff as arrayDiff } from "fast-array-diff";
 import { Flags } from 'src/app/models/sockets/flags.enum';
@@ -22,8 +22,10 @@ export class TagsManagerComponent implements ITabElement {
     private readonly socket: SocketService,
   ) { }
 
-  title: string = "Gestionnaire de tags";
-  show: boolean = false;
+  public show: boolean = false;
+
+  public readonly title = "Gestionnaire de tags";
+  public readonly type = TabTypes.STANDALONE;
 
   public addPrimaryTag() {
     this.dialog.open(AddTagComponent);
@@ -72,9 +74,15 @@ export class TagsManagerComponent implements ITabElement {
   }
 
   get docTags(): Tag[] {
-    return this.project.docs
+    return Array.from(new Set(this.project.docs
       .reduce<string[]>((prev, curr) => [...prev, ...curr.tags.map(el => el.name)], [])
       .map(el => this.project.tags.find(val => val.name === el))
-      .filter(el => el != null && !el.primary);
+      .filter(el => el != null && !el.primary)));
+  }
+  get blueprintTags(): Tag[] {
+    return Array.from(new Set(this.project.blueprints
+      .reduce<string[]>((prev, curr) => [...prev, ...curr.tags.map(el => el.name)], [])
+      .map(el => this.project.tags.find(val => val.name === el))
+      .filter(el => el != null && !el.primary)));
   }
 }

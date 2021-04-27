@@ -1,10 +1,15 @@
+import { WelcomeTabComponent } from './../../tabs/welcome-tab/welcome-tab.component';
+import { MenuComponent } from './../menu/menu.component';
+import { BlueprintComponent } from './../../tabs/blueprint/blueprint.component';
 import { TabService } from './../../../services/tab.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ProgressService } from './../../../services/progress.service';
 import { ApiService } from './../../../services/api.service';
 import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
 import { SocketService } from './../../../services/socket.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { DocumentComponent } from '../../tabs/document/document.component';
+import { B, M, N, W } from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'app-board',
@@ -30,7 +35,7 @@ export class BoardComponent implements OnInit {
       this.progress.show();
       snack = this.snackbar.open("Synchronisation du projet...", null, { duration: null });
       await this.api.openProject(this.project.id);
-      this.tabs.loadSavedTabs();
+      this.tabs.loadSavedTabs(this.project.id);
       this.snackbar.open("Project synchronisé avec succès !", null, { duration: 3000 });
     } catch (e) {
       console.error(e);
@@ -41,5 +46,30 @@ export class BoardComponent implements OnInit {
     }
   }
 
-
+  @HostListener('document:keydown', ['$event'])
+  public onCtrlKeyDown(e: KeyboardEvent) {
+    if (!e.ctrlKey)
+      return;
+    switch (e.keyCode) {
+      case W:
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        this.tabs.removeTab();
+        break;
+      case N:
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        this.tabs.pushTab(DocumentComponent, false, null);
+      case B:
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        this.tabs.pushTab(BlueprintComponent, false, null);
+      case M:
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        this.tabs.pushTab(WelcomeTabComponent);
+      default:
+        break;
+    }
+  }
 }

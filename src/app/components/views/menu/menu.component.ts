@@ -80,5 +80,13 @@ export class MenuComponent implements OnInit {
       this.progress.hide();
     }
   }
+  public logout() {
+    const user = this.api.user.name;
+    if (this.api.logout()) {
+      this.router.navigateByUrl("/auth");
+      this.snackbar.snack(`Au revoir ${user} !`);
+    } else
+      this.snackbar.snack("Erreur lors de la deconnexion !");
+  }
 
 }

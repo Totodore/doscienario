@@ -1,16 +1,17 @@
+import { Vector } from './../../../../types/global.d';
+import { EditorWorkerService } from './../../../services/document-worker.service';
 import { ApiService } from 'src/app/services/api.service';
 import { TabService } from './../../../services/tab.service';
-import { SnackbarService } from './../../../services/snackbar.service';
-import { WorkerManagerService } from '../../../services/worker-manager.service';
 import { Change, DocumentModel } from './../../../models/sockets/document-sock.model';
 import { ProgressService } from 'src/app/services/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { SocketService } from './../../../services/socket.service';
-import { ITabElement } from './../../../models/tab-element.model';
-import { Component, Input, OnInit, Type, OnDestroy } from '@angular/core';
+import { ITabElement, TabTypes } from './../../../models/tab-element.model';
+import { Component, Input, OnInit, Type, OnDestroy, ChangeDetectionStrategy, Provider, ViewEncapsulation, ViewChild, ElementRef } from '@angular/core';
 import * as CKEditor from "../../../../lib/ckeditor.js";
-import { CKEditor5 } from '@ckeditor/ckeditor5-angular';
+import { CKEditor5, CKEditorComponent, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 import { v4 as uuid4 } from "uuid";
+import { Flags } from 'src/app/models/sockets/flags.enum';
 @Component({
   selector: 'app-document',
   templateUrl: './document.component.html',
@@ -22,11 +23,17 @@ export class DocumentComponent implements ITabElement, OnDestroy {
   public content: string = "";
   public tabId: string;
   public lastChangeId: number;
+  
+  @ViewChild("editorView", { static: false })
+  private editorView: ElementRef<HTMLElement>;
+  private contentElement: HTMLElement;
+
+  public readonly type = TabTypes.DOCUMENT;
   public readonly editor: CKEditor5.EditorConstructor = CKEditor;
   public readonly editorCongig: CKEditor5.Config = {
     toolbar: {
       items: [
-        "heading", "|", "bold", "italic", "Underline", "BlockQuote", "HorizontalLine","|",
+        "heading", "|", "bold", "italic", "Underline", "BlockQuote", "HorizontalLine", "FontColor", "|",
         "numberedList", "bulletedList", "|",
         "indent", "outdent", "|", "link", "imageUpload",
         "insertTable", "mediaEmbed", "|",
@@ -49,56 +56,70 @@ export class DocumentComponent implements ITabElement, OnDestroy {
     simpleUpload: {
       // The URL that the images are uploaded to.
       uploadUrl: `${this.api.root}/res/${this.project.id}/image`,
-
+      
       // Headers sent along with the XMLHttpRequest to the upload server.
       headers: {
-          Authorization: this.api.jwt
+        Authorization: this.api.jwt
       }
     }
   };
-
+  
   private displayProgress: boolean = false;
   private hasEdited: boolean = false;
-
+  private scroll: Vector;
+  
   constructor(
     private readonly socket: SocketService,
     private readonly project: ProjectService,
     private readonly progress: ProgressService,
     private readonly tabs: TabService,
-    private readonly worker: WorkerManagerService,
+    private readonly docWorker: EditorWorkerService,
     private readonly api: ApiService
   ) { }
+
+  onClose() {
+    this.socket.socket.emit(Flags.CLOSE_DOC, this.id);
+  }
 
   openTab(id?: number): string {
     this.tabId = uuid4();
     this.progress.show();
-    this.socket.openDocument(this.tabId, id);
-    this.worker.addEventListener<Change[]>(`diff-${this.tabId}`, (data) => this.onDocParsed(data));
+    this.socket.socket.emit(Flags.OPEN_DOC, [this.tabId, id]);
+    this.docWorker.worker.addEventListener<Change[]>(`diff-${this.tabId}`, (data) => this.onDocParsed(data));
     return this.tabId;
   }
 
   ngOnDestroy() {
-    this.worker.removeEventListener(`diff-${this.tabId}`);
+    this.docWorker.worker.removeEventListener(`diff-${this.tabId}`);
   }
 
   editorLoaded(editor: CKEditor5.Editor): void {
-    this.progress.hide();
-    this.content = this.doc.content;
     editor.ui.getEditableElement().parentElement.insertBefore(
       editor.ui.view.toolbar.element,
       editor.ui.getEditableElement()
     );
     this.addTagsListener();
+    this.contentElement = this.editorView.nativeElement.querySelector(".ck-content");
+    this.contentElement.scrollTo({ left: this.scroll?.[0], top: this.scroll?.[1], behavior: "auto" });
     window.setInterval(() => this.hasEdited && this.addTagsListener(), 1000);
   }
+  
+  loadedTab() {
+    this.progress.hide();
+    this.content = this.doc.content;
+  }
+  public onUnFocus() {
+    this.scroll = [this.contentElement?.scrollLeft, this.contentElement?.scrollTop];
+  }
 
-  onChange(data: string) {
+  onChange(e: ChangeEvent) {
+    const data = e.editor.getData();
     this.hasEdited = true;
     if (Math.abs(data.length - this.content.length) > 500) {
       const change: Change = [2, null, data];
-      this.socket.updateDocument(this.docId, this.tabId, [change], this.doc.lastChangeId, ++this.doc.clientUpdateId);
+      this.socket.updateDocument(this.id, this.tabId, [change], this.doc.lastChangeId, ++this.doc.clientUpdateId);
     } else {
-      this.worker.postMessage<[string, string]>(`diff-${this.tabId}`, [this.content, data]);
+      this.docWorker.worker.postMessage<[string, string]>(`diff-${this.tabId}`, [this.content, data]);
       this.progressWatcher();
     }
     this.content = data;
@@ -109,9 +130,10 @@ export class DocumentComponent implements ITabElement, OnDestroy {
     this.displayProgress = false;
     this.progress.hide();
     try {
-      this.socket.updateDocument(this.docId, this.tabId, changes, this.doc.lastChangeId, ++this.doc.clientUpdateId);
+      this.socket.updateDocument(this.id, this.tabId, changes, this.doc.lastChangeId, ++this.doc.clientUpdateId);
     } catch (error) {   }
   }
+
 
   private progressWatcher() {
     this.displayProgress = true;
@@ -126,7 +148,7 @@ export class DocumentComponent implements ITabElement, OnDestroy {
   }
 
   private addTagsListener() {
-    document.querySelectorAll(".ck-content .mention")
+    this.contentElement?.querySelectorAll(".ck-content .mention")
       .forEach((el: HTMLSpanElement) => el.onclick = () => this.onTagClick(el.getAttribute("data-mention")));
     this.hasEdited = false;
   }
@@ -135,14 +157,12 @@ export class DocumentComponent implements ITabElement, OnDestroy {
     if (tag.startsWith("@")) {
       const docId = this.project.docs.find(el => el.title.toLowerCase() === tag.substr(1).toLowerCase())?.id;
       if (docId)
-        this.tabs.pushTab(DocumentComponent, true, docId, true);
+        this.tabs.pushTab(DocumentComponent, true, docId);
     } else if (tag.startsWith("#")) {}
   }
 
   get doc(): DocumentModel {
-    const doc = this.project.openDocs[this.tabId];
-    this.content = doc?.content || "";
-    return doc;
+    return this.project.openDocs[this.tabId];
   }
 
   get title(): string {
@@ -153,7 +173,7 @@ export class DocumentComponent implements ITabElement, OnDestroy {
     else return this.doc.title;
   }
 
-  get docId(): number {
+  get id(): number {
      return this.doc?.id;
   }
 

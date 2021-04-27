@@ -5,12 +5,15 @@
         <mat-icon class="main-icon" color="accent">description</mat-icon>
         <mat-icon color="accent" matSuffix>add</mat-icon>
       </button>
-      <button mat-stroked-button>
+      <button mat-stroked-button (click)="openBlueprint()">
         <mat-icon class="main-icon" color="accent" matSuffix>account_tree</mat-icon>
         <mat-icon color="accent" matSuffix>add</mat-icon>
       </button>
       <button mat-stroked-button>
         <mat-icon class="main-icon" color="accent" matSuffix>folder</mat-icon>
+      </button>
+      <button mat-stroked-button (click)="openMenu()">
+        <mat-icon class="main-icon" color="accent" matSuffix>menu</mat-icon>
       </button>
     </div>
   </div>

@@ -1,5 +1,7 @@
+import { Blueprint } from './../sockets/blueprint-sock.model';
 import { Tag } from './../sockets/tag-sock.model';
 import { DocumentTypes } from './../document-types.enum';
+import { DataType } from '../default.model';
 export interface CreateProjectReq {
   name: string;
 }
@@ -36,7 +38,7 @@ export interface GetProjectRes {
 
   documents: GetProjectDocumentRes[];
 
-  blueprints: GetProjectBlueprintRes[];
+  blueprints: Blueprint[];
 
   tags: Tag[];
 
@@ -53,6 +55,8 @@ export interface GetProjectDocumentRes {
   images?: GetProjectDocumentImageRes[];
 
   title: string;
+
+  readonly type: DataType.Document;
 }
 
 export interface GetProjectDocumentImageRes {
@@ -71,17 +75,9 @@ export interface GetProjectDocumentImageRes {
   documentId: number;
 }
 
-export interface GetProjectBlueprintRes {
-
-  id: number;
-
-  name: string;
-
-}
-
 export interface SearchQueryRes {
   docs: number[];
   tags: string[];
 }
 
-export type SearchResults = (GetProjectDocumentRes | Tag)[];
+export type SearchResults = (GetProjectDocumentRes | Tag | Blueprint)[];

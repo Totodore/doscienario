@@ -1,13 +1,12 @@
-<div class="wrapper" *ngIf="show">
+<div class="wrapper" *ngIf="show" #editorView>
   <ckeditor *ngIf="doc != null"
   [editor]="editor"
   [config]="editorCongig"
-  [(ngModel)]="doc?.content == null ? '' : doc.content"
-  (ngModelChange)="onChange($event)"
+  [data]="doc.content"
+  (change)="onChange($event)"
   name="edit"
   ngDefaultControl
   (ready)="editorLoaded($event)"
   ></ckeditor>
-  <app-autocomplete-docs [query]="" *ngIf="tagLength > 0"></app-autocomplete-docs>
   <h1 *ngIf="doc == null">Chargement du document...</h1>
 </div>

@@ -1,6 +1,8 @@
 .wrapper {
   text-align: center;
   color: whitesmoke;
+	overflow: auto;
+	height: calc(100vh - 48px);
   h1 {
     font-size: 35px;
     margin-top: 60px;
@@ -14,4 +16,7 @@
     margin: auto;
     border-bottom: 1px solid hsla(0,0%,100%,.12);
   }
+	.tag {
+		border: 2px solid #212121;
+	}
 }

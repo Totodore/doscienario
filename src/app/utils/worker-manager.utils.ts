@@ -1,19 +1,30 @@
 import { Injectable } from '@angular/core';
-
+import { v4 as uuid } from "uuid";
 @Injectable({
   providedIn: 'root'
 })
-export class WorkerManagerService {
+export class WorkerManager {
 
   private worker: Worker;
   private readonly eventListeners: Map<string, WorkerListener<any>[]> = new Map();
 
-  constructor() {
+  constructor(workerType: WorkerType) {
     if (typeof Worker === 'undefined')
       alert("Worker not supported, cannot start Doscenario");
-    else
-      this.worker = new Worker('../app.worker', { type: 'module' });
-    console.log("Worker", this.worker);
+    else {
+      switch (workerType) {
+        case WorkerType.Blueprint:
+          this.worker = new Worker("../workers/blueprint.worker", { type: 'module' });          
+          break;
+        case WorkerType.Editor:
+          this.worker = new Worker("../workers/editor.worker", { type: 'module' });
+          break;
+        case WorkerType.Search:
+          this.worker = new Worker("../workers/search.worker", { type: 'module' });
+          break;
+      }
+    }
+    console.log("Creating worker for", workerType, this.worker);
     this.worker.onmessage = e => this.onMessage(e);
    }
 
@@ -33,6 +44,17 @@ export class WorkerManagerService {
   postMessage<Q>(flag: string, message: Q) {
     this.worker.postMessage([flag, message]);
   }
+  postAsyncMessage<R, Q = unknown>(flag: string, message: Q): Promise<R> {
+    const eventFlag = flag + "-" + uuid();
+    const promise = new Promise<R>((resolve, reject) => {
+      this.addEventListener(eventFlag, (data: R) => {
+        resolve(data);
+        this.removeEventListener(eventFlag);
+      });
+    });
+    this.worker.postMessage([eventFlag, message]);
+    return promise;
+  }
 
   /**
    * On worker message
@@ -45,6 +67,13 @@ export class WorkerManagerService {
       }
     }
   }
+
+
 }
 
 export type WorkerListener<Q> = (data: Q) => void;
+export enum WorkerType {
+  Blueprint,
+  Editor,
+  Search
+}

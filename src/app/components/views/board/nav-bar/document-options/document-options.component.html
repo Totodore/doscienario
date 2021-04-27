@@ -1,16 +1,16 @@
-<div class="wrapper">
+<div class="wrapper" *ngIf="doc">
   <mat-form-field color="accent">
     <mat-label>Titre du document</mat-label>
     <input type="text" #input matInput [(ngModel)]="doc.title" (ngModelChange)="onRename()">
   </mat-form-field>
   <div class="doc-tags">
     <mat-chip-list aria-label="doc tags" *ngIf="docTags && docTags.length > 0">
-      <mat-chip *ngFor="let tag of docTags" [style]="'background-color: #' + tag.color">#{{ tag.name }}</mat-chip>
+      <mat-chip *ngFor="let tag of docTags" [style]="'border: 2px solid #616161; border-color: #' + tag.color">#{{ tag.name }}</mat-chip>
       <mat-chip (click)="openTagEdit()"><mat-icon color="accent">edit</mat-icon></mat-chip>
     </mat-chip-list>
     <div class="btns">
       <button mat-stroked-button class="add-tags" *ngIf="!docTags?.length" (click)="openTagEdit()" color="accent">Ajouter des tags</button>
-      <button mat-stroked-button class="remove-doc" *ngIf="!docTags?.length" (click)="deleteDoc()" color="accent">Suprimer le doc</button>
+      <button mat-stroked-button class="remove-doc" [style]="docTags?.length ? 'margin-top: 10px' : ''" (click)="deleteDoc()" color="accent">Supprimer le doc</button>
     </div>
   </div>
 </div>

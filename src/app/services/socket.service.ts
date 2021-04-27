@@ -1,3 +1,4 @@
+import { OpenBlueprintReq, SendBlueprintReq, CloseBlueprintReq, CreateNodeReq, RemoveNodeIn, CreateRelationReq, RemoveRelationReq, PlaceNodeIn, Relationship, EditSumarryIn, WriteNodeContentOut, WriteNodeContentIn } from './../models/sockets/blueprint-sock.model';
 import { Tag, UpdateTagColorReq, UpdateTagNameReq } from './../models/sockets/tag-sock.model';
 import { TabService } from './tab.service';
 import { WriteDocumentReq, Change, DocumentModel, DocumentRes, WriteDocumentRes, RenameDocumentRes, EditTagDocumentReq, AddTagDocumentRes, OpenDocumentRes } from './../models/sockets/document-sock.model';
@@ -67,13 +68,6 @@ export class SocketService {
     this.project.removeProjectUser(user);
   }
 
-  /**
-   * Open a document or create one
-   */
-  openDocument(tabId: string, docId?: number) {
-    this.socket.emit(Flags.OPEN_DOC, [tabId, docId]);
-  }
-
   @EventHandler(Flags.OPEN_DOC)
   onOpenDocument(packet: OpenDocumentRes) {
     this.project.addOpenDoc(packet);
@@ -82,10 +76,7 @@ export class SocketService {
   @EventHandler(Flags.SEND_DOC)
   onSendDocument(packet: DocumentRes) {
     this.project.addSendDoc(packet);
-  }
-
-  closeDocument(docId: number) {
-    this.socket.emit(Flags.CLOSE_DOC, docId);
+    this.tabs.updateDocTab(packet.reqId, packet.doc.id);
   }
 
   @EventHandler(Flags.CLOSE_DOC)
@@ -164,5 +155,91 @@ export class SocketService {
   @EventHandler(Flags.REMOVE_TAG)
   onRemoveTag(tagName: string) {
     this.project.removeProjectTag(tagName);
+  }
+
+  @EventHandler(Flags.SEND_BLUEPRINT)
+  onSendBlueprint(packet: SendBlueprintReq) {
+    this.project.addSendBlueprint(packet);
+    this.tabs.updateBlueprintTab(packet.reqId, packet.blueprint.id);
+  }
+
+  @EventHandler(Flags.OPEN_BLUEPRINT)
+  onOpenBlueprint(packet: OpenBlueprintReq) {
+    this.project.addOpenBlueprint(packet)
+  }
+
+  @EventHandler(Flags.CLOSE_BLUEPRINT)
+  onCloseBlueprint(packet: CloseBlueprintReq) {
+    this.project.removeOpenBlueprint(packet.id);
+  }
+
+  @EventHandler(Flags.REMOVE_BLUEPRINT)
+  onRemoveBlueprint(id: number) {
+    this.tabs.removeBlueprintTab(id);
+    this.project.removeBlueprint(id);
+  }
+  @EventHandler(Flags.TAG_ADD_BLUEPRINT)
+  onAddTagBlueprint(packet: AddTagDocumentRes) {
+    const projectTag = this.project.tags.find(el => el.name == packet.tag.name);
+    if (projectTag && projectTag.id == null)
+      this.project.updateProjectTag(packet.tag);
+    else if (!projectTag)
+      this.project.addProjectTag(packet.tag);
+    const doc = this.project.getBlueprint(packet.docId);
+    const tag = doc.tags.find(el => el.name == packet.tag.name);
+    if (tag)
+      doc.tags[doc.tags.indexOf(tag)] = packet.tag;
+    else
+      doc.tags.push(packet.tag);
+  }
+
+  @EventHandler(Flags.TAG_ADD_BLUEPRINT)
+  onRemoveTagBlueprint(packet: EditTagDocumentReq) {
+    const tags = this.project.getBlueprint(packet.docId).tags;
+    tags.splice(tags.findIndex(el => el.name == packet.name.toLowerCase()), 1);
+  }
+  
+  @EventHandler(Flags.CREATE_NODE)
+  onCreateNode(packet: CreateNodeReq) {
+    this.project.addBlueprintNode(packet);
+  }
+  @EventHandler(Flags.PLACE_NODE)
+  onPlaceNode(packet: PlaceNodeIn) {
+    this.project.placeBlueprintNode(packet);
+  }
+  @EventHandler(Flags.PLACE_RELATIONSHIP)
+  onPlaceRel(packet: Relationship) {
+    this.project.placeBlueprintRel(packet);
+  }
+  @EventHandler(Flags.REMOVE_NODE)
+  onRemoveNode(packet: RemoveNodeIn) {
+    this.project.removeBlueprintNode(packet);
+  }
+  @EventHandler(Flags.CREATE_RELATION)
+  onCreateRelation(packet: CreateRelationReq) {
+    this.project.addBlueprintRelation(packet);
+  }
+
+  @EventHandler(Flags.REMOVE_RELATION)
+  onRemoveRelation(packet: RemoveRelationReq) {
+    this.project.removeBlueprintRelation(packet);
+  }
+
+  @EventHandler(Flags.SUMARRY_NODE)
+  onSumarryNode(packet: EditSumarryIn) {
+    this.project.setSumarryNode(packet);
+  }
+
+  
+  @EventHandler(Flags.CONTENT_NODE)
+  onUpdateNode(packet: WriteNodeContentIn) {
+    if (packet.userId != this.api.user.id)
+      this.project.updateNode(packet);
+  }
+
+  updateNode(nodeId: number, tabId: string, changes: Change[], blueprintId: number) {
+    const doc = this.project.openBlueprints[tabId].nodes.find(el => el.id === nodeId);
+    console.log("Updating blueprint node", nodeId, "tab", tabId);
+    this.socket.emit(Flags.CONTENT_NODE, new WriteNodeContentOut(changes, nodeId, this.api.user.id, blueprintId));
   }
 }

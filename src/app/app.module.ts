@@ -1,4 +1,5 @@
-import { AutocompleteDocsComponent } from './components/tabs/document/autocomplete-docs/autocomplete-docs.component';
+import { NodeComponent } from './components/tabs/blueprint/node/node.component';
+import { BlueprintComponent } from './components/tabs/blueprint/blueprint.component';
 import { AddOptionsComponent } from './components/views/board/nav-bar/add-options/add-options.component';
 import { AddTagComponent } from './components/tabs/tags-manager/add-tag/add-tag.component';
 import { OptionsSeparatorComponent } from './components/views/board/nav-bar/options-separator/options-separator.component';
@@ -6,6 +7,7 @@ import { SearchOptionsComponent } from './components/views/board/nav-bar/search-
 import { DocumentOptionsComponent } from './components/views/board/nav-bar/document-options/document-options.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -46,6 +48,9 @@ import { TagsManagerComponent } from './components/tabs/tags-manager/tags-manage
 import { MAT_COLOR_FORMATS, NgxMatColorPickerModule, NGX_MAT_COLOR_FORMATS } from '@angular-material-components/color-picker';
 import { ConfirmComponent } from './components/utils/confirm/confirm.component';
 import { SearchResultsComponent } from './components/views/board/nav-bar/search-results/search-results.component';
+import { BlueprintOptionsComponent } from './components/views/board/nav-bar/blueprint-options/blueprint-options.component';
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import { NodeEditorComponent } from './components/tabs/blueprint/node/node-editor/node-editor.component';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -71,7 +76,10 @@ import { SearchResultsComponent } from './components/views/board/nav-bar/search-
     AddTagComponent,
     ConfirmComponent,
     SearchResultsComponent,
-    AutocompleteDocsComponent
+    BlueprintComponent,
+    NodeComponent,
+    BlueprintOptionsComponent,
+    NodeEditorComponent
   ],
   imports: [
     ReactiveFormsModule,
@@ -95,7 +103,9 @@ import { SearchResultsComponent } from './components/views/board/nav-bar/search-
     MatSelectModule,
     CKEditorModule,
     NgxMatColorPickerModule,
-    MatRippleModule
+    MatRippleModule,
+    DragDropModule,
+    MatSlideToggleModule
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: appearance },

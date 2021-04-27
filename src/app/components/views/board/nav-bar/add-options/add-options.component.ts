@@ -1,6 +1,8 @@
+import { BlueprintComponent } from './../../../../tabs/blueprint/blueprint.component';
 import { DocumentComponent } from './../../../../tabs/document/document.component';
 import { TabService } from './../../../../../services/tab.service';
 import { Component, Input } from '@angular/core';
+import { WelcomeTabComponent } from 'src/app/components/tabs/welcome-tab/welcome-tab.component';
 
 @Component({
     selector: 'app-add-options',
@@ -13,6 +15,13 @@ export class AddOptionsComponent {
   ) { }
 
   createDoc() {
-    this.tabs.pushTab(DocumentComponent, false, null, true);
+    this.tabs.pushTab(DocumentComponent, false);
+  }
+
+  public openMenu() {
+    this.tabs.pushTab(WelcomeTabComponent);
+  }
+  public openBlueprint() {
+    this.tabs.pushTab(BlueprintComponent, false);
   }
 }

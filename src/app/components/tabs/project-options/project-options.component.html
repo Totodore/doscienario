@@ -6,8 +6,19 @@
       <mat-label>Nom du projet</mat-label>
       <input type="text" [(ngModel)]="name" (input)="updateName()" matInput>
     </mat-form-field>
-
   </section>
+	<section class="blueprint-options">
+		<h4>Paramètres des arbres :</h4>
+		<mat-slide-toggle color="accent" [(ngModel)]="project.dispGrid">
+			Afficher une grille d'arrière plan par défaut
+		</mat-slide-toggle><br>
+		<mat-slide-toggle color="accent" [(ngModel)]="project.autoMode">
+			Auto Mode par défaut
+		</mat-slide-toggle><br>
+		<mat-slide-toggle color="accent" [(ngModel)]="project.zoomScroll">
+			Zoomer avec la molette de scroll
+		</mat-slide-toggle>
+	</section>
   <section class="data-project">
     <button mat-stroked-button color="accent" (click)="exportProject()">Exporter le projet <mat-icon class="mat-18">download</mat-icon></button>
     <button mat-stroked-button color="accent" (click)="deleteProject()">Supprimer le projet <mat-icon class="mat-18">delete</mat-icon></button>

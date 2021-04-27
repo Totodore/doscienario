@@ -1,0 +1,17 @@
+<div #wrapper id="node-editor-wrapper">
+	<ckeditor
+		[editor]="editor"
+		[config]="editorCongig"
+		[data]="data"
+		(change)="onContentUpdate($event)"
+		name="edit"
+		ngDefaultControl
+		(ready)="editorLoaded($event)"
+		#editorEl
+	></ckeditor>
+
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-stroked-button color="accent" (click)="onClose()">Fermer</button>
+</div>
+

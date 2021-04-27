@@ -264,7 +264,7 @@ export class ProjectService {
   }
   public async addBlueprintNode(packet: CreateNodeReq) {
     this.getBlueprint(packet.node.blueprint.id).nodes.push(packet.node);
-    if (this.tabs.displayedTab[1].type === TabTypes.BLUEPRINT && this.tabs.displayedTab[1].id === packet.node.blueprint.id && packet.user === this.owner.id) {
+    if (this.tabs.displayedTab[1].type === TabTypes.BLUEPRINT && this.tabs.displayedTab[1].id === packet.node.blueprint.id && packet.user === packet.node.createdBy.id) {
       window.setTimeout(async () => {
         const component = this.tabs.displayedTab[1] as BlueprintComponent;
         if (component.autoMode)

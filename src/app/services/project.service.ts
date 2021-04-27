@@ -279,7 +279,7 @@ export class ProjectService {
     node.x = packet.pos[0];
     node.y = packet.pos[1];
     this.saveData();
-    this.tabs.tabs.find(el => el.id === packet.blueprintId).refreshView();
+    this.tabs.tabs.find(el => el.id === packet.blueprintId && el.type === TabTypes.BLUEPRINT).refreshView();
   }
   public placeBlueprintRel(packet: Relationship) {
     const rel = this.getBlueprint(packet.blueprint.id).relationships.find(el => el.id === packet.id);
@@ -288,7 +288,7 @@ export class ProjectService {
     rel.ox = packet.ox;
     rel.oy = packet.oy;
     this.saveData();
-    this.tabs.tabs.find(el => el.id === packet.blueprint.id).refreshView();
+    this.tabs.tabs.find(el => el.id === packet.blueprint.id && el.type === TabTypes.BLUEPRINT).refreshView();
   }
   public removeBlueprintNode(packet: RemoveNodeIn) {
     const blueprint = this.getBlueprint(packet.blueprintId);
@@ -299,7 +299,7 @@ export class ProjectService {
   }
   public addBlueprintRelation(packet: CreateRelationReq) {
     this.getBlueprint(packet.blueprint).relationships.push(packet.relation);
-    this.tabs.tabs.find(el => el.id === packet.blueprint).refreshView();
+    this.tabs.tabs.find(el => el.id === packet.blueprint && el.type === TabTypes.BLUEPRINT).refreshView();
   }
   public removeBlueprintRelation(packet: RemoveRelationReq) {
     const index = this.getBlueprint(packet.blueprint).relationships.findIndex(el => el.id === packet.id);

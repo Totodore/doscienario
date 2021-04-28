@@ -23,7 +23,7 @@ jobs:
         repository: totodore/build-doscienario
         token: ${{ secrets.CR_PAT }}
     - name: Build Angular app
-      run: ./build.ps1
+      run: ls ; ./build.ps1
     - name: Build Electron app
       run: tsc -b tsconfig.json
     - name: Create Electron package

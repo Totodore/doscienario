@@ -15,18 +15,10 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-builders/custom-webpack:browser",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "showCircularDependencies": false,
             "outputPath": "dist/doscienario",
-            "optimization": true,
-            "progress": true,
-            "customWebpackConfig": {
-              "path": "./webpack.config.js",
-              "mergeStrategies": {
-                "externals": "replace"
-              }
-            },
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -77,11 +69,6 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "browserTarget": "doscienario:build"
-          },
-          "configurations": {
-            "production": {
-              "browserTarget": "doscienario:build:production"
-            }
           }
         },
         "extract-i18n": {

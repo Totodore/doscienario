@@ -27,8 +27,7 @@ jobs:
         token: ${{ secrets.CR_PAT }}
     - name: Build Electron
       run: 
-        cd ..;
-        git clone https://github.com/Totodore/doscenario-build;
+        ls;
         cd doscenario-build;
         npm it;
         tsc;

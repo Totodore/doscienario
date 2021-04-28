@@ -18,8 +18,6 @@ jobs:
       run: npm install -D electron electron-builder typescript
     - name: Install dependencies
       run: npm install
-    - name: Build on Windows
-      run: npm run build
     - uses: actions/checkout@v2
       with: 
         repository: totodore/build-doscienario

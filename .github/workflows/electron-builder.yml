@@ -24,12 +24,11 @@ jobs:
         submodules: recursive
     - name: Build Angular app
       run:
-        env GH_TOKEN=${{ secrets.CR_PAT }};
         cd build;
         ./build.ps1;
         npm install;
         tsc -b tsconfig.json;
-        electron-builder build -w;
+        electron-builder build -w --publish=never;
         ls ./build;
     - name: Create Release
       uses: "marvinpinto/action-automatic-releases@latest"
@@ -54,18 +53,17 @@ jobs:
           submodules: recursive
       - name: Build Angular app
         run: 
-          env GH_TOKEN=${{ secrets.CR_PAT }};
           cd build;
           ./build.bash;
           npm install;
           tsc -b tsconfig.json;
-          electron-builder build -l;
+          electron-builder build -l --publish=never;
           ls ./build;
       - name: Create Release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          files: ./build/*.exe
+          files: ./build/*.AppImage
           title: "${{ github.ref }} - Linux"
       

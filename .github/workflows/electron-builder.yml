@@ -31,7 +31,8 @@ jobs:
       with:
         token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: false
-        files: ./build/build/*.exe
+        files: 
+          ./build/*.exe
         tag: ${{ github.ref }}
         release: "${{ github.ref }} - Windows"
   Linux:
@@ -59,7 +60,8 @@ jobs:
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          files: ./build/*.AppImage
+          files: 
+            ./build/*.AppImage
           tag: ${{ github.ref }}
           release: "${{ github.ref }} - Linux"
       

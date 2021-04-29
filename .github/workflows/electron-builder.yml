@@ -9,12 +9,8 @@ jobs:
   Windows:
     runs-on: windows-latest
     steps:
-    - name: Branch name
-      id: branch_name
-      run: |
-        echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
-        echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
-        echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+    - uses: olegtarasov/get-tag@v2.1
+      id: tagName
     - uses: actions/setup-node@master
       with:
         node-version: 14.13
@@ -35,18 +31,14 @@ jobs:
     - name: Upload Windows Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: windows_${{ steps.branch_name.outputs.SOURCE_TAG }}
+        name: windows_${{ steps.tagName.outputs.tag }}
         path: ./build/*.exe
         retention-days: 1
   Linux:
     runs-on: ubuntu-latest
     steps:
-      - name: Branch name
-        id: branch_name
-        run: |
-          echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
-          echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
-          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+      - uses: olegtarasov/get-tag@v2.1
+        id: tagName
       - uses: actions/setup-node@master
         with:
           node-version: 14.13
@@ -67,7 +59,7 @@ jobs:
       - name: Upload Linux Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: linux_${{ steps.branch_name.outputs.SOURCE_TAG }}
+          name: linux_${{ steps.tagName.outputs.tag }}
           path: ./build/*.AppImage
           retention-days: 1
   #Release Upload
@@ -77,26 +69,22 @@ jobs:
       - Linux
       - Windows
     steps:
-      - name: Branch name
-        id: branch_name
-        run: |
-          echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
-          echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
-          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+      - uses: olegtarasov/get-tag@v2.1
+        id: tagName
       - name: Download Windows Artifacts
         uses: actions/download-artifact@v2
         with:
-          name: windows_${{ steps.branch_name.outputs.SOURCE_TAG }}
+          name: windows_${{ steps.tagName.outputs.tag }}
       - name: Download Linux Artifacts
         uses: actions/download-artifact@v2
         with:
-          name: linux_${{ steps.branch_name.outputs.SOURCE_TAG }}
+          name: linux_${{ steps.tagName.outputs.tag }}
       - name: Create Release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          title: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+          title: ${{ steps.tagName.outputs.tag }}
           files: |
             *.AppImage
             *.exe

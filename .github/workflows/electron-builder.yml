@@ -28,7 +28,7 @@ jobs:
         tsc -b tsconfig.json;
         electron-builder build -w --publish=never;
         ls ./build;
-    - name: Create Release
+    - name: Create Release Windows
       uses: johnwbyrd/update-release@v1.0.0
       with:
         token: "${{ secrets.GITHUB_TOKEN }}"
@@ -58,7 +58,7 @@ jobs:
           tsc -b tsconfig.json;
           electron-builder build -l --publish=never;
           ls ./build;
-      - name: Create Release
+      - name: Create Release Linux
         uses: johnwbyrd/update-release@v1.0.0
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"

@@ -16,13 +16,11 @@ jobs:
       run: npm install -g electron electron-builder typescript
     - uses: actions/checkout@v2
       with: 
-        path: build
         repository: totodore/build-doscienario
         token: ${{ secrets.CR_PAT }}
         submodules: recursive
     - name: Build Angular app
       run:
-        cd build;
         ./build.ps1;
         npm install;
         tsc -b tsconfig.json;
@@ -46,13 +44,11 @@ jobs:
         run: npm install -g electron electron-builder typescript
       - uses: actions/checkout@v2
         with: 
-          path: build
           repository: totodore/build-doscienario
           token: ${{ secrets.CR_PAT }}
           submodules: recursive
       - name: Build Angular app
         run: 
-          cd build;
           ./build.bash;
           npm install;
           tsc -b tsconfig.json;
@@ -63,7 +59,7 @@ jobs:
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          files: ./build/build/*.AppImage
+          files: ./build/*.AppImage
           tag: ${{ github.ref }}
           release: "${{ github.ref }} - Linux"
       

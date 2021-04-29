@@ -31,8 +31,8 @@ jobs:
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: false
-        automatic_release_tag: ${GITHUB_REF##*/}
-        title: "${GITHUB_REF##*/} - Windows"
+        automatic_release_tag: ${{ GITHUB_REF##*/ }}
+        title: "${{ GITHUB_REF##*/ }} - Windows"
         files: |
           ./build/*.exe
   Linux:
@@ -60,7 +60,7 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          automatic_release_tag: ${GITHUB_REF##*/}
-          title: ${GITHUB_REF##*/} - Linux"
+          automatic_release_tag: ${{ GITHUB_REF##*/ }}
+          title: ${{ GITHUB_REF##*/ }} - Linux"
           files: |
             ./build/*.AppImage

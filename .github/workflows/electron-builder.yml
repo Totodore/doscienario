@@ -9,6 +9,12 @@ jobs:
   Windows:
     runs-on: windows-latest
     steps:
+    - name: Branch name
+      id: branch_name
+      run: |
+        echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
+        echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
+        echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
     - uses: actions/setup-node@master
       with:
         node-version: 14.13
@@ -31,13 +37,19 @@ jobs:
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: false
-        automatic_release_tag: ${{ GITHUB_REF##*/ }}
-        title: "${{ GITHUB_REF##*/ }} - Windows"
+        automatic_release_tag: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+        title: "${{ steps.branch_name.outputs.SOURCE_TAG }} - Windows"
         files: |
           ./build/*.exe
   Linux:
     runs-on: ubuntu-latest
     steps:
+      - name: Branch name
+        id: branch_name
+        run: |
+          echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
+          echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
+          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
       - uses: actions/setup-node@master
         with:
           node-version: 14.13
@@ -60,7 +72,7 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          automatic_release_tag: ${{ GITHUB_REF##*/ }}
-          title: ${{ GITHUB_REF##*/ }} - Linux"
+          automatic_release_tag: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+          title: ${{ steps.branch_name.outputs.SOURCE_TAG }} - Linux"
           files: |
             ./build/*.AppImage

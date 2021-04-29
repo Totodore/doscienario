@@ -26,15 +26,15 @@ jobs:
         tsc -b tsconfig.json;
         electron-builder build -w --publish=never;
         ls ./build;
-    - name: Create Release Windows
-      uses: johnwbyrd/update-release@v1.0.0
+    - name: Create Windows Release
+      uses: "marvinpinto/action-automatic-releases@latest"
       with:
-        token: "${{ secrets.GITHUB_TOKEN }}"
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: false
-        files: 
+        automatic_release_tag: ${{ github.ref }}
+        title: "${{ github.ref }} - Windows"
+        files: |
           ./build/*.exe
-        tag: ${{ github.ref }}
-        release: "${{ github.ref }} - Windows"
   Linux:
     runs-on: ubuntu-latest
     steps:
@@ -55,13 +55,12 @@ jobs:
           tsc -b tsconfig.json;
           electron-builder build -l --publish=never;
           ls ./build;
-      - name: Create Release Linux
-        uses: johnwbyrd/update-release@v1.0.0
+      - name: Create Linux Release
+        uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          token: "${{ secrets.GITHUB_TOKEN }}"
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          files: 
+          automatic_release_tag: ${{ github.ref }}
+          title: "${{ github.ref }} - Linux"
+          files: |
             ./build/*.AppImage
-          tag: ${{ github.ref }}
-          release: "${{ github.ref }} - Linux"
-      

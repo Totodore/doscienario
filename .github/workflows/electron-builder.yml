@@ -23,7 +23,8 @@ jobs:
         token: ${{ secrets.CR_PAT }}
         submodules: recursive
     - name: Build Angular app
-      run: 
+      run:
+        env GH_TOKEN=${{ secrets.CR_PAT }};
         cd build;
         ./build.ps1;
         npm install;
@@ -31,11 +32,40 @@ jobs:
         electron-builder build -w;
         ls ./build;
     - name: Create Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      uses: "marvinpinto/action-automatic-releases@latest"
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: false
+        files: ./build/*.exe
+        title: "${{ github.ref }} - Windows"
+  Linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@master
+        with:
+          node-version: 14.13
+      - name: install node tools
+        run: npm install -g electron electron-builder typescript
+      - uses: actions/checkout@v2
+        with: 
+          path: build
+          repository: totodore/build-doscienario
+          token: ${{ secrets.CR_PAT }}
+          submodules: recursive
+      - name: Build Angular app
+        run: 
+          env GH_TOKEN=${{ secrets.CR_PAT }};
+          cd build;
+          ./build.bash;
+          npm install;
+          tsc -b tsconfig.json;
+          electron-builder build -l;
+          ls ./build;
+      - name: Create Release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          files: ./build/*.exe
+          title: "${{ github.ref }} - Linux"
+      

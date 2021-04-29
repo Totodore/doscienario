@@ -12,7 +12,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: ls
-      run: ls . ; pwd
+      run: pwd ; ls .
     - uses: actions/setup-node@master
       with:
         node-version: 14.13

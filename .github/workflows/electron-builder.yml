@@ -27,6 +27,7 @@ jobs:
         cd build;
         ls; 
         ./build.ps1;
+        ls;
     - name: Install dependencies
       run: npm install
     - name: Build Electron app

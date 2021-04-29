@@ -25,7 +25,7 @@ jobs:
       run: npm install
     - name: Build Angular app
       run: 
-        cd build; 
+        cd build/doscienario; 
         ./build.ps1;
     - name: Build Electron app
       run: tsc -b tsconfig.json

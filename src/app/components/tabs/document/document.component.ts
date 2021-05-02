@@ -101,7 +101,6 @@ export class DocumentComponent implements ITabElement, OnDestroy {
     this.contentElement = this.editorView.nativeElement.querySelector(".ck-content");
     this.contentElement.scrollTo({ left: this.scroll?.[0], top: this.scroll?.[1], behavior: "auto" });
     window.setInterval(() => this.hasEdited && this.addTagsListener(), 1000);
-    console.log(this.doc.content);
   }
   
   loadedTab() {

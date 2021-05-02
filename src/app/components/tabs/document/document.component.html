@@ -2,7 +2,7 @@
   <ckeditor *ngIf="doc != null"
   [editor]="editor"
   [config]="editorCongig"
-  [data]="content"
+  [data]="doc.content"
   (change)="onChange($event)"
   name="edit"
   ngDefaultControl

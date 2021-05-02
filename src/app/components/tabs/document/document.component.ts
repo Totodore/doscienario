@@ -20,7 +20,6 @@ import { Flags } from 'src/app/models/sockets/flags.enum';
 export class DocumentComponent implements ITabElement, OnDestroy {
 
   public show: boolean = false;
-  public content: string = "";
   public tabId: string;
   public lastChangeId: number;
   
@@ -102,11 +101,12 @@ export class DocumentComponent implements ITabElement, OnDestroy {
     this.contentElement = this.editorView.nativeElement.querySelector(".ck-content");
     this.contentElement.scrollTo({ left: this.scroll?.[0], top: this.scroll?.[1], behavior: "auto" });
     window.setInterval(() => this.hasEdited && this.addTagsListener(), 1000);
+    console.log(this.doc.content);
   }
   
   loadedTab() {
     this.progress.hide();
-    this.content = this.doc.content;
+    this.project.openDocs[this.tabId].content = this.doc.content;
   }
   public onUnFocus() {
     this.scroll = [this.contentElement?.scrollLeft, this.contentElement?.scrollTop];
@@ -115,14 +115,14 @@ export class DocumentComponent implements ITabElement, OnDestroy {
   onChange(e: ChangeEvent) {
     const data = e.editor.getData();
     this.hasEdited = true;
-    if (Math.abs(data.length - this.content.length) > 500) {
+    if (Math.abs(data.length - this.doc.content.length) > 500) {
       const change: Change = [2, null, data];
       this.socket.updateDocument(this.id, this.tabId, [change], this.doc.lastChangeId, ++this.doc.clientUpdateId);
     } else {
-      this.docWorker.worker.postMessage<[string, string]>(`diff-${this.tabId}`, [this.content, data]);
+      this.docWorker.worker.postMessage<[string, string]>(`diff-${this.tabId}`, [this.doc.content, data]);
       this.progressWatcher();
     }
-    this.content = data;
+    this.project.openDocs[this.tabId].content = data;
   }
 
   private onDocParsed(changes: Change[]) {

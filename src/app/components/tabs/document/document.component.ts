@@ -97,10 +97,10 @@ export class DocumentComponent implements ITabElement, OnDestroy {
       editor.ui.view.toolbar.element,
       editor.ui.getEditableElement()
     );
-    this.addTagsListener();
     this.contentElement = this.editorView.nativeElement.querySelector(".ck-content");
     this.contentElement.scrollTo({ left: this.scroll?.[0], top: this.scroll?.[1], behavior: "auto" });
     window.setInterval(() => this.hasEdited && this.addTagsListener(), 1000);
+    this.addTagsListener();
   }
   
   loadedTab() {
@@ -125,7 +125,6 @@ export class DocumentComponent implements ITabElement, OnDestroy {
   }
 
   private onDocParsed(changes: Change[]) {
-    // console.log("Doc changed", changes);
     this.displayProgress = false;
     this.progress.hide();
     try {
@@ -147,7 +146,7 @@ export class DocumentComponent implements ITabElement, OnDestroy {
   }
 
   private addTagsListener() {
-    this.contentElement?.querySelectorAll(".ck-content .mention")
+    this.contentElement.querySelectorAll(".mention")
       .forEach((el: HTMLSpanElement) => el.onclick = () => this.onTagClick(el.getAttribute("data-mention")));
     this.hasEdited = false;
   }

@@ -10,7 +10,6 @@ export interface ITabElement extends Component {
   onClose?: () => void;
   openTab?: (id: number | string) => string;
   loadedTab?: () => void;
-  refreshView?: () => void;
   onFocus?: () => void;
   onUnFocus?: () => void;
 }

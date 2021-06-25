@@ -25,7 +25,7 @@
 		</button>
 		<mat-form-field color="accent" class="zoom">
 			<mat-label>Zoom</mat-label>
-			<input type="text" #zoom matInput (keydown)="onZoom($event, zoom.value)" [ngModel]="(blueprintHandler.scale * 100).toFixed() + '%'">
+			<input type="text" #zoom matInput (keydown)="onZoom($event, zoom.value)" [ngModel]="(component.scale * 100).toFixed() + '%'">
 		</mat-form-field>
   </div>
 </div>

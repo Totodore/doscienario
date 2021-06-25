@@ -1,6 +1,6 @@
 <div class="wrapper">
   <div matRipple class="result doc" *ngFor="let result of results" (click)="openEl(result)">
     <mat-icon class="mat-18">{{ getIconName(result) }}</mat-icon>
-    <h3>{{ result.title || result.name }}</h3>
+    <h3>{{ $any(result).title || $any(result).name }}</h3>
   </div>
 </div>

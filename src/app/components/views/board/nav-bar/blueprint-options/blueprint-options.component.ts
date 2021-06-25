@@ -1,5 +1,4 @@
 import { TabTypes } from './../../../../../models/tab-element.model';
-import { BlueprintService } from './../../../../../services/blueprint.service';
 import { Blueprint, RenameBlueprintOut } from './../../../../../models/sockets/blueprint-sock.model';
 import { ConfirmComponent } from './../../../../utils/confirm/confirm.component';
 import { Tag } from 'src/app/models/sockets/tag-sock.model';
@@ -27,7 +26,6 @@ export class BlueprintOptionsComponent {
     private readonly project: ProjectService,
     private readonly socket: SocketService,
     private readonly dialog: MatDialog,
-    private readonly blueprintHandler: BlueprintService
   ) { }
 
   onRename() {
@@ -42,7 +40,7 @@ export class BlueprintOptionsComponent {
     } else if (e.keyCode == UP_ARROW) {
       ratio = parseFloat(val) + 1;
     } else return;
-    this.blueprintHandler.onWheel(ratio / 100);
+    this.component.onWheel(ratio / 100);
   }
 
   openTagEdit() {
@@ -55,7 +53,7 @@ export class BlueprintOptionsComponent {
   }
 
   autoPosBlueprint() {
-    this.blueprintHandler.autoPos();
+    this.component.autoPos();
   }
 
   toggleAutoMode() {
@@ -63,7 +61,6 @@ export class BlueprintOptionsComponent {
   }
   toggleGrid() {
     this.component.gridMode = !this.component.gridMode;
-    this.component.blueprintHandler.drawRelations();
   }
 
   deleteBlueprint() {

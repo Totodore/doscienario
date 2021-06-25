@@ -1,3 +1,4 @@
+import { DrawStates } from './../blueprint.component';
 import { ProgressService } from './../../../../services/progress.service';
 import { NodeEditorComponent } from './node-editor/node-editor.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -5,11 +6,9 @@ import { Flags } from 'src/app/models/sockets/flags.enum';
 import { SocketService } from './../../../../services/socket.service';
 import { Vector } from './../../../../../types/global.d';
 import { TabService } from './../../../../services/tab.service';
-import { BlueprintService } from './../../../../services/blueprint.service';
 import { Node, EditSumarryOut } from './../../../../models/sockets/blueprint-sock.model';
 import { Component, Input, OnInit, Output, EventEmitter, HostListener, ViewChild, ElementRef, OnDestroy, AfterViewInit } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import { Y } from '@angular/cdk/keycodes';
 import { ProjectService } from 'src/app/services/project.service';
 import { EditorWorkerService } from 'src/app/services/document-worker.service';
 import { Change } from 'src/app/models/sockets/document-sock.model';
@@ -30,14 +29,32 @@ export class NodeComponent implements AfterViewInit, OnInit {
   @Input()
   public tabId: string;
 
+  @Input()
+  public parentGhost: NodeComponent;
+
+  @Input()
+  public drawState: DrawStates;
+
+  @Input()
+  public overlay: HTMLDivElement;
+
   @Output()
-  private readonly relationBegin = new EventEmitter<[number, number, boolean?]>();
+  private readonly relationBegin = new EventEmitter<[number, number, Poles, boolean?]>();
 
   @Output()
   private readonly relationBind = new EventEmitter<Vector>();
 
   @Output()
   private readonly remove = new EventEmitter<void>();
+
+  @Output()
+  private readonly moveStart = new EventEmitter<void>();
+
+  @Output()
+  private readonly move = new EventEmitter<[Vector<number>, Node]>();
+
+  @Output()
+  private readonly moveEnd = new EventEmitter<[Vector<number>, Node]>();
 
   private onMove = (e: MouseEvent) => this.onDragMove(e);
   private onUp = (e: MouseEvent) => this.onDragEnd(e);
@@ -56,7 +73,6 @@ export class NodeComponent implements AfterViewInit, OnInit {
 
 
   constructor(
-    private readonly blueprintHandler: BlueprintService,
     private readonly project: ProjectService,
     private readonly tabs: TabService,
     private readonly socket: SocketService,
@@ -82,10 +98,10 @@ export class NodeComponent implements AfterViewInit, OnInit {
     e.stopImmediatePropagation();
     const rels = this.project.getBlueprint(this.tabs.displayedTab[1].id).relationships.filter(el => el.childId === this.data.id);
     const rect = (icon._elementRef.nativeElement as HTMLElement).getBoundingClientRect();
-    if (this.blueprintHandler.drawState === "drawing" && this.blueprintHandler.parentGhost !== this && !rels.find(el => el.parentId === this.blueprintHandler.parentGhost.data.id)) {
+    if (this.drawState === "drawing" && this.parentGhost !== this && !rels.find(el => el.parentId === this.parentGhost.data.id)) {
       this.relationBind.emit([rect.x + rect.width / 2, rect.y + rect.height / 2]);
     } else {
-      this.relationBegin.emit([rect.x + rect.width / 2, rect.y + rect.height / 2, rightClick]);
+      this.relationBegin.emit([rect.x + rect.width / 2, rect.y + rect.height / 2, this.btnAnchor, rightClick]);
     }
   }
 
@@ -152,9 +168,9 @@ export class NodeComponent implements AfterViewInit, OnInit {
   onDragStart(e: MouseEvent) {
     e.preventDefault();
     e.stopImmediatePropagation();
-    this.blueprintHandler.overlay.addEventListener("mousemove", this.onMove);
-    this.blueprintHandler.overlay.addEventListener("mouseup", this.onUp);
-    this.blueprintHandler.onDragStart();
+    this.overlay.addEventListener("mousemove", this.onMove);
+    this.overlay.addEventListener("mouseup", this.onUp);
+    this.moveStart.emit();
   }
 
   /**
@@ -163,15 +179,14 @@ export class NodeComponent implements AfterViewInit, OnInit {
   onDragMove(e: MouseEvent) {
     let x = Math.min(
       Math.max(e.offsetX - this.wrapper.nativeElement.parentElement.clientWidth, 48),
-      this.blueprintHandler.overlay.clientWidth - this.wrapper.nativeElement.clientWidth
+      this.overlay.clientWidth - this.wrapper.nativeElement.clientWidth
     );
     let y = Math.min(
       e.offsetY + (this.wrapper.nativeElement.parentElement.clientHeight / 2),
-      this.blueprintHandler.overlay.clientHeight - this.wrapper.nativeElement.clientHeight
-    ) - this.blueprintHandler.overlay.clientHeight / 2;
+      this.overlay.clientHeight - this.wrapper.nativeElement.clientHeight
+    ) - this.overlay.clientHeight / 2;
     const delta: Vector = [this.data.x - x, this.data.y - y];
-    this.blueprintHandler.nodeMagnetMove(delta, this.data);
-    this.blueprintHandler.onDragMove(delta, this.data);
+    this.move.emit([delta, this.data]);
   }
 
   /**
@@ -180,12 +195,12 @@ export class NodeComponent implements AfterViewInit, OnInit {
   onDragEnd(e: MouseEvent) {
     e.preventDefault();
     e.stopImmediatePropagation();
-    const x = Math.min(e.offsetX - this.wrapper.nativeElement.parentElement.clientWidth, this.blueprintHandler.overlay.clientWidth);
-    const y = e.offsetY + (this.wrapper.nativeElement.parentElement.clientHeight / 2) - this.blueprintHandler.overlay.clientHeight / 2;
+    const x = Math.min(e.offsetX - this.wrapper.nativeElement.parentElement.clientWidth, this.overlay.clientWidth);
+    const y = e.offsetY + (this.wrapper.nativeElement.parentElement.clientHeight / 2) - this.overlay.clientHeight / 2;
     const delta: Vector = [this.data.x - x, this.data.y - y];
-    this.blueprintHandler.overlay.removeEventListener("mousemove", this.onMove);
-    this.blueprintHandler.overlay.removeEventListener("mouseup", this.onUp);
-    this.blueprintHandler.onDragEnd(this.data, delta);
+    this.overlay.removeEventListener("mousemove", this.onMove);
+    this.overlay.removeEventListener("mouseup", this.onUp);
+    this.moveEnd.emit([delta, this.data]);
   }
 }
 export type Poles = "north" | "east" | "south" | "west";

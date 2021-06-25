@@ -44,6 +44,16 @@
     z-index: 5;
     pointer-events: none;
   }
+	svg {
+		position: absolute;
+		height: 100%;
+		width: 100%;
+		z-index: 5;
+		pointer-events: none;
+		g {
+			transform: translateY(-50%);
+		}
+	}
   .overlay {
     height: 100%;
     width: 100%;
@@ -57,6 +67,27 @@
 			app-node {
 				pointer-events: none;
 			}
+		}
+		&.grid {
+			background:
+				linear-gradient(-90deg, #6161610d 1px, transparent 1px),
+				linear-gradient(#6161610d 1px, transparent 1px), 
+				linear-gradient(-90deg, rgba(0, 0, 0, .04) 1px, transparent 1px),
+				linear-gradient(#6161610d 1px, transparent 1px),
+				linear-gradient(transparent 3px, transparent 3px, transparent 78px, transparent 78px),
+				linear-gradient(-90deg, #b0bec518 2px, transparent 1px),
+				linear-gradient(-90deg, transparent 3px, transparent 3px, transparent 78px, transparent 78px),
+				linear-gradient(#b0bec518 2px, transparent 1px),
+				transparent;
+			background-size:
+				20px 20px,
+				20px 20px,
+				100px 100px,
+				100px 100px,
+				100px 100px,
+				100px 100px,
+				100px 100px,
+				100px 100px;	
 		}
     app-node {
       position: absolute;

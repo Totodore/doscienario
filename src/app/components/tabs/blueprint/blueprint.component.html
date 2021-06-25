@@ -15,7 +15,8 @@
 			[class.grid]="gridMode"
 			(mousedown)="onMouseDown($event)" 
 			(mouseup)="onMouseUp($event)" 
-			(mousemove)="onMouseMove($event)">
+			(mousemove)="onMouseMove($event)"
+			(click)="onClick($event)">
 
 			<svg>
 				<g *ngFor="let rel of rels" [overlay]="overlayEl" [data]="rel" relation></g>
@@ -28,7 +29,7 @@
         [style.left.px]="node.x" [style.top]="'calc(50% + ' + node.y + 'px)'"
         [data]="node" (relationBegin)="beginRelation(nodeEl, $event)"
         (remove)="onRemove(nodeEl)" (relationBind)="bindRelation(nodeEl, $event)"></app-node>
-      <app-node *ngIf="ghostNode" class="skeleton" [style.left.px]="ghostNode.ex" [style.top.px]="ghostNode.ey"></app-node>
+      <app-node *ngIf="ghostNode" class="skeleton" [style.left.px]="ghostNode.ex" [style.top]="'calc(50% + ' + (ghostNode.ey - overlayEl.clientHeight / 2) + 'px'"></app-node>
     </div>
     <h1 *ngIf="!blueprint">Chargement du document...</h1>
   </div>

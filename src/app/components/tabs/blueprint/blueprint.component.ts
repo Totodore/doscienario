@@ -3,7 +3,7 @@ import { ConfirmComponent } from './../../utils/confirm/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ProgressService } from './../../../services/progress.service';
 import { SocketService } from './../../../services/socket.service';
-import { Blueprint, Node, RemoveNodeOut, Relationship, CreateNodeRes, PlaceNodeOut } from './../../../models/sockets/blueprint-sock.model';
+import { Blueprint, Node, RemoveNodeOut, Relationship, CreateNodeRes, PlaceNodeOut, CreateRelationReq } from './../../../models/sockets/blueprint-sock.model';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { ProjectService } from './../../../services/project.service';
 import { Component, ViewChild, ElementRef, AfterViewChecked, ViewChildren, QueryList, OnInit, ChangeDetectorRef } from '@angular/core';
@@ -38,7 +38,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
   public tabId: string;
   public show: boolean;
   public magnetMode = false;
-  public autoMode: boolean = false;
+  public autoMode: boolean;
   public gridMode: boolean;
   public scrollPoles: Set<Poles> = new Set();
   public drawState: DrawStates = "none";
@@ -46,7 +46,6 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
 
   public readonly type = TabTypes.BLUEPRINT;
   public ghostNode?: TemporaryNode;
-  private parentGhostId?: number;
   private scroll: Vector;
   private scrollIntervalId: number;
   private tresholdMousePole: Poles[];
@@ -66,7 +65,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
   }
 
   public ngOnInit() {
-    // this.autoMode = this.project.autoMode;
+    this.autoMode = this.project.autoMode;
     this.gridMode = this.project.dispGrid;
   }
 
@@ -105,23 +104,24 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
   /**
    * On mouse click event
    */
-  private onClick(e: MouseEvent) {
+  public onClick(e: MouseEvent) {
     if (this.drawState === "drawing") {
       e.preventDefault();
+      this.createNewNode([this.ghostNode.ox, this.ghostNode.oy], [this.ghostNode.ex, this.ghostNode.ey], this.ghostNode.parent.id);
       this.drawState = "none";
-      
       this.ghostNode = null;
     }
   }
 
-  private createNewNode() {
+  private createNewNode([ox, oy]: Vector, [ex, ey]: Vector, parentId: number) {
     this.socket.socket.emit(Flags.CREATE_NODE, new CreateNodeRes(
-      this.parentGhostId,
+      parentId,
       this.id,
-      this.ghostNode.ex,
-      this.ghostNode.ey - this.overlay.clientHeight / 2,
-      this.ghostNode.ox,
-      this.ghostNode.oy - this.overlay.clientHeight / 2
+      ex,
+      ey - this.overlay.clientHeight / 2,
+      ox,
+      oy - this.overlay.clientHeight / 2,
+      this.overlay.clientHeight / 2,
     ));
   }
 
@@ -168,14 +168,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
     pos[0] += this.wrapper.scrollLeft;
     pos[1] += this.wrapper.scrollTop;
     if (this.autoMode && !rightClick) {
-      this.socket.socket.emit(Flags.CREATE_NODE, new CreateNodeRes(
-        parent.data.id,
-        this.id,
-        pos[0] + 100,
-        pos[1] - this.overlay.clientHeight / 2,
-        pos[0],
-        pos[1] - this.overlay.clientHeight / 2
-      ));
+      this.createNewNode(pos.slice(0, 2) as Vector, [pos[0] + 100, pos[1]], parent.data.id);
     } else {
       this.drawState = "drawing";
       this.ghostNode = {
@@ -193,7 +186,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
 
   public bindRelation(child: NodeComponent, anchorPos: [number, number]) {
     const childLevel = findLevelByNode(child.data, this.root, this.nodes, this.blueprint.relationships);
-    const parentLevel = findLevelByNode(this.allNodes.find(el => el.id == this.parentGhostId), this.root, this.nodes, this.blueprint.relationships);
+    const parentLevel = findLevelByNode(this.allNodes.find(el => el.id == this.ghostNode.parent.id), this.root, this.nodes, this.blueprint.relationships);
     if (childLevel > parentLevel) {
       this.socket.socket.emit(Flags.CREATE_RELATION, new Relationship({
         parentId: this.ghostNode.parent.id,
@@ -224,14 +217,15 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
   }
 
   public onMouseDown(e: MouseEvent) {
-    if ((e.target as HTMLDivElement)?.classList.contains("overlay")) {
+    if ((e.target as HTMLDivElement)?.classList.contains("overlay") && this.drawState === "none") {
       e.stopImmediatePropagation();
       e.preventDefault();
       this.drawState = "moving";
     }
   }
   public onMouseUp(e: MouseEvent) {
-    this.drawState = "none";
+    if (this.drawState == "moving")
+      this.drawState = "none";
   }
   public onMouseMove(e: MouseEvent) {
     if (this.drawState === "moving") {

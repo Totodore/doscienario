@@ -1,4 +1,4 @@
-import { Vector } from './../../../../types/global.d';
+import { Vector, Vector3 } from './../../../../types/global.d';
 import { ConfirmComponent } from './../../utils/confirm/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ProgressService } from './../../../services/progress.service';
@@ -20,7 +20,7 @@ import { SnackbarService } from 'src/app/services/snackbar.service';
   templateUrl: './blueprint.component.html',
   styleUrls: ['./blueprint.component.scss']
 })
-export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit {
+export class BlueprintComponent implements ITabElement, OnInit {
 
   @ViewChild("wrapper", { static: false })
   public wrapperEl: ElementRef<HTMLDivElement>;
@@ -42,7 +42,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
   public gridMode: boolean;
   public scrollPoles: Set<Poles> = new Set();
   public drawState: DrawStates = "none";
-  public scale: number;
+  public zoomMatrix: Vector3; //[1: Scale, 2: x translation, 3: y translation]
 
   public readonly type = TabTypes.BLUEPRINT;
   public ghostNode?: TemporaryNode;
@@ -50,8 +50,6 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
   private scrollIntervalId: number;
   private tresholdMousePole: Poles[];
   private readonly blueprintWorker: WorkerManager;
-
-
 
   constructor(
     private readonly dialog: MatDialog,
@@ -64,18 +62,17 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
     this.blueprintWorker = new WorkerManager(WorkerType.Blueprint);
   }
 
+  /**
+   * Load default options
+   */
   public ngOnInit() {
     this.autoMode = this.project.autoMode;
     this.gridMode = this.project.dispGrid;
   }
 
-  ngAfterViewChecked() {
-    // if (this.canvas && this.tabId && !this.initialized) {
-    // this.blueprintHandler.init(this);
-    // this.initialized = true;
-    // }
-  }
-
+  /**
+   * When the tab is focused we set the scroll
+   */
   public onFocus() {
     if (this.initialized) {
       window.setTimeout(() => {
@@ -83,10 +80,17 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
       });
     }
   }
+  /**
+   * When the tab is unfocused we save the scroll state
+   */
   public onUnFocus() {
     this.scroll = [this.wrapper?.scrollLeft, this.wrapper?.scrollTop];
   }
 
+  /**
+   * When the tab is opened with an optional blueprint id we request the blueprint loading 
+   * We also generate a tabId
+   */
   public openTab(id?: string | number): string {
     this.tabId = uuid4();
     this.progress.show();
@@ -95,11 +99,30 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
   }
 
   public loadedTab() {
+    console.log("loaded tab");
     this.progress.hide();
+    this.configSize();
+    this.zoomMatrix = this.defaultMatrix;
   }
 
   public onWheel(e: WheelEvent | number): void {
-    //TODO: Implement zoom !
+    if (e instanceof WheelEvent) {
+      e.preventDefault();
+      if ((this.zoomMatrix[0] >= 1 && e.deltaY < 0) || (this.zoomMatrix[0] <= 0.05 && e.deltaY > 0))
+        return;
+      let [scale, px, py] = this.zoomMatrix;
+      const xs = (e.clientX - px) / scale;
+      const ys = (e.clientY - py) / scale;
+      (-e.deltaY > 0) ? (scale *= 1.1) : (scale /= 1.1);
+      px = e.clientX - xs * scale;
+      py = e.clientY - ys * scale;
+      this.zoomMatrix = [scale, px, py];
+    } else {
+      if ((this.zoomMatrix[0] >= 1 && e > 0) || (this.zoomMatrix[0] <= 0.05 && e < 0))
+        return;
+      this.zoomMatrix = this.defaultMatrix;
+      this.zoomMatrix[0] = e;
+    }
   }
   /**
    * On mouse click event
@@ -135,7 +158,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
   }
 
 
-  public onScroll(e: MouseEvent) {
+  public onScroll(e: WheelEvent) {
     if (this.drawState === "drawing")
       this.moveGhost([e.clientX, e.clientY]);
     if (this.wrapper.scrollTop < 20)
@@ -215,6 +238,10 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
     });
   }
 
+  /**
+   * start the moving system in order to move around the blueprint
+   * @param e 
+   */
   public onMouseDown(e: MouseEvent) {
     if ((e.target as HTMLDivElement)?.classList.contains("overlay") && this.drawState === "none") {
       e.stopImmediatePropagation();
@@ -222,10 +249,18 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
       this.drawState = "moving";
     }
   }
+  /**
+   * Stop the moving system in the blueprint
+   * @param e 
+   */
   public onMouseUp(e: MouseEvent) {
     if (this.drawState == "moving")
       this.drawState = "none";
   }
+  /**
+   * Handle the mouse moving event on the blueprint, handle mouse scrolling, mouse drawing and mouse dragging
+   * @param e 
+   */
   public onMouseMove(e: MouseEvent) {
     if (this.drawState === "moving") {
       e.stopImmediatePropagation();
@@ -258,14 +293,18 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
     else if (this.drawState === "dragging" && pole === "east")
       this.ghostNode.ex += 500;
   }
-
-  public getNodeEl(id: number): NodeComponent {
-    return this.nodeEls.find(el => el.data.id === id) || this.rootEl.data.id === id ? this.rootEl : null;
-  }
   
+  /**
+   * Enable dragging mode
+   */
   public onDragStart() {
     this.drawState = "dragging";
   }
+  /**
+   * Move all parent and child rel of a moving node
+   * @param offset the moving offset
+   * @param node the node that is moving
+   */
   public onDragMove(offset: Vector, node: Node) {
     const parentRel = findParentRels(node, this.rels);
     const childRel = findChildRels(node, this.rels);
@@ -281,6 +320,12 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
     node.y -= offset[1];
   }
 
+  /**
+   * End the node grabbing mode
+   * Save parent and child relationships, save moved none
+   * @param pos the last offset
+   * @param node the grabbed node
+   */
   public onDragEnd(pos: Vector, node: Node) {
     const nodeData = this.nodes.find(el => el.id === node.id);
     this.onDragMove(pos, node);
@@ -293,8 +338,6 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
     this.socket.socket.emit(Flags.PLACE_NODE, new PlaceNodeOut(this.id, node.id, [nodeData.x, nodeData.y]));
     this.drawState = "none";
   }
-
-
 
   /**
    * Detect if the mouse is in a Pole
@@ -327,7 +370,6 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
       this.wrapper.scrollBy({ left: - 10, behavior: 'auto' });
   }
 
-
   /** 
    * Method to autoPositionate each node and relations.
    * If a node is provided only this node level will be autopos
@@ -357,6 +399,15 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
       this.socket.socket.emit(Flags.PLACE_RELATIONSHIP, rel);
     for (const node of nodes)
       this.socket.socket.emit(Flags.PLACE_NODE, new PlaceNodeOut(this.id, node.id, [node.x, node.y]));
+  }
+  
+  /**
+   * Get a node element from the node id
+   * @param id the id of the node
+   * @returns the node component
+   */
+  private getNodeEl(id: number): NodeComponent {
+    return this.nodeEls.find(el => el.data.id === id) || this.rootEl.data.id === id ? this.rootEl : null;
   }
 
 
@@ -399,6 +450,9 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
   }
   private get overlay(): HTMLDivElement {
     return this.overlayEl.nativeElement;
+  }
+  private get defaultMatrix(): Vector3 {
+    return [1, 0, 0];
   }
 }
 

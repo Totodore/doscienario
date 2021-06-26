@@ -164,11 +164,11 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
 
   public beginRelation(parent: NodeComponent, pos: [number, number, Poles, boolean?]) {
     const rightClick = pos[3] || false;
-    const pole = pos[2]
+    const pole = pos[2];
     pos[0] += this.wrapper.scrollLeft;
     pos[1] += this.wrapper.scrollTop;
     if (this.autoMode && !rightClick) {
-      this.createNewNode(pos.slice(0, 2) as Vector, [pos[0] + 100, pos[1]], parent.data.id);
+      this.createNewNode([pos[0], pos[1] - 48], [pos[0] + 100, pos[1]], parent.data.id);
     } else {
       this.drawState = "drawing";
       this.ghostNode = {
@@ -250,8 +250,8 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
 
   }
   public onWiden(pole: Poles) {
-    this.overlay.style.width = (pole === "east" ? this.overlay.clientWidth + 500 : 0) + "px";
-    this.overlay.style.height = (pole === "north" || pole === "south" ? 100 : 0) + "px";
+    this.overlay.style.width = this.overlay.clientWidth + (pole === "east" ? 500 : 0) + "px";
+    this.overlay.style.height = this.overlay.clientHeight + (pole === "north" || pole === "south" ? 1000 : 0) + "px";
     if (pole === "north" || pole === "south")
       this.wrapper.scrollTop += 500;
     if (this.drawState === "drawing" && (pole === "north" || pole === "south"))

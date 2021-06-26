@@ -20,7 +20,7 @@
 
 			<svg>
 				<g *ngFor="let rel of rels" [overlay]="overlayEl" [data]="rel" relation></g>
-				<g *ngIf="ghostNode" [overlay]="overlayEl" [data]="ghostNode" relation></g>
+				<g *ngIf="ghostNode" [overlay]="overlayEl" [data]="ghostNode" relation class="ghost" [ghost]="true"></g>
 				<!-- <app-relation ></app-relation> -->
 			</svg>
       <app-node [blueprintId]="id" [tabId]="tabId" class="root" #rootEl [data]="root" (relationBegin)="beginRelation(rootEl, $event)"></app-node>

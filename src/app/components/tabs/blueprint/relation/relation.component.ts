@@ -15,6 +15,9 @@ export class RelationComponent implements AfterViewChecked {
   @Input()
   public overlay: HTMLDivElement;
 
+  @Input()
+  public ghost = false;
+
   public initialized = false;
 
   public ngAfterViewChecked(): void {
@@ -24,7 +27,7 @@ export class RelationComponent implements AfterViewChecked {
 
   public get d(): string {
     const w = -(this.data.ox - this.data.ex);
-    const half = this.overlay.clientHeight / 2;
+    const half = !this.ghost ? this.overlay.clientHeight / 2 : 0;
     const [ox, oy, ex, ey] = [this.data.ox, this.data.oy + half, this.data.ex, this.data.ey + half];
     return `M${ox},${oy} C${ox + w / 2},${oy} ${ox + w / 2},${ey} ${ex},${ey}`;
   }

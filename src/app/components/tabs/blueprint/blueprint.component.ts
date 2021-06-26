@@ -121,7 +121,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
       ey - this.overlay.clientHeight / 2,
       ox,
       oy - this.overlay.clientHeight / 2,
-      this.overlay.clientHeight / 2,
+      0,
     ));
   }
 
@@ -335,9 +335,9 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
    * If a node is provided only this node level will be autopos
    */
   public async autoPos(node?: Node) {
-    console.time("a");
+    console.time("auto-pos");
     this.progress.show();
-    let nodes = [...this.nodes, this.root];
+    let nodes = this.allNodes;
     const margin: Vector = [100, 50];
     for (const node of nodes) {
       const el = this.getNodeEl(node.id).wrapper.nativeElement;
@@ -347,13 +347,13 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
     const data: [Node[], Relationship[]] = await this.blueprintWorker.postAsyncMessage(`autopos-${this.tabId}`, [nodes, this.rels, margin, node]);
     if (!data) {
       this.snack.snack("Ouups ! Impossible d'agencer cet arbre");
-      console.timeEnd("a");
+      console.timeEnd("auto-pos");
       return;
     }
     this.nodes = nodes = data[0];
     this.rels = data[1];
     this.configSize();
-    console.timeEnd("a");
+    console.timeEnd("auto-pos");
     this.progress.hide();
     for (const rel of this.rels)
       this.socket.socket.emit(Flags.PLACE_RELATIONSHIP, rel);

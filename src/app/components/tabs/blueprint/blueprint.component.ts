@@ -136,7 +136,6 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
 
 
   public onScroll(e: MouseEvent) {
-    console.log(e);
     if (this.drawState === "drawing")
       this.moveGhost([e.clientX, e.clientY]);
     if (this.wrapper.scrollTop < 20)
@@ -263,7 +262,6 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
   public getNodeEl(id: number): NodeComponent {
     return this.nodeEls.find(el => el.data.id === id) || this.rootEl.data.id === id ? this.rootEl : null;
   }
-
   
   public onDragStart() {
     this.drawState = "dragging";
@@ -283,7 +281,7 @@ export class BlueprintComponent implements ITabElement, AfterViewChecked, OnInit
     node.y -= offset[1];
   }
 
-  public onDragEnd(node: Node, pos: [number, number]) {
+  public onDragEnd(pos: Vector, node: Node) {
     const nodeData = this.nodes.find(el => el.id === node.id);
     this.onDragMove(pos, node);
     for (const rel of this.rels) {

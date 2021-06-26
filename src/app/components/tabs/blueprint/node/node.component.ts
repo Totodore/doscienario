@@ -51,11 +51,15 @@ export class NodeComponent implements AfterViewInit, OnInit {
   private readonly moveStart = new EventEmitter<void>();
 
   @Output()
-  private readonly move = new EventEmitter<[Vector<number>, Node]>();
+  private readonly move = new EventEmitter<Vector>();
 
   @Output()
-  private readonly moveEnd = new EventEmitter<[Vector<number>, Node]>();
+  private readonly moveEnd = new EventEmitter<Vector>();
 
+  /**
+   * Named listeners in order to remove them and keep this inside function
+   * @param e mouse event 
+   */
   private onMove = (e: MouseEvent) => this.onDragMove(e);
   private onUp = (e: MouseEvent) => this.onDragEnd(e);
 
@@ -81,11 +85,11 @@ export class NodeComponent implements AfterViewInit, OnInit {
     private readonly editorWorker: EditorWorkerService,
   ) { }
   
-  ngOnInit() {
+  public ngOnInit() {
     this.editorWorker.worker.addEventListener<Change[]>(`diff-${this.nodeUuid}`, (data) => this.onContentDataResult(data));
   }
 
-  ngAfterViewInit(): void {
+  public ngAfterViewInit(): void {
     if (!this.initialized) {
       this.addRelBtn.nativeElement.addEventListener("mouseenter", () => this.mouseHoverButton = true);
       this.addRelBtn.nativeElement.addEventListener("mouseleave", () => this.mouseHoverButton = false);
@@ -93,7 +97,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
     }
   }
 
-  onAddRelButton(icon: MatIcon, e: Event, rightClick = false) {
+  public onAddRelButton(icon: MatIcon, e: Event, rightClick = false) {
     e.preventDefault();
     e.stopImmediatePropagation();
     const rels = this.project.getBlueprint(this.tabs.displayedTab[1].id).relationships.filter(el => el.childId === this.data.id);
@@ -105,15 +109,15 @@ export class NodeComponent implements AfterViewInit, OnInit {
     }
   }
 
-  onRemoveClick(e: Event) {
+  public onRemoveClick(e: Event) {
     e.stopImmediatePropagation();
     this.remove.emit();
   }
-  onChange(val: string) {
+  public onChange(val: string) {
     this.socket.socket.emit(Flags.SUMARRY_NODE, new EditSumarryOut(this.data.id, val, this.blueprintId));
   }
 
-  openDetailsView() {
+  public openDetailsView() {
     const dialog = this.dialog.open(NodeEditorComponent, {
       closeOnNavigation: false,
       height: "90%",
@@ -127,7 +131,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
     }, null, () => dialog.close());
   }
 
-  async onContentData(val: string) {
+  public async onContentData(val: string) {
     if (Math.abs(val.length - this.data.content?.length) > 500) {
       const change: Change = [2, null, val];
       this.socket.updateNode(this.data.id, this.tabId, [change], this.blueprintId);
@@ -152,7 +156,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
   }
 
   @HostListener("mousemove", ['$event'])
-  onMoveHover(e: MouseEvent) {
+  public onMoveHover(e: MouseEvent) {
     if (this.mouseHoverButton) return;
     const [w, h] = [this.wrapper.nativeElement.parentElement.clientWidth, this.wrapper.nativeElement.parentElement.clientHeight];
     if (e.offsetX < w / 4 && !this.data?.isRoot)
@@ -165,7 +169,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
       this.btnAnchor = "north";
   }
 
-  onDragStart(e: MouseEvent) {
+  public onDragStart(e: MouseEvent) {
     e.preventDefault();
     e.stopImmediatePropagation();
     this.overlay.addEventListener("mousemove", this.onMove);
@@ -176,7 +180,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
   /**
    * Emit the distance between the origin and the drag
    */
-  onDragMove(e: MouseEvent) {
+  public onDragMove(e: MouseEvent) {
     let x = Math.min(
       Math.max(e.offsetX - this.wrapper.nativeElement.parentElement.clientWidth, 48),
       this.overlay.clientWidth - this.wrapper.nativeElement.clientWidth
@@ -185,14 +189,13 @@ export class NodeComponent implements AfterViewInit, OnInit {
       e.offsetY + (this.wrapper.nativeElement.parentElement.clientHeight / 2),
       this.overlay.clientHeight - this.wrapper.nativeElement.clientHeight
     ) - this.overlay.clientHeight / 2;
-    const delta: Vector = [this.data.x - x, this.data.y - y];
-    this.move.emit([delta, this.data]);
+    this.move.emit([this.data.x - x, this.data.y - y]);
   }
 
   /**
    * Emit the last position
    */
-  onDragEnd(e: MouseEvent) {
+  public onDragEnd(e: MouseEvent) {
     e.preventDefault();
     e.stopImmediatePropagation();
     const x = Math.min(e.offsetX - this.wrapper.nativeElement.parentElement.clientWidth, this.overlay.clientWidth);
@@ -200,7 +203,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
     const delta: Vector = [this.data.x - x, this.data.y - y];
     this.overlay.removeEventListener("mousemove", this.onMove);
     this.overlay.removeEventListener("mouseup", this.onUp);
-    this.moveEnd.emit([delta, this.data]);
+    this.moveEnd.emit(delta);
   }
 }
 export type Poles = "north" | "east" | "south" | "west";

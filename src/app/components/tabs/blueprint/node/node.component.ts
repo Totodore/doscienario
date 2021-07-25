@@ -84,7 +84,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
     private readonly progress: ProgressService,
     private readonly editorWorker: EditorWorkerService,
   ) { }
-  
+
   public ngOnInit() {
     this.editorWorker.worker.addEventListener<Change[]>(`diff-${this.nodeUuid}`, (data) => this.onContentDataResult(data));
   }
@@ -97,15 +97,34 @@ export class NodeComponent implements AfterViewInit, OnInit {
     }
   }
 
+  /**
+   * We compute the position of the pole in the relative overlay
+   */
   public onAddRelButton(icon: MatIcon, e: Event, rightClick = false) {
     e.preventDefault();
     e.stopImmediatePropagation();
     const rels = this.project.getBlueprint(this.tabs.displayedTab[1].id).relationships.filter(el => el.childId === this.data.id);
-    const rect = (icon._elementRef.nativeElement as HTMLElement).getBoundingClientRect();
+    let [x, y] = [this.data.x, this.data.y];
+    const [w, h] = [this.wrapper.nativeElement.clientWidth, this.wrapper.nativeElement.clientHeight];
+    switch (this.btnAnchor) {
+      case "north":
+        y -= h / 2;
+        x -= h / 2;
+        break;
+      case "south":
+        y += h / 2;
+        x += w / 2;
+        break;
+      case "east":
+        x += w;
+        break;
+      case "west":
+        break;
+    }
     if (this.drawState === "drawing" && this.parentGhost !== this && !rels.find(el => el.parentId === this.parentGhost.data.id)) {
-      this.relationBind.emit([rect.x + rect.width / 2, rect.y + rect.height / 2]);
+      this.relationBind.emit([x ,y]);
     } else {
-      this.relationBegin.emit([rect.x + rect.width / 2, rect.y + rect.height / 2, this.btnAnchor, rightClick]);
+      this.relationBegin.emit([x, y, this.btnAnchor, rightClick]);
     }
   }
 

@@ -101,14 +101,14 @@ export class BlueprintComponent implements ITabElement, OnInit {
   public loadedTab() {
     console.log("loaded tab");
     this.progress.hide();
-    this.configSize();
+    this.configView();
     this.zoomMatrix = this.defaultMatrix;
   }
 
   public onWheel(e: WheelEvent | number): void {
     if (e instanceof WheelEvent) {
       e.preventDefault();
-      if ((this.zoomMatrix[0] >= 1 && e.deltaY < 0) || (this.zoomMatrix[0] <= 0.05 && e.deltaY > 0))
+      if ((this.zoomMatrix[0] >= 1 && e.deltaY < 0) || (this.zoomMatrix[0] <= 0.2 && e.deltaY > 0))
         return;
       let [scale, px, py] = this.zoomMatrix;
       const xs = (e.clientX - px) / scale;
@@ -116,8 +116,8 @@ export class BlueprintComponent implements ITabElement, OnInit {
       (-e.deltaY > 0) ? (scale *= 1.1) : (scale /= 1.1);
       px = e.clientX - xs * scale;
       py = e.clientY - ys * scale;
-      console.log(xs, ys, px, py);
       this.zoomMatrix = [scale, px, py];
+      this.configView();
     } else {
       if ((this.zoomMatrix[0] >= 1 && e > 0) || (this.zoomMatrix[0] <= 0.05 && e < 0))
         return;
@@ -142,20 +142,22 @@ export class BlueprintComponent implements ITabElement, OnInit {
       parentId,
       this.id,
       ex,
-      ey - this.overlay.clientHeight / 2,
+      ey,
       ox,
-      oy - this.overlay.clientHeight / 2,
+      oy,
       0,
     ));
   }
 
-  private configSize() {
-    const [w, h] = [
-      Math.max(this.wrapper.clientWidth, this.nodes.reduce((prev, curr) => prev > curr.x ? prev : curr.x, 0) + 530),
-      Math.max(this.wrapper.clientHeight, this.nodes.reduce((prev, curr) => prev > Math.abs(curr.y) ? prev : Math.abs(curr.y), 0) + 530),
-    ]
-    this.overlay.style.width = w + "px";
-    this.overlay.style.height = h + "px";
+  /**
+   * Set the middle scroll position
+   * It is call each time the zooming Matrix change so the scroll can be readjusted
+  */
+  private configView() {
+    this.wrapper.scrollTo({
+      top: (this.overlay.clientHeight / 2) * (this.zoomMatrix?.[0] || 1) - this.wrapper.clientHeight / 2,
+      left: (this.overlay.clientWidth / 2) * (this.zoomMatrix?.[0] || 1),
+    });
   }
 
 
@@ -174,33 +176,32 @@ export class BlueprintComponent implements ITabElement, OnInit {
   }
 
   private moveGhost(pos: Vector) {
-    let [ex, ey] = [pos[0], pos[1] - 48];
-    ex += this.wrapper.scrollLeft;
-    ey += this.wrapper.scrollTop;
-    ex = Math.min(ex, this.overlay.clientWidth - this.ghostNode.w);
-    ey = Math.min(ey, this.overlay.clientHeight);
-
-    this.ghostNode.ex = ex;
-    this.ghostNode.ey = ey;
+    const rec = this.overlay.getBoundingClientRect();
+    this.ghostNode.ex = (pos[0] / this.zoomMatrix?.[0] || 1) - rec.left - rec.width / 2;
+    this.ghostNode.ey = (pos[1] / this.zoomMatrix?.[0] || 1) - rec.top - rec.height / 2;
     this.changeDetector.detectChanges();
   }
 
   public beginRelation(parent: NodeComponent, pos: [number, number, Poles, boolean?]) {
     const rightClick = pos[3] || false;
     const pole = pos[2];
-    pos[0] += this.wrapper.scrollLeft;
-    pos[1] += this.wrapper.scrollTop;
     if (this.autoMode && !rightClick) {
-      this.createNewNode([pos[0], pos[1] - 48], [pos[0] + 100, pos[1]], parent.data.id);
+      this.createNewNode([
+        pos[0],
+        pos[1]
+      ], [
+        pos[0] + 100,
+        pos[1]
+      ], parent.data.id);
     } else {
       this.drawState = "drawing";
       this.ghostNode = {
         w: parent.wrapper.nativeElement.clientWidth,
         h: parent.wrapper.nativeElement.clientHeight,
         ox: pos[0],
-        oy: pos[1] - 48,
+        oy: pos[1],
         ex: pos[0],
-        ey: pos[1] - 48,
+        ey: pos[1],
         pole,
         parent: parent.data
       }
@@ -280,21 +281,11 @@ export class BlueprintComponent implements ITabElement, OnInit {
         this.scrollIntervalId = window.setInterval(() => this.adaptViewport(currTreshold), 16.6);   //60fps
         this.tresholdMousePole = currTreshold;
       }
-    } if (this.drawState === "drawing")
+    } if (this.drawState === "drawing") {
       this.moveGhost([e.x, e.y]);
+    }
 
   }
-  public onWiden(pole: Poles) {
-    this.overlay.style.width = this.overlay.clientWidth + (pole === "east" ? 500 : 0) + "px";
-    this.overlay.style.height = this.overlay.clientHeight + (pole === "north" || pole === "south" ? 1000 : 0) + "px";
-    if (pole === "north" || pole === "south")
-      this.wrapper.scrollTop += 500;
-    if (this.drawState === "drawing" && (pole === "north" || pole === "south"))
-      this.ghostNode.ey += 500;
-    else if (this.drawState === "dragging" && pole === "east")
-      this.ghostNode.ex += 500;
-  }
-  
   /**
    * Enable dragging mode
    */
@@ -393,7 +384,7 @@ export class BlueprintComponent implements ITabElement, OnInit {
     }
     this.nodes = nodes = data[0];
     this.rels = data[1];
-    this.configSize();
+    this.configView();
     console.timeEnd("auto-pos");
     this.progress.hide();
     for (const rel of this.rels)
@@ -401,7 +392,7 @@ export class BlueprintComponent implements ITabElement, OnInit {
     for (const node of nodes)
       this.socket.socket.emit(Flags.PLACE_NODE, new PlaceNodeOut(this.id, node.id, [node.x, node.y]));
   }
-  
+
   /**
    * Get a node element from the node id
    * @param id the id of the node

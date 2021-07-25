@@ -11,13 +11,15 @@
   <div class="wrapper" #wrapper 
 		[class.grabbing]="drawState === 'moving'" 
 		(wheel)="onWheel($event)" 
-		(scroll)="onScroll($event)">
+		(scroll)="onScroll($event)"
+		[style]="zoomMatrix ? '--grid-scale: ' + zoomMatrix[0] + '; --grid-translate-x:' + zoomMatrix[1] + 'px; --grid-translate-y:' + zoomMatrix[2] + 'px' : ''"
+		[class.grid]="gridMode">
     <div class="overlay" *ngIf="blueprint" #overlayEl
-			[class.grid]="gridMode"
 			[class.dragging]="drawState == 'dragging'"
 			(mousedown)="onMouseDown($event)" 
 			(mouseup)="onMouseUp($event)" 
 			(mousemove)="onMouseMove($event)"
+			(mouseout)="onMouseUp($event)"
 			(click)="onClick($event)"
 			[style.transform]="zoomMatrix ? 'scale('+zoomMatrix[0]+') translate('+zoomMatrix[1]+'px,'+zoomMatrix[2]+'px)' : ''"
 		>

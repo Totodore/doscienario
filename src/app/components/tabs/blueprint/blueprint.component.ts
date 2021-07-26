@@ -297,19 +297,25 @@ export class BlueprintComponent implements ITabElement, OnInit {
    * @param offset the moving offset
    * @param node the node that is moving
    */
-  public onDragMove(offset: Vector, node: Node) {
+  public onDragMove(offset: Vector, node: Node, component: NodeComponent): void {
+    const overlayRect = this.overlay.getBoundingClientRect();
+    const wrapperRect = component.wrapper.nativeElement.getBoundingClientRect();
+    let x = offset[0] - (overlayRect.width / 2) / (this.zoomMatrix?.[0] || 1) - wrapperRect.width;
+    let y = offset[1] - (overlayRect.height / 2) / (this.zoomMatrix?.[0] || 1) + wrapperRect.height / 2;
+    x -= node.x;
+    y -= node.y;
     const parentRel = findParentRels(node, this.rels);
     const childRel = findChildRels(node, this.rels);
     for (const rel of parentRel) {
-      rel.ex -= offset[0];
-      rel.ey -= offset[1];
+      rel.ex += x;
+      rel.ey += y;
     }
     for (const rel of childRel) {
-      rel.ox -= offset[0];
-      rel.oy -= offset[1];
+      rel.ox += x;
+      rel.oy += y;
     }
-    node.x -= offset[0];
-    node.y -= offset[1];
+    node.x += x;
+    node.y += y;
   }
 
   /**
@@ -318,9 +324,8 @@ export class BlueprintComponent implements ITabElement, OnInit {
    * @param pos the last offset
    * @param node the grabbed node
    */
-  public onDragEnd(pos: Vector, node: Node) {
+  public onDragEnd(node: Node): void {
     const nodeData = this.nodes.find(el => el.id === node.id);
-    this.onDragMove(pos, node);
     for (const rel of this.rels) {
       if (rel.childId === node.id) {
         this.socket.socket.emit(Flags.PLACE_RELATIONSHIP, rel);

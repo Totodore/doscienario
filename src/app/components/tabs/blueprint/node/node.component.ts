@@ -54,7 +54,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
   private readonly move = new EventEmitter<Vector>();
 
   @Output()
-  private readonly moveEnd = new EventEmitter<Vector>();
+  private readonly moveEnd = new EventEmitter<void>();
 
   /**
    * Named listeners in order to remove them and keep this inside function
@@ -200,15 +200,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
    * Emit the distance between the origin and the drag
    */
   public onDragMove(e: MouseEvent) {
-    let x = Math.min(
-      Math.max(e.offsetX - this.wrapper.nativeElement.parentElement.clientWidth, 48),
-      this.overlay.clientWidth - this.wrapper.nativeElement.clientWidth
-    );
-    let y = Math.min(
-      e.offsetY + (this.wrapper.nativeElement.parentElement.clientHeight / 2),
-      this.overlay.clientHeight - this.wrapper.nativeElement.clientHeight
-    ) - this.overlay.clientHeight / 2;
-    this.move.emit([this.data.x - x, this.data.y - y]);
+    this.move.emit([e.offsetX, e.offsetY]);
   }
 
   /**
@@ -217,12 +209,9 @@ export class NodeComponent implements AfterViewInit, OnInit {
   public onDragEnd(e: MouseEvent) {
     e.preventDefault();
     e.stopImmediatePropagation();
-    const x = Math.min(e.offsetX - this.wrapper.nativeElement.parentElement.clientWidth, this.overlay.clientWidth);
-    const y = e.offsetY + (this.wrapper.nativeElement.parentElement.clientHeight / 2) - this.overlay.clientHeight / 2;
-    const delta: Vector = [this.data.x - x, this.data.y - y];
     this.overlay.removeEventListener("mousemove", this.onMove);
     this.overlay.removeEventListener("mouseup", this.onUp);
-    this.moveEnd.emit(delta);
+    this.moveEnd.emit();
   }
 }
 export type Poles = "north" | "east" | "south" | "west";

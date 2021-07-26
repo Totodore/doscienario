@@ -13,10 +13,15 @@
 				(relationBegin)="beginRelation(rootEl, $event)">
 			</app-node>
 			<app-node #nodeEl *ngFor="let node of nodes" [overlay]="overlayEl" [blueprintId]="id" [tabId]="tabId"
-				[style.left]="'calc(50% + ' + node.x + 'px)'" [style.top]="'calc(50% + ' + node.y + 'px)'" [data]="node"
-				(relationBegin)="beginRelation(nodeEl, $event)" (remove)="onRemove(nodeEl)"
-				(relationBind)="bindRelation(nodeEl, $event)" (moveStart)="onDragStart()" (move)="onDragMove($event, node)"
-				(moveEnd)="onDragEnd($event, node)">
+				[style.left]="'calc(50% + ' + node.x + 'px)'" 
+				[style.top]="'calc(50% + ' + node.y + 'px)'" 
+				[data]="node"
+				(remove)="onRemove(nodeEl)"
+				(relationBegin)="beginRelation(nodeEl, $event)"
+				(relationBind)="bindRelation(nodeEl, $event)" 
+				(moveStart)="onDragStart()" 
+				(move)="onDragMove($event, node, nodeEl)"
+				(moveEnd)="onDragEnd(node)">
 			</app-node>
 			<app-node *ngIf="ghostNode" class="skeleton" 
 				[style.left]="'calc(50% + ' + ghostNode.ex + 'px)'"

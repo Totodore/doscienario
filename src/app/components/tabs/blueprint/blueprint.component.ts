@@ -116,7 +116,7 @@ export class BlueprintComponent implements ITabElement, OnInit {
       (-e.deltaY > 0) ? (scale *= 1.1) : (scale /= 1.1);
       px = e.clientX - xs * scale;
       py = e.clientY - ys * scale;
-      this.zoomMatrix = [scale, px, py];
+      this.zoomMatrix = [scale > 1 ? 1 : scale, px, py];
       this.configView();
     } else {
       if ((this.zoomMatrix[0] >= 1 && e > 0) || (this.zoomMatrix[0] <= 0.05 && e < 0))

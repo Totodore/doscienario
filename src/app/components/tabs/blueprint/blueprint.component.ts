@@ -117,13 +117,13 @@ export class BlueprintComponent implements ITabElement, OnInit {
       px = e.clientX - xs * scale;
       py = e.clientY - ys * scale;
       this.zoomMatrix = [scale > 1 ? 1 : scale, px, py];
-      this.configView();
     } else {
-      if ((this.zoomMatrix[0] >= 1 && e > 0) || (this.zoomMatrix[0] <= 0.05 && e < 0))
+      if (e > 1 || e < 0.2)
         return;
       this.zoomMatrix = this.defaultMatrix;
       this.zoomMatrix[0] = e;
     }
+    this.configView();
   }
   /**
    * On mouse click event

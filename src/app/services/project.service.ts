@@ -4,12 +4,14 @@ import { Blueprint, SendBlueprintReq, OpenBlueprintReq, CreateNodeReq, CreateRel
 import { Router } from '@angular/router';
 import { ApiService } from './api.service';
 import { DocumentModel, DocumentRes, Change, WriteDocumentRes, OpenDocumentRes } from './../models/sockets/document-sock.model';
-import { GetProjectRes, ProjectUserRes, GetProjectDocumentRes, SearchQueryRes } from './../models/api/project.model';
+import { GetProjectRes, ProjectUserRes, Document, SearchQueryRes } from './../models/api/project.model';
 import { Injectable, OnInit } from '@angular/core';
 import { Tag } from '../models/sockets/tag-sock.model';
 import { removeNodeFromTree } from '../utils/tree.utils';
 import { TabTypes } from '../models/tab-element.model';
 import { BlueprintComponent } from '../components/tabs/blueprint/blueprint.component';
+import { TagTree } from '../models/tag.model';
+import { WorkerManager, WorkerType } from '../utils/worker-manager.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -20,11 +22,13 @@ export class ProjectService {
   public openBlueprints: { [k: string]: Blueprint } = {};
 
   public updateSearch: () => void;
-
+  private searchWorker: WorkerManager;
   constructor(
     private readonly router: Router,
     private readonly tabs: TabService,
-  ) { }
+  ) {
+    this.searchWorker = new WorkerManager(WorkerType.Search);
+  }
 
   private data: GetProjectRes = JSON.parse(localStorage.getItem("project-data"));
   public async loadData(data: GetProjectRes) {
@@ -339,6 +343,10 @@ export class ProjectService {
     this.getBlueprint(packet.blueprint).nodes.find(el => el.id === packet.node).summary = packet.content;
   }
 
+  public async getTagTree(needle?: string) {
+    return await this.searchWorker.postAsyncMessage<[Tag[], (GetProjectRes | Blueprint)[]]>('getTagTree', [this.tags, [...this.docs, ...this.blueprints]]);
+  }
+
   public saveData() {
     setTimeout(() => localStorage.setItem("project-data", JSON.stringify(this.data)), 0);
   }
@@ -367,11 +375,11 @@ export class ProjectService {
   public get id(): number {
     return this.data.id;
   }
-  public get docs(): GetProjectDocumentRes[] {
-    return this.data.documents;
+  public get docs(): Document[] {
+    return this.data.documents || [];
   }
   public get blueprints(): Blueprint[] {
-    return this.data.blueprints;
+    return this.data.blueprints || [];
   }
   public get dispGrid(): boolean {
     return localStorage.getItem("disp-grid") !== "false";

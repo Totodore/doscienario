@@ -1,6 +1,7 @@
+import { TagTree } from './../models/tag.model';
 
 import { Blueprint } from '../models/sockets/blueprint-sock.model';
-import { GetProjectDocumentRes, SearchResults } from '../models/api/project.model';
+import { Document, SearchResults } from '../models/api/project.model';
 import { Tag } from '../models/sockets/tag-sock.model';
 import { sortByRelevance } from '../utils/helpers';
 
@@ -9,11 +10,14 @@ addEventListener('message', (e: MessageEvent<[string, any] | string>) => {
   if (e.data[0].startsWith('search'))
     //@ts-ignore
     postMessage([e.data[0], search(...e.data[1])]);
+  else if (e.data[0].startsWith('getTagTree'))
+    //@ts-ignore
+    postMessage([e.data[0], getTagTree(...e.data[1])]);
 });
 
-function search(needle: string, data: [Tag[], GetProjectDocumentRes[], Blueprint[]]): SearchResults {
+function search(needle: string, data: [Tag[], Document[], Blueprint[]]): SearchResults {
   let tags: Tag[] = [];
-  let docs: GetProjectDocumentRes[] = [];
+  let docs: Document[] = [];
   let blueprints: Blueprint[] = [];
   needle = needle.toLowerCase();
   if (needle.startsWith('@')) {
@@ -74,4 +78,15 @@ function search(needle: string, data: [Tag[], GetProjectDocumentRes[], Blueprint
    */
   let els: SearchResults = [...blueprints, ...docs, ...tags];
   return els;
+}
+
+function getTagTree(tags: Tag[], els: (Document | Blueprint)[]): TagTree[] {
+  return tags.filter(el => el.primary).map(primary => ({
+    primary,
+    children: els.reduce(
+      (prev, curr) =>
+        [...prev, ...curr.tags.find(el => el.id === primary.id) ? curr.tags.filter(el => !el.primary) : null],
+      []),
+    els: els.filter(el => el.tags.find(el => el.id === primary.id)),
+  }));
 }

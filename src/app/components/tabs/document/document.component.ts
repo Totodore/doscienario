@@ -1,4 +1,3 @@
-import { Vector } from './../../../../types/global.d';
 import { EditorWorkerService } from './../../../services/document-worker.service';
 import { ApiService } from 'src/app/services/api.service';
 import { TabService } from './../../../services/tab.service';
@@ -7,25 +6,22 @@ import { ProgressService } from 'src/app/services/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { SocketService } from './../../../services/socket.service';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
-import { Component, Input, OnInit, Type, OnDestroy, ChangeDetectionStrategy, Provider, ViewEncapsulation, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import * as CKEditor from "../../../../lib/ckeditor.js";
-import { CKEditor5, CKEditorComponent, ChangeEvent } from '@ckeditor/ckeditor5-angular';
-import { v4 as uuid4 } from "uuid";
+import { CKEditor5, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 import { Flags } from 'src/app/models/sockets/flags.enum';
+import { ElementComponent } from '../element.component';
 @Component({
   selector: 'app-document',
   templateUrl: './document.component.html',
   styleUrls: ['./document.component.scss']
 })
-export class DocumentComponent implements ITabElement, OnDestroy {
+export class DocumentComponent extends ElementComponent implements ITabElement, OnDestroy {
 
-  public show: boolean = false;
-  public tabId: string;
   public lastChangeId: number;
-  
+
   @ViewChild("editorView", { static: false })
   private editorView: ElementRef<HTMLElement>;
-  private contentElement: HTMLElement;
 
   public readonly type = TabTypes.DOCUMENT;
   public readonly editor: CKEditor5.EditorConstructor = CKEditor;
@@ -55,44 +51,44 @@ export class DocumentComponent implements ITabElement, OnDestroy {
     simpleUpload: {
       // The URL that the images are uploaded to.
       uploadUrl: `${this.api.root}/res/${this.project.id}/image`,
-      
       // Headers sent along with the XMLHttpRequest to the upload server.
       headers: {
         Authorization: this.api.jwt
       }
     }
   };
-  
+
   private displayProgress: boolean = false;
   private hasEdited: boolean = false;
-  private scroll: Vector;
-  
+
   constructor(
     private readonly socket: SocketService,
     private readonly project: ProjectService,
-    private readonly progress: ProgressService,
+    progress: ProgressService,
     private readonly tabs: TabService,
     private readonly docWorker: EditorWorkerService,
     private readonly api: ApiService
-  ) { }
-
-  onClose() {
-    this.socket.socket.emit(Flags.CLOSE_DOC, this.id);
+  ) {
+    super(progress);
   }
 
-  openTab(id?: number): string {
-    this.tabId = uuid4();
-    this.progress.show();
+  public onClose() {
+    this.socket.socket.emit(Flags.CLOSE_DOC, this.id);
+    super.onClose();
+  }
+
+  public openTab(id?: number): string {
+    super.openTab(id);
     this.socket.socket.emit(Flags.OPEN_DOC, [this.tabId, id]);
     this.docWorker.worker.addEventListener<Change[]>(`diff-${this.tabId}`, (data) => this.onDocParsed(data));
     return this.tabId;
   }
 
-  ngOnDestroy() {
+  public ngOnDestroy() {
     this.docWorker.worker.removeEventListener(`diff-${this.tabId}`);
   }
 
-  editorLoaded(editor: CKEditor5.Editor): void {
+  public editorLoaded(editor: CKEditor5.Editor): void {
     editor.ui.getEditableElement().parentElement.insertBefore(
       editor.ui.view.toolbar.element,
       editor.ui.getEditableElement()
@@ -102,16 +98,13 @@ export class DocumentComponent implements ITabElement, OnDestroy {
     window.setInterval(() => this.hasEdited && this.addTagsListener(), 1000);
     this.addTagsListener();
   }
-  
-  loadedTab() {
-    this.progress.hide();
+
+  public loadedTab() {
+    super.loadedTab();
     this.project.openDocs[this.tabId].content = this.doc.content;
   }
-  public onUnFocus() {
-    this.scroll = [this.contentElement?.scrollLeft, this.contentElement?.scrollTop];
-  }
 
-  onChange(e: ChangeEvent) {
+  public onChange(e: ChangeEvent) {
     const data = e.editor.getData();
     this.hasEdited = true;
     if (Math.abs(data.length - this.doc.content.length) > 500) {

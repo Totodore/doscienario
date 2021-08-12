@@ -14,6 +14,7 @@ import { findChildRels, findLevelByNode, findNodesByLevel, findParentRels, remov
 import { WorkerManager, WorkerType } from 'src/app/utils/worker-manager.utils';
 import { SnackbarService } from 'src/app/services/snackbar.service';
 import { environment } from 'src/environments/environment';
+import { ElementComponent } from '../element.component';
 
 
 @Component({
@@ -21,7 +22,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './blueprint.component.html',
   styleUrls: ['./blueprint.component.scss']
 })
-export class BlueprintComponent implements ITabElement, OnInit {
+export class BlueprintComponent extends ElementComponent implements ITabElement, OnInit {
 
   @ViewChild("wrapper", { static: false })
   public wrapperEl: ElementRef<HTMLDivElement>;
@@ -47,7 +48,6 @@ export class BlueprintComponent implements ITabElement, OnInit {
 
   public readonly type = TabTypes.BLUEPRINT;
   public ghostNode?: TemporaryNode;
-  private scroll: Vector;
   private scrollIntervalId: number;
   private tresholdMousePole: Poles[];
   private readonly blueprintWorker: WorkerManager;
@@ -56,10 +56,11 @@ export class BlueprintComponent implements ITabElement, OnInit {
     private readonly dialog: MatDialog,
     private readonly project: ProjectService,
     private readonly socket: SocketService,
-    private readonly progress: ProgressService,
+    progress: ProgressService,
     private readonly snack: SnackbarService,
     private readonly changeDetector: ChangeDetectorRef,
   ) {
+    super(progress);
     this.blueprintWorker = new WorkerManager(WorkerType.Blueprint);
   }
 
@@ -72,36 +73,17 @@ export class BlueprintComponent implements ITabElement, OnInit {
   }
 
   /**
-   * When the tab is focused we set the scroll
-   */
-  public onFocus() {
-    if (this.initialized) {
-      window.setTimeout(() => {
-        this.wrapper.scrollTo({ left: this.scroll?.[0], top: this.scroll?.[1], behavior: "auto" });
-      });
-    }
-  }
-  /**
-   * When the tab is unfocused we save the scroll state
-   */
-  public onUnFocus() {
-    this.scroll = [this.wrapper?.scrollLeft, this.wrapper?.scrollTop];
-  }
-
-  /**
    * When the tab is opened with an optional blueprint id we request the blueprint loading 
    * We also generate a tabId
    */
   public openTab(id?: string | number): string {
-    this.tabId = uuid4();
-    this.progress.show();
+    super.openTab(id);
     this.socket.socket.emit(Flags.OPEN_BLUEPRINT, [this.tabId, id]);
     return this.tabId;
   }
 
   public loadedTab() {
-    console.log("loaded tab");
-    this.progress.hide();
+    super.loadedTab();
     this.configView();
     this.zoomMatrix = this.defaultMatrix;
   }
@@ -449,10 +431,10 @@ export class BlueprintComponent implements ITabElement, OnInit {
   }
 
   private get wrapper(): HTMLDivElement {
-    return this.wrapperEl.nativeElement;
+    return this.contentElement = this.wrapperEl.nativeElement;
   }
   private get overlay(): HTMLDivElement {
-    return this.overlayEl.nativeElement;
+    return  this.overlayEl.nativeElement;
   }
   private get defaultMatrix(): Vector3 {
     return [1, 0, 0];

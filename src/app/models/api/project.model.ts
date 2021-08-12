@@ -36,7 +36,7 @@ export interface GetProjectRes {
 
   createdBy: ProjectUserRes;
 
-  documents: GetProjectDocumentRes[];
+  documents: Document[];
 
   blueprints: Blueprint[];
 
@@ -45,12 +45,12 @@ export interface GetProjectRes {
   files: File[];
 }
 
-export interface GetProjectDocumentRes {
+export interface Document {
   id: number;
 
   createdDate: string;
 
-  tags: { name: string, id: number }[];
+  tags: Tag[];
 
   images?: GetProjectDocumentImageRes[];
 
@@ -80,4 +80,4 @@ export interface SearchQueryRes {
   tags: string[];
 }
 
-export type SearchResults = (GetProjectDocumentRes | Tag | Blueprint)[];
+export type SearchResults = (Document | Tag | Blueprint)[];

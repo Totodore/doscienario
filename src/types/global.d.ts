@@ -20,6 +20,10 @@ declare global {
   interface Math {
     factorial(num: number): number;
   }
+
+  interface JSON {
+    dateParser: (key: string, value: any) => any;
+  }
 }
 export type Vector<T = number> = [T, T];
 export type Vector3<T = number> = [T, T, T];

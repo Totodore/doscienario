@@ -10,7 +10,7 @@ export interface DocumentModel {
   lastEditor: UserDetailsRes,
   createdBy: UserDetailsRes,
   lastEditing: string;
-  createdDate: string;
+  createdDate: Date;
   tags: Tag[];
   elIndex?: number;
   changes: Map<number, Change[]>;

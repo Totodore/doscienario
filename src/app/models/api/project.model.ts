@@ -30,7 +30,7 @@ export interface GetProjectRes {
 
   name: string;
 
-  createdDate: string;
+  createdDate: Date;
 
   users: ProjectUserRes[];
 
@@ -48,7 +48,7 @@ export interface GetProjectRes {
 export interface Document {
   id: number;
 
-  createdDate: string;
+  createdDate: Date;
 
   tags: Tag[];
 

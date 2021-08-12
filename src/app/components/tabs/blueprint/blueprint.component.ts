@@ -13,6 +13,7 @@ import { Poles, NodeComponent } from './node/node.component';
 import { findChildRels, findLevelByNode, findNodesByLevel, findParentRels, removeNodeFromTree } from 'src/app/utils/tree.utils';
 import { WorkerManager, WorkerType } from 'src/app/utils/worker-manager.utils';
 import { SnackbarService } from 'src/app/services/snackbar.service';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -105,7 +106,12 @@ export class BlueprintComponent implements ITabElement, OnInit {
     this.zoomMatrix = this.defaultMatrix;
   }
 
+  /**
+   * Allow the user to zoom on the viewport (can be call from a wheel event or from another ui method)
+   * !Currently only allowed in dev mode
+   * */
   public onWheel(e: WheelEvent | number): void {
+    if (environment.production) return;
     if (e instanceof WheelEvent) {
       e.preventDefault();
       if ((this.zoomMatrix[0] >= 1 && e.deltaY < 0) || (this.zoomMatrix[0] <= 0.2 && e.deltaY > 0))

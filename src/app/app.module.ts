@@ -51,6 +51,7 @@ import { SearchResultsComponent } from './components/views/board/nav-bar/search-
 import { BlueprintOptionsComponent } from './components/views/board/nav-bar/blueprint-options/blueprint-options.component';
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { NodeEditorComponent } from './components/tabs/blueprint/node/node-editor/node-editor.component';
+import { RelationComponent } from './components/tabs/blueprint/relation/relation.component';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -79,7 +80,8 @@ import { NodeEditorComponent } from './components/tabs/blueprint/node/node-edito
     BlueprintComponent,
     NodeComponent,
     BlueprintOptionsComponent,
-    NodeEditorComponent
+    NodeEditorComponent,
+    RelationComponent
   ],
   imports: [
     ReactiveFormsModule,

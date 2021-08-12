@@ -1,5 +1,6 @@
 .outer-wrapper {
   position: relative;
+
   button {
     z-index: 1000;
     cursor: pointer;
@@ -11,16 +12,19 @@
     height: 33px;
     width: 33px;
     line-height: 33px;
+
     &.top {
       top: 10px;
       left: 50%;
       transform: translateX(-50%);
     }
+
     &.bottom {
       bottom: 10px;
       left: 50%;
       transform: translateX(-50%);
     }
+
     &.right {
       right: 10px;
       top: 50%;
@@ -28,14 +32,16 @@
     }
   }
 }
+
 .wrapper {
   min-width: 100%;
   min-height: calc(100vh - 53px);
   position: relative;
   overflow: auto;
-	&.grabbing {
-		cursor: grabbing;
-	}
+
+  &.grabbing {
+    cursor: grabbing;
+  }
 
   canvas {
     position: absolute;
@@ -44,37 +50,84 @@
     z-index: 5;
     pointer-events: none;
   }
-  .overlay {
+
+  svg {
+    position: absolute;
     height: 100%;
     width: 100%;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .overlay {
+    height: 50000px;
+    width: 50000px;
     position: absolute;
     top: 0px;
     left: 0px;
     z-index: 10;
-		transform-origin: center;
-		&.dragging {
-	    cursor: move;
-			app-node {
-				pointer-events: none;
-			}
-		}
+    transform-origin: 0px 0px;
+		will-change: transform;
+
+    &.dragging {
+      cursor: move;
+
+      app-node {
+        pointer-events: none;
+      }
+    }
+
+    &::after {
+      content: '';
+      pointer-events: none;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0px;
+      left: 0px;
+      background:
+        linear-gradient(-90deg, #6161610d 1px, transparent 1px),
+        linear-gradient(#6161610d 1px, transparent 1px),
+        linear-gradient(-90deg, rgba(0, 0, 0, .04) 1px, transparent 1px),
+        linear-gradient(#6161610d 1px, transparent 1px),
+        linear-gradient(transparent 3px, transparent 3px, transparent 78px, transparent 78px),
+        linear-gradient(-90deg, #b0bec518 2px, transparent 1px),
+        linear-gradient(-90deg, transparent 3px, transparent 3px, transparent 78px, transparent 78px),
+        linear-gradient(#b0bec518 2px, transparent 1px),
+        transparent;
+      background-size:
+        20px 20px,
+        20px 20px,
+        100px 100px,
+        100px 100px,
+        100px 100px,
+        100px 100px,
+        100px 100px,
+        100px 100px;
+    }
+
     app-node {
       position: absolute;
       transform: translateY(-50%);
+
       &.skeleton {
         opacity: 0.3;
         pointer-events: none;
       }
+
       &.root {
         top: 50%;
-        left: 48px;
+        left: 50%;
       }
-      &:hover:not(.skeleton) ~ .skeleton {
+
+      &:hover:not(.skeleton)~.skeleton {
         opacity: 0 !important;
       }
 
       ::ng-deep &.root {
-        .handle, .remove {
+
+        .handle,
+        .remove {
           display: none !important;
         }
       }
@@ -82,6 +135,7 @@
   }
 
 }
+
 h1 {
   font-size: 35px;
   text-align: center;

@@ -22,3 +22,4 @@ declare global {
   }
 }
 export type Vector<T = number> = [T, T];
+export type Vector3<T = number> = [T, T, T];

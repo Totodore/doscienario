@@ -113,7 +113,9 @@ export class CreateNodeRes {
     public x: number,
     public y: number,
     public ox: number,
-    public oy: number
+    public oy: number,
+    public relYOffset: number,
+    public locked?: boolean
   ) { }
 }
 export class CreateNodeReq {

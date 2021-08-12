@@ -56,6 +56,8 @@ export interface Document {
 
   title: string;
 
+  lastEditing?: Date;
+
   readonly type: DataType.Document;
 }
 

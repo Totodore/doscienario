@@ -9,7 +9,7 @@ export interface DocumentModel {
   id: number,
   lastEditor: UserDetailsRes,
   createdBy: UserDetailsRes,
-  lastEditing: string;
+  lastEditing: Date;
   createdDate: Date;
   tags: Tag[];
   elIndex?: number;

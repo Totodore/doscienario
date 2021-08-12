@@ -13,4 +13,11 @@
       margin-left: 10px;
     }
   }
+	mat-divider, app-tag-category {
+		width: 90%;
+		margin: auto;
+	}
+	app-tag-category {
+		margin-bottom: 10px;
+	}
 }

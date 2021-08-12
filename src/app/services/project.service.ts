@@ -30,7 +30,7 @@ export class ProjectService {
     this.searchWorker = new WorkerManager(WorkerType.Search);
   }
 
-  private data: GetProjectRes = JSON.parse(localStorage.getItem("project-data"));
+  private data: GetProjectRes = JSON.parse(localStorage.getItem("project-data"), JSON.dateParser);
   public async loadData(data: GetProjectRes) {
     this.data = data;
     localStorage.setItem("project-data", JSON.stringify(data));
@@ -344,7 +344,7 @@ export class ProjectService {
   }
 
   public async getTagTree(needle?: string) {
-    return await this.searchWorker.postAsyncMessage<[Tag[], (GetProjectRes | Blueprint)[]]>('getTagTree', [this.tags, [...this.docs, ...this.blueprints]]);
+    return await this.searchWorker.postAsyncMessage<TagTree[]>('getTagTree', [this.tags, [...this.docs, ...this.blueprints]]);
   }
 
   public saveData() {

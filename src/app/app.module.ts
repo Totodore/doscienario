@@ -11,7 +11,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
-import { HttpClientModule } from "@angular/common/http";
+import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { MatButtonModule } from '@angular/material/button';
 import { AppRoutingModule } from './app-routing.module';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -52,6 +52,8 @@ import { BlueprintOptionsComponent } from './components/views/board/nav-bar/blue
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { NodeEditorComponent } from './components/tabs/blueprint/node/node-editor/node-editor.component';
 import { RelationComponent } from './components/tabs/blueprint/relation/relation.component';
+import { TagCategoryComponent } from './components/views/board/nav-bar/search-results/tag-category/tag-category.component';
+import { DateHttpInterceptor } from './interceptors/date.interceptor';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -81,7 +83,8 @@ import { RelationComponent } from './components/tabs/blueprint/relation/relation
     NodeComponent,
     BlueprintOptionsComponent,
     NodeEditorComponent,
-    RelationComponent
+    RelationComponent,
+    TagCategoryComponent,
   ],
   imports: [
     ReactiveFormsModule,
@@ -111,7 +114,8 @@ import { RelationComponent } from './components/tabs/blueprint/relation/relation
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: appearance },
-    { provide: MAT_COLOR_FORMATS, useValue: NGX_MAT_COLOR_FORMATS }
+    { provide: MAT_COLOR_FORMATS, useValue: NGX_MAT_COLOR_FORMATS },
+    { provide: HTTP_INTERCEPTORS, useClass: DateHttpInterceptor, multi: true },
   ],
   bootstrap: [AppComponent]
 })

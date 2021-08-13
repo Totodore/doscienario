@@ -56,4 +56,7 @@ export class SearchResultsComponent implements OnInit {
     else
       return "description";
   }
+  public get tags(): Tag[] {
+    return this.project.tags.filter(el => !el.primary) || [];
+  }
 }

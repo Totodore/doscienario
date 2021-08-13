@@ -16,7 +16,6 @@ export class SearchOptionsComponent implements OnInit {
   public sortState: ("doc" | "tag")[] = ["doc", "tag"];
 
   @Output() public results: EventEmitter<SearchResults> = new EventEmitter<SearchResults>();
-
   private searchWorker: WorkerManager;
   constructor(
     private readonly project: ProjectService,

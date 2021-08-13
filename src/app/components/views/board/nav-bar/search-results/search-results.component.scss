@@ -20,4 +20,21 @@
 	app-tag-category {
 		margin-bottom: 10px;
 	}
+	.tags ::ng-deep .mat-chip-list-wrapper {
+		margin-left: 10px;
+	}
+  mat-chip, ::ng-deep mat-chip {
+    border: 2px solid #212121;
+
+    &:not(.primary) {
+      margin-left: 5px;
+      margin-top: 10px;
+    }
+		mat-icon {
+			height: auto;
+			width: auto;
+			font-size: 19px;
+			margin-right: 10px;
+		}
+  }
 }

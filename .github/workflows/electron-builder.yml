@@ -13,7 +13,7 @@ jobs:
       id: tagName
     - uses: actions/setup-node@master
       with:
-        node-version: 14.13
+        node-version: 16.0
     - name: install node tools
       run: npm install -g electron electron-builder typescript
     - uses: actions/checkout@v2
@@ -41,7 +41,7 @@ jobs:
         id: tagName
       - uses: actions/setup-node@master
         with:
-          node-version: 14.13
+          node-version: 16.0
       - name: install node tools
         run: npm install -g electron electron-builder typescript
       - uses: actions/checkout@v2

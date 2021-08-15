@@ -50,6 +50,10 @@ export class DocumentOptionsComponent {
     });
   }
 
+  public onTagClick(tag: Tag) {
+    this.project.updateSearch('#' + tag.name);
+  }
+
   get doc(): DocumentModel {
     return this.project.openDocs[this.tabId];
   }

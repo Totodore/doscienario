@@ -37,7 +37,10 @@ export class SearchResultsComponent implements OnInit, OnChanges {
   }
 
   public ngOnInit() {
-    this.project.updateSearch = () => this.search();
+    this.project.updateSearch = val => {
+      this.searchQueryChange.emit(val);
+      this.search(val);
+    };
     this.search();
   }
 

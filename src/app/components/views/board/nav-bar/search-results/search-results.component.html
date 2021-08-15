@@ -1,7 +1,7 @@
 <div class="wrapper" *ngIf="tagTree">
 	<app-tag-category *ngFor="let tree of tagTree" [tree]="tree" (searchQuery)="searchQueryChange.emit($event)">
 	</app-tag-category>
-	<mat-chip-list class="tags" *ngIf="searchQuery || searchQuery.length == 0">
+	<mat-chip-list class="tags" *ngIf="!searchQuery || searchQuery.length == 0">
 		<mat-chip *ngFor="let tag of tags" [style]="'border-color: #' + tag.color" (click)="openEl(tag)">
 			#{{ tag.name }}
 		</mat-chip>

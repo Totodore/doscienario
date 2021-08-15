@@ -21,7 +21,7 @@ export class ProjectService {
   public openDocs: { [k: string]: DocumentModel } = {};
   public openBlueprints: { [k: string]: Blueprint } = {};
 
-  public updateSearch: () => void;
+  public updateSearch: (val?: string) => void;
   private searchWorker: WorkerManager;
   constructor(
     private readonly router: Router,

@@ -43,6 +43,10 @@ export class BlueprintOptionsComponent {
     this.component.onWheel(ratio / 100);
   }
 
+  public onTagClick(tag: Tag) {
+    this.project.updateSearch('#' + tag.name);
+  }
+
   openTagEdit() {
     this.dialog.open(EditTagsComponent, {
       data: [this.tabId, TabTypes.BLUEPRINT],

@@ -31,13 +31,10 @@ function getTagTree(tags: Tag[], needle: string, els: (Document | Blueprint)[]):
      * If their is no children tag allowed, that the primary tag is not allowed and that their is no child elements allowed
      * We don't return the tag
      */
-    // console.log((!children.reduce((prev, curr) => prev || allowedTags.includes(curr.id) ? true : false, false)
-    // && !childEls.reduce((prev, curr) => prev || allowedEls.includes(curr.id) ? true : false, false)
-    // && !allowedTags.includes(primary.id))
-    // || (childEls.length === 0 && children.length === 0));
     if ((!children.reduce((prev, curr) => prev || allowedTags.includes(curr.id) ? true : false, false)
       && !childEls.reduce((prev, curr) => prev || allowedEls.includes(curr.id) ? true : false, false)
-      && !allowedTags.includes(primary.id)))
+      && !allowedTags.includes(primary.id))
+      || childEls?.length == 0)
       return null;
     return {
       primary,

@@ -142,10 +142,11 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
    * It is call each time the zooming Matrix change so the scroll can be readjusted
   */
   private configView() {
-    this.wrapper.scrollTo({
-      top: (this.overlay.clientHeight / 2) * (this.zoomMatrix?.[0] || 1) - this.wrapper.clientHeight / 2,
-      left: (this.overlay.clientWidth / 2) * (this.zoomMatrix?.[0] || 1),
-    });
+    if (this.wrapper)
+      this.wrapper.scrollTo({
+        top: (this.overlay.clientHeight / 2) * (this.zoomMatrix?.[0] || 1) - this.wrapper.clientHeight / 2,
+        left: (this.overlay.clientWidth / 2) * (this.zoomMatrix?.[0] || 1),
+      });
   }
 
 
@@ -431,7 +432,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   }
 
   private get wrapper(): HTMLDivElement {
-    return this.contentElement = this.wrapperEl.nativeElement;
+    return this.contentElement = this.wrapperEl?.nativeElement;
   }
   private get overlay(): HTMLDivElement {
     return  this.overlayEl.nativeElement;

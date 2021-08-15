@@ -1,16 +1,9 @@
-<div class="wrapper">
-	<ng-container *ngIf="results">
-		<div matRipple class="result doc" *ngFor="let result of results" (click)="openEl(result)">
-			<mat-icon class="mat-18">{{ getIconName(result) }}</mat-icon>
-			<h3>{{ $any(result).title || $any(result).name }}</h3>
-		</div>
-	</ng-container>
-	<ng-container *ngIf="!results || results.length == 0">
-		<app-tag-category *ngFor="let tree of tagTree" [tree]="tree"></app-tag-category>
-		<mat-chip-list class="tags">
-			<mat-chip *ngFor="let tag of tags" [style]="'border-color: #' + tag.color" (click)="openEl(tag)">
-				#{{ tag.name }}
-			</mat-chip>
-		</mat-chip-list>
-	</ng-container>
+<div class="wrapper" *ngIf="tagTree">
+	<app-tag-category *ngFor="let tree of tagTree" [tree]="tree" (searchQuery)="searchQueryChange.emit($event)">
+	</app-tag-category>
+	<mat-chip-list class="tags" *ngIf="searchQuery || searchQuery.length == 0">
+		<mat-chip *ngFor="let tag of tags" [style]="'border-color: #' + tag.color" (click)="openEl(tag)">
+			#{{ tag.name }}
+		</mat-chip>
+	</mat-chip-list>
 </div>

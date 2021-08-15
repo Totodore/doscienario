@@ -344,7 +344,7 @@ export class ProjectService {
   }
 
   public async getTagTree(needle?: string) {
-    return await this.searchWorker.postAsyncMessage<TagTree[]>('getTagTree', [this.tags, [...this.docs, ...this.blueprints]]);
+    return await this.searchWorker.postAsyncMessage<TagTree[]>('getTagTree', [this.tags, needle, [...this.docs, ...this.blueprints]]);
   }
 
   public saveData() {

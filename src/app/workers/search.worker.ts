@@ -7,90 +7,43 @@ import { sortByRelevance } from '../utils/helpers';
 
 /// <reference lib="webworker" />
 addEventListener('message', (e: MessageEvent<[string, any] | string>) => {
-  if (e.data[0].startsWith('search'))
-    //@ts-ignore
-    postMessage([e.data[0], search(...e.data[1])]);
-  else if (e.data[0].startsWith('getTagTree'))
+  if (e.data[0].startsWith('getTagTree'))
     //@ts-ignore
     postMessage([e.data[0], getTagTree(...e.data[1])]);
 });
-
-function search(needle: string, data: [Tag[], Document[], Blueprint[]]): SearchResults {
-  let tags: Tag[] = [];
-  let docs: Document[] = [];
-  let blueprints: Blueprint[] = [];
-  needle = needle.toLowerCase();
-  if (needle.startsWith('@')) {
-    /**
-     * Search docs
-     */
-    if (needle[1] === '*') {
-      docs = data[1];
-      blueprints = data[2];
-    }
-    else {
-      docs.push(...data[1].filter(el => el.title.toLowerCase().includes(needle.substr(1))));
-      blueprints.push(...data[2].filter(el => el.name.toLowerCase().includes(needle.substr(1))));
-    }
-  } else if (needle.startsWith('#')) {
-    /**
-     * Search tags and docs that have these tags
-     */
-    if (needle[1] === '*')
-      tags = data[0];
-    else {
-      tags.push(...data[0].filter(tag => tag.name.toLowerCase().includes(needle.substr(1))));
-      docs.push(...data[1].filter(doc => doc.tags.find(docTag => tags.map(el => el.name).includes(docTag.name))));
-    }
-  } else if (needle === '*') {
-    [tags, docs, blueprints] = data;
-  } else {
-    /**
-     * Search tags, docs and docs affiliated with these tags
-     */
-    if (needle[1] === '*')
-      tags = data[0];
-    else {
-      docs.push(...data[1].filter(el => el.title.toLowerCase().includes(needle.substr(1))));
-      blueprints.push(...data[2].filter(el => el.name.toLowerCase().includes(needle.substr(1))));
-      tags.push(...data[0].filter(tag => tag.name.toLowerCase().includes(needle.substr(1))));
-      docs.push(...data[1].filter(doc => doc.tags.find(docTag => tags.map(el => el.name).includes(docTag.name))));
-      blueprints.push(...data[2].filter(blueprint => blueprint.tags.find(blueprintTag => tags.map(el => el.name).includes(blueprintTag.name))))
-    }
-  }
-  //Make results unique and sort them by relevance
-  const docsIds = docs.map(el => el.id).reduce<number[]>((prev, curr) => [...prev, curr], []);
-  const tagsIds = tags.map(el => el.name).reduce<string[]>((prev, curr) => [...prev, curr], []);
-  const blueprintIds = blueprints.map(el => el.id).reduce((prev, curr) => [...prev, curr], []);
-
-  docs = docs
-    .filter(doc => docsIds.includes(doc.id))
-    .sort((a, b) => sortByRelevance(a, b, needle, (el) => el.title));
-  tags = tags
-    .filter(tag => tagsIds.includes(tag.name))
-    .sort((a, b) => sortByRelevance(a, b, needle, el => el.name));
-  blueprints = blueprints
-    .filter(blueprint => blueprintIds.includes(blueprint.id))
-    .sort((a, b) => sortByRelevance(a, b, needle, el => el.name));
-
-  /**
-   * Alternative merge
-   */
-  let els: SearchResults = [...blueprints, ...docs, ...tags];
-  return els;
-}
-
-function getTagTree(tags: Tag[], els: (Document | Blueprint)[]): TagTree[] {
-  return tags.filter(el => el.primary).map(primary => {
+/**
+ * Get a tag tree (primary tag with their children) and the elements they have
+ * The needle allow the results to be filtered with the needle (it can be a tag name or an element title)
+ */
+function getTagTree(tags: Tag[], needle: string, els: (Document | Blueprint)[]): TagTree[] {
+  if (needle.startsWith('#'))
+    needle = needle.substr(1);
+  const isSearching = needle?.length > 0;
+  const allowedEls = els.filter(el => ((el as Document)?.title || (el as Blueprint)?.name).toLowerCase().includes(needle.toLowerCase())).map(el => el.id);
+  const allowedTags = tags.filter(el => el.name.toLowerCase().includes(needle.toLowerCase())).map(el => el.id);
+  return tags.filter(el => el.primary || (allowedTags.includes(el.id) && isSearching)).map(primary => {
     const childEls = els.filter(el => el.tags.find(el => el.id === primary.id));
+    const children: Tag[] = els.reduce(
+      (prev, curr) =>
+        [...prev, ...curr.tags.find(el => el.id === primary.id) ? curr.tags.filter(el => !el.primary) : []],
+      []);
+    /**
+     * If their is no children tag allowed, that the primary tag is not allowed and that their is no child elements allowed
+     * We don't return the tag
+     */
+    // console.log((!children.reduce((prev, curr) => prev || allowedTags.includes(curr.id) ? true : false, false)
+    // && !childEls.reduce((prev, curr) => prev || allowedEls.includes(curr.id) ? true : false, false)
+    // && !allowedTags.includes(primary.id))
+    // || (childEls.length === 0 && children.length === 0));
+    if ((!children.reduce((prev, curr) => prev || allowedTags.includes(curr.id) ? true : false, false)
+      && !childEls.reduce((prev, curr) => prev || allowedEls.includes(curr.id) ? true : false, false)
+      && !allowedTags.includes(primary.id)))
+      return null;
     return {
       primary,
-      children: els.reduce(
-        (prev, curr) =>
-          [...prev, ...curr.tags.find(el => el.id === primary.id) ? curr.tags.filter(el => !el.primary) : []],
-        []),
+      children,
       els: childEls,
       sortIndex: childEls.reduce((prev, curr) => prev + curr.lastEditing.getTime(), 0) / (childEls.length || 1),
     }
-  }).sort((a, b) => b.sortIndex - a.sortIndex);
+  }).filter(el => el).sort((a, b) => !a.primary.primary ? -1 : (b.sortIndex - a.sortIndex));
 }

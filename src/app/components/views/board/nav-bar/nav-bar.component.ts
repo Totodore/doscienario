@@ -2,7 +2,7 @@ import { SearchResults } from './../../../../models/api/project.model';
 import { WelcomeTabComponent } from './../../../tabs/welcome-tab/welcome-tab.component';
 import { ProjectService } from 'src/app/services/project.service';
 import { TabService } from './../../../../services/tab.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { TabTypes } from 'src/app/models/tab-element.model';
 
 @Component({
@@ -13,7 +13,9 @@ import { TabTypes } from 'src/app/models/tab-element.model';
 export class NavBarComponent {
 
   public dispDocOptions: boolean = true;
-  public results: SearchResults;
+
+  public searchQuery = "";
+
   constructor(
     public readonly tabs: TabService,
   ) { }

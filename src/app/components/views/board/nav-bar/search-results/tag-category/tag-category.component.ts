@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Blueprint } from 'src/app/models/sockets/blueprint-sock.model';
 import { TagTree } from 'src/app/models/tag.model';
 import { Document } from 'src/app/models/api/project.model';
@@ -13,18 +13,18 @@ import { DocumentComponent } from 'src/app/components/tabs/document/document.com
   templateUrl: './tag-category.component.html',
   styleUrls: ['./tag-category.component.scss']
 })
-export class TagCategoryComponent implements OnInit {
+export class TagCategoryComponent {
 
   @Input()
   public tree!: TagTree;
+
+  @Output()
+  public readonly searchQuery = new EventEmitter<string>();
 
   constructor(
     private readonly tabs: TabService,
   ) { }
 
-  public ngOnInit(): void {
-    console.log(this.children);
-  }
 
   public get children(): (Document | Blueprint)[] {
     return this.tree.els.sort((a, b) => a.lastEditing?.getTime() - b.lastEditing?.getTime()).slice(0, 5);
@@ -42,7 +42,7 @@ export class TagCategoryComponent implements OnInit {
   public openEl(el: Document | Tag | Blueprint) {
     console.log(el);
     if (el.type === DataType.Tag) {
-      //TODO: TagView
+      this.searchQuery.emit('#' + el.name);
     } else if (el.type === DataType.Blueprint)
       this.tabs.pushTab(BlueprintComponent, true, el.id);
     else if (el.type === DataType.Document)

@@ -2,13 +2,11 @@ import { BlueprintComponent } from './../../../../tabs/blueprint/blueprint.compo
 import { Blueprint } from './../../../../../models/sockets/blueprint-sock.model';
 import { DocumentComponent } from '../../../../tabs/document/document.component';
 import { TabService } from '../../../../../services/tab.service';
-import { Document, SearchResults } from '../../../../../models/api/project.model';
+import { Document } from '../../../../../models/api/project.model';
 import { Tag } from '../../../../../models/sockets/tag-sock.model';
 import { ProjectService } from '../../../../../services/project.service';
-import { Component, Input, OnInit } from '@angular/core';
-import { SearchQueryRes } from 'src/app/models/api/project.model';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { DataType } from 'src/app/models/default.model';
-import { WorkerManager, WorkerType } from 'src/app/utils/worker-manager.utils';
 import { ProgressService } from 'src/app/services/progress.service';
 import { TagTree } from 'src/app/models/tag.model';
 
@@ -17,10 +15,13 @@ import { TagTree } from 'src/app/models/tag.model';
   templateUrl: './search-results.component.html',
   styleUrls: ['./search-results.component.scss']
 })
-export class SearchResultsComponent implements OnInit {
+export class SearchResultsComponent implements OnInit, OnChanges {
 
   @Input()
-  public results: SearchResults;
+  public searchQuery = '';
+
+  @Output()
+  public readonly searchQueryChange = new EventEmitter<string>();
 
   public tagTree: TagTree[];
 
@@ -30,20 +31,28 @@ export class SearchResultsComponent implements OnInit {
     private readonly progress: ProgressService,
   ) { }
 
-  public ngOnInit() {
-    this.dispTagTree();
+  public ngOnChanges(changes: SimpleChanges): void {
+    if (changes['searchQuery'])
+      this.search(this.searchQuery);
   }
 
-  private async dispTagTree() {
+  public ngOnInit() {
+    this.project.updateSearch = () => this.search();
+    this.search();
+  }
+
+  private async search(query?: string) {
     this.progress.show();
-    this.tagTree = await this.project.getTagTree();
-    console.log(this.tagTree);
+    console.log('searching', query);
+    this.tagTree = await this.project.getTagTree(this.searchQuery);
+    this.progress.hide();
   }
 
   public openEl(el: Document | Tag | Blueprint) {
     console.log(el);
     if (el.type === DataType.Tag) {
-      //TODO: TagView
+      this.searchQuery = "#" + el.name;
+      this.searchQueryChange.emit(this.searchQuery);
     } else if (el.type === DataType.Blueprint)
       this.tabs.pushTab(BlueprintComponent, true, el.id);
     else if (el.type === DataType.Document)

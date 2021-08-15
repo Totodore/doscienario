@@ -7,7 +7,6 @@
 	</ng-container>
 	<ng-container *ngIf="!results || results.length == 0">
 		<app-tag-category *ngFor="let tree of tagTree" [tree]="tree"></app-tag-category>
-		<mat-divider></mat-divider>
 		<mat-chip-list class="tags">
 			<mat-chip *ngFor="let tag of tags" [style]="'border-color: #' + tag.color" (click)="openEl(tag)">
 				#{{ tag.name }}

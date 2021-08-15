@@ -37,6 +37,7 @@ export class SearchResultsComponent implements OnInit {
   private async dispTagTree() {
     this.progress.show();
     this.tagTree = await this.project.getTagTree();
+    console.log(this.tagTree);
   }
 
   public openEl(el: Document | Tag | Blueprint) {

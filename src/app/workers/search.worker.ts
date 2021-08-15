@@ -81,13 +81,16 @@ function search(needle: string, data: [Tag[], Document[], Blueprint[]]): SearchR
 }
 
 function getTagTree(tags: Tag[], els: (Document | Blueprint)[]): TagTree[] {
-  console.log(tags);
-  return tags.filter(el => el.primary).map(primary => ({
-    primary,
-    children: els.reduce(
-      (prev, curr) =>
-        [...prev, ...curr.tags.find(el => el.id === primary.id) ? curr.tags.filter(el => !el.primary) : []],
-      []),
-    els: els.filter(el => el.tags.find(el => el.id === primary.id)),
-  }));
+  return tags.filter(el => el.primary).map(primary => {
+    const childEls = els.filter(el => el.tags.find(el => el.id === primary.id));
+    return {
+      primary,
+      children: els.reduce(
+        (prev, curr) =>
+          [...prev, ...curr.tags.find(el => el.id === primary.id) ? curr.tags.filter(el => !el.primary) : []],
+        []),
+      els: childEls,
+      sortIndex: childEls.reduce((prev, curr) => prev + curr.lastEditing.getTime(), 0) / (childEls.length || 1),
+    }
+  }).sort((a, b) => b.sortIndex - a.sortIndex);
 }

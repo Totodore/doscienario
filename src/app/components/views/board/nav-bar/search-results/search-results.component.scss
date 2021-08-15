@@ -18,11 +18,11 @@
 		margin: auto;
 	}
 	app-tag-category {
-		margin-bottom: 10px;
+		margin-bottom: 5px;
+		margin-top: 7px;
 	}
 	.tags ::ng-deep .mat-chip-list-wrapper {
 		margin-left: 10px;
-		margin-top: 10px;
 	}
   mat-chip, ::ng-deep mat-chip {
     border: 2px solid #212121;

@@ -6,5 +6,6 @@ import { Document } from "../models/api/project.model";
 export interface TagTree {
   primary: Tag;
   children: Tag[];
+  sortIndex: number;
   els: (Document | Blueprint)[];
 }

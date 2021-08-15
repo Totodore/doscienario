@@ -43,7 +43,6 @@ export class SearchResultsComponent implements OnInit, OnChanges {
 
   private async search(query?: string) {
     this.progress.show();
-    console.log('searching', query);
     this.tagTree = await this.project.getTagTree(this.searchQuery);
     this.progress.hide();
   }

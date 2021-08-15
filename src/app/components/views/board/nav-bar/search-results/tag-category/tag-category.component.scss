@@ -3,19 +3,8 @@
 }
 div {
   margin-top: 10px;
-
-  mat-chip {
-    border: 2px solid #212121;
-
-    &:not(.primary) {
-      margin-left: 25px;
-      margin-top: 10px;
-    }
-		mat-icon {
-			height: auto;
-			width: auto;
-			font-size: 19px;
-			margin-right: 10px;
-		}
-  }
+	*:not(.primary) ::ng-deep .mat-chip-list-wrapper {
+		margin-left: 10px;
+		margin-top: 3px;
+	}
 }

@@ -1,6 +1,6 @@
 {
   "name": "doscienario",
-  "version": "2.0.30",
+  "version": "2.0.33",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --disable-host-check",

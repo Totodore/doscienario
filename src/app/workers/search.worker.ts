@@ -17,7 +17,7 @@ addEventListener('message', (e: MessageEvent<[string, any] | string>) => {
  */
 function getTagTree(tags: Tag[], needle: string, els: (Document | Blueprint)[]): TagTree[] {
   const isSearching = needle?.length > 0;
-  const allowedEls = els.filter(el => ((el as Document)?.title || (el as Blueprint)?.name).toLowerCase().includes(needle.toLowerCase())).map(el => el.id);
+  const allowedEls = els.filter(el => ((el as Document)?.title || (el as Blueprint)?.name).toLowerCase().includes(needle?.toLowerCase())).map(el => el.id);
   const allowedTags = tags.filter(el => ("#" + el.name.toLowerCase()).includes(needle.toLowerCase())).map(el => el.id);
   return tags.filter(el => el.primary || (allowedTags.includes(el.id) && isSearching)).map(primary => {
     const childEls = els.filter(el => el.tags.find(el => el.id === primary.id));

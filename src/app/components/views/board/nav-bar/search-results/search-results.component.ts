@@ -46,7 +46,7 @@ export class SearchResultsComponent implements OnInit, OnChanges {
 
   private async search(query?: string) {
     this.progress.show();
-    this.tagTree = await this.project.getTagTree(this.searchQuery);
+    this.tagTree = await this.project.getTagTree(query);
     this.progress.hide();
   }
 
@@ -70,5 +70,11 @@ export class SearchResultsComponent implements OnInit, OnChanges {
   }
   public get tags(): Tag[] {
     return this.project.tags.filter(el => !el.primary) || [];
+  }
+  public get noTagEls(): (Document | Blueprint)[] {
+    const showedEls = this.tagTree.reduce((prev, curr) => [...prev, ...curr.els], []).map(el => el.id);
+    return [...this.project.docs, ...this.project.blueprints].filter(el =>
+      !showedEls.includes(el.id)
+        && ((el as Blueprint)?.name || (el as Document)?.title).toLowerCase().includes(this.searchQuery?.toLowerCase() || ''));
   }
 }

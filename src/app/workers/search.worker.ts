@@ -19,7 +19,8 @@ function getTagTree(tags: Tag[], needle: string, els: (Document | Blueprint)[]):
   const isSearching = needle?.length > 0;
   const allowedEls = (isSearching ? els.filter(el => ((el as Document)?.title || (el as Blueprint)?.name)?.toLowerCase()?.includes(needle?.toLowerCase())) : els).map(el => el.id);
   const allowedTags = (isSearching ? tags.filter(el => ("#" + el.name?.toLowerCase()).includes(needle?.toLowerCase())) : tags).map(el => el.id);
-  return tags.filter(el => el.primary || (allowedTags.includes(el.id) && isSearching)).map(primary => {
+  const tagMatched = tags.find(el => '#' + el.name.toLowerCase() == needle?.toLowerCase());
+  return tags.filter(el => ((el.primary || (allowedTags.includes(el.id) && isSearching)) && (!tagMatched || el.id === tagMatched.id))).map(primary => {
     const childEls = els.filter(el => el.tags.find(el => el.id === primary.id));
     const children: Tag[] = els.reduce(
       (prev, curr) =>

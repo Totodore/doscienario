@@ -14,8 +14,6 @@ export class NavBarComponent {
 
   public dispDocOptions: boolean = true;
 
-  public searchQuery = "";
-
   constructor(
     public readonly tabs: TabService,
   ) { }

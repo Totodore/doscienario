@@ -1,33 +1,45 @@
 .wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  .search-wrapper {
-    .search {
-      width: 100%;
-      ::ng-deep {
-        .mat-form-field-wrapper {
-          padding: 0;
-        }
-      }
+  color: whitesmoke;
+  .result {
+    display: flex;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+    align-items: center;
+    padding-top: 10px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    cursor: pointer;
+    h3 {
+      margin: 0;
+      margin-left: 10px;
     }
-    input {
-      color: whitesmoke;
+  }
+	mat-divider, app-tag-category {
+		width: 90%;
+		margin: auto;
+	}
+	mat-divider {
+		margin-top: 10px;
+	}
+	app-tag-category {
+		margin-bottom: 5px;
+		margin-top: 7px;
+	}
+	.tags ::ng-deep .mat-chip-list-wrapper {
+		margin-left: 10px;
+		margin-top: 7px;
+	}
+  mat-chip, ::ng-deep mat-chip {
+    border: 2px solid #212121;
+
+    &:not(.primary) {
+      margin-left: 5px;
+      margin-top: 3px;
     }
-    .sort-chip {
-      display: flex;
-      justify-content: space-evenly;
-      margin: 7px 0;
-      ::ng-deep {
-        mat-chip {
-          cursor: pointer;
-          border: 2px solid red;
-          background-color: transparent !important;
-          &.selected {
-            background-color: initial !important;
-          }
-        }
-      }
-    }
+		mat-icon {
+			height: auto;
+			width: auto;
+			font-size: 19px;
+			margin-right: 10px;
+		}
   }
 }

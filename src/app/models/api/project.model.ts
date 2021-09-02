@@ -1,6 +1,5 @@
 import { Blueprint } from './../sockets/blueprint-sock.model';
 import { Tag } from './../sockets/tag-sock.model';
-import { DocumentTypes } from './../document-types.enum';
 import { DataType } from '../default.model';
 export interface CreateProjectReq {
   name: string;

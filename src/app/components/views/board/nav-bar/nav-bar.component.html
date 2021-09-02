@@ -1,8 +1,7 @@
 <div class="nav-bar">
   <mat-divider [vertical]="true" class="separator"></mat-divider>
   <div class="wrapper">
-    <app-search-options class="search" [(needle)]="searchQuery"></app-search-options>
-    <app-search-results [(searchQuery)]="searchQuery"></app-search-results>
+    <app-search-options></app-search-options>
     <app-options-separator (toggle)="dispDocOptions = !dispDocOptions" *ngIf="hasOpenedBlueprint || hasOpenedDoc"></app-options-separator>
     <app-document-options *ngIf="hasOpenedDoc && dispDocOptions"></app-document-options>
     <app-blueprint-options *ngIf="hasOpenedBlueprint && dispDocOptions"></app-blueprint-options>

@@ -1,0 +1,15 @@
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-search-bar',
+  templateUrl: './search-bar.component.html',
+  styleUrls: ['./search-bar.component.scss']
+})
+export class SearchBarComponent {
+
+  @Output()
+  public readonly needleChange = new EventEmitter<string>();
+
+  @Input()
+  public needle = "";
+}

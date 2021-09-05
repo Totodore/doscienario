@@ -16,5 +16,8 @@
     width: 100%;
     flex-flow: column;
     box-sizing: border-box;
+		* {
+			height: 100%;
+		}
   }
 }

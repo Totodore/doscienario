@@ -1,12 +1,12 @@
-import { TabTypes } from './../../../../../models/tab-element.model';
-import { Blueprint, RenameBlueprintOut } from './../../../../../models/sockets/blueprint-sock.model';
-import { ConfirmComponent } from './../../../../utils/confirm/confirm.component';
+import { TabTypes } from '../../../../../models/tab-element.model';
+import { Blueprint, RenameBlueprintOut } from '../../../../../models/sockets/blueprint-sock.model';
+import { ConfirmComponent } from '../../../../utils/confirm/confirm.component';
 import { Tag } from 'src/app/models/sockets/tag-sock.model';
-import { DocumentModel } from './../../../../../models/sockets/document-sock.model';
+import { DocumentModel } from '../../../../../models/sockets/document-sock.model';
 import { MatDialog } from '@angular/material/dialog';
-import { SocketService } from './../../../../../services/socket.service';
+import { SocketService } from '../../../../../services/socket.service';
 import { ProjectService } from 'src/app/services/project.service';
-import { TabService } from './../../../../../services/tab.service';
+import { TabService } from '../../../../../services/tab.service';
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { RenameDocumentReq } from 'src/app/models/sockets/document-sock.model';

@@ -4,7 +4,7 @@ import { AddOptionsComponent } from './components/views/board/nav-bar/add-option
 import { AddTagComponent } from './components/tabs/tags-manager/add-tag/add-tag.component';
 import { OptionsSeparatorComponent } from './components/views/board/nav-bar/options-separator/options-separator.component';
 import { SearchBarComponent } from './components/views/board/nav-bar/search-options/search-bar/search-bar.component';
-import { DocumentOptionsComponent } from './components/views/board/nav-bar/document-options/document-options.component';
+import { DocumentOptionsComponent } from './components/views/board/options-bar/document-options/document-options.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { DragDropModule } from '@angular/cdk/drag-drop';
@@ -48,13 +48,14 @@ import { TagsManagerComponent } from './components/tabs/tags-manager/tags-manage
 import { MAT_COLOR_FORMATS, NgxMatColorPickerModule, NGX_MAT_COLOR_FORMATS } from '@angular-material-components/color-picker';
 import { ConfirmComponent } from './components/utils/confirm/confirm.component';
 import { SearchOptionsComponent } from './components/views/board/nav-bar/search-options/search-options.component';
-import { BlueprintOptionsComponent } from './components/views/board/nav-bar/blueprint-options/blueprint-options.component';
+import { BlueprintOptionsComponent } from './components/views/board/options-bar/blueprint-options/blueprint-options.component';
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { NodeEditorComponent } from './components/tabs/blueprint/node/node-editor/node-editor.component';
 import { RelationComponent } from './components/tabs/blueprint/relation/relation.component';
 import { DateHttpInterceptor } from './interceptors/date.interceptor';
 import { SearchTagSortComponent } from './components/views/board/nav-bar/search-options/search-tag-sort/search-tag-sort.component';
 import { SearchResultsComponent } from './components/views/board/nav-bar/search-options/search-results/search-results.component';
+import { OptionsBarComponent } from './components/views/board/options-bar/options-bar.component';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -87,6 +88,7 @@ import { SearchResultsComponent } from './components/views/board/nav-bar/search-
     RelationComponent,
     SearchTagSortComponent,
     SearchResultsComponent,
+    OptionsBarComponent,
   ],
   imports: [
     ReactiveFormsModule,

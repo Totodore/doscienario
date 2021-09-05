@@ -6,6 +6,7 @@ $nav-bar-size: 320px;
   .body {
     display: flex;
     flex-direction: column;
+		flex: 1 1 auto;
     width: calc(100% - 2 * 320px);
   }
   app-nav-bar, app-options-bar {

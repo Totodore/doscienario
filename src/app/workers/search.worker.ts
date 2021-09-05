@@ -10,16 +10,33 @@ addEventListener('message', (e: MessageEvent<[string, any] | string>) => {
   if (e.data[0].startsWith('searchFromTags'))
     //@ts-ignore
     postMessage([e.data[0], searchFromTags(...e.data[1])]);
+  else if (e.data[0].startsWith('filterSecondaryTags'))
+    //@ts-ignore
+    postMessage([e.data[0], filterSecondaryTags(...e.data[1])]);
 });
 
+/** 
+ * We get all the elements if they have the selected @param tags and the @param needle as title
+ */
 function searchFromTags(tags: Tag[], needle: string | undefined, els: ElementModel[]) {
-  console.log(tags, needle);
   return tags.length > 0 ? els.filter(el =>
-    el.tags.some(tag => tags.includes(tag))
-    && (el as Blueprint).name?.toLowerCase()?.includes(needle?.toLowerCase() || '')
-    || (el as DocumentModel).title?.toLowerCase()?.includes(needle?.toLowerCase() || ''))
-    .sort((a, b) => sortByRelevance(a, b, needle || '', el => (el as Blueprint).name || (el as DocumentModel).title)) : els;
+    tags.reduce((prev, curr) => prev && !!el.tags.find(tag => tag.id === curr.id), true)
+    && (
+      (el as Blueprint).name?.toLowerCase()?.includes(needle?.toLowerCase() || '')
+      || (el as DocumentModel).title?.toLowerCase()?.includes(needle?.toLowerCase() || '')
+    )
+  ).sort((a, b) => sortByRelevance(a, b, needle || '', el => (el as Blueprint).name || (el as DocumentModel).title)) : els;
 }
+
+/**
+ * We get all the tags if they are common with other elements 
+ */
+function filterSecondaryTags(selectedTags: Tag[], els: ElementModel[]): Tag[] {
+  return els.reduce(
+    (prev, curr) => [...prev, ...(curr.tags.find(el => !!selectedTags.find(tag => tag.id === el.id)) ? curr.tags : [])], [])
+    .filter(el => !el.primary);
+}
+
 /**
  * Get a tag tree (primary tag with their children) and the elements they have
  * The needle allow the results to be filtered with the needle (it can be a tag name or an element title)

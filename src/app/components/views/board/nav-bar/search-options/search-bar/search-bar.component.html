@@ -2,7 +2,7 @@
   <div class="search-wrapper">
     <mat-form-field color="accent" class="search">
       <mat-label>Rechercher</mat-label>
-      <input type="search" matInput placeholder="Rechercher un doc / tag / arbre" [(ngModel)]="needle" (ngModelChange)="needleChange.emit($event)">
+      <input type="search" matInput placeholder="Rechercher un doc / arbre" [(ngModel)]="needle" (ngModelChange)="needleChange.emit($event)">
       <mat-icon color="accent" matSuffix>search</mat-icon>
     </mat-form-field>
   </div>

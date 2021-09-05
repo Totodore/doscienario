@@ -8,6 +8,7 @@ import { ProjectService } from '../../../../../services/project.service';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { DataType, ElementModel } from 'src/app/models/default.model';
 import { ProgressService } from 'src/app/services/progress.service';
+import { DocumentModel } from 'src/app/models/sockets/document-sock.model';
 
 @Component({
   selector: 'app-search-options',
@@ -23,6 +24,8 @@ export class SearchOptionsComponent implements OnInit {
 
   public selectedPrimaryTags: Tag[] = [];
   public selectedSecondaryTags: Tag[] = [];
+
+  public allowedSecondaryTags: Tag[] = this.tags;
 
   public results: ElementModel[] = [];
 
@@ -42,26 +45,18 @@ export class SearchOptionsComponent implements OnInit {
   public async search(query?: string) {
     this.progress.show();
     this.needle = query;
-    this.results = await this.project.searchFromTags([...this.selectedPrimaryTags, ...this.selectedSecondaryTags], this.needle);
+    this.results = this.selectedPrimaryTags.length > 0 || this.selectedSecondaryTags.length > 0 ?
+      await this.project.searchFromTags([...this.selectedPrimaryTags, ...this.selectedSecondaryTags], this.needle)
+      : [...this.project.blueprints, ...this.project.docs].filter(el => ((el as Blueprint).name || (el as DocumentModel).title)?.toLowerCase()?.includes(this.needle?.toLowerCase() || ""));
     this.progress.hide();
   }
 
-  public openEl(el: Document | Tag | Blueprint) {
-    if (el.type === DataType.Tag) {
-      this.needle = "#" + el.name;
-    } else if (el.type === DataType.Blueprint)
-      this.tabs.pushTab(BlueprintComponent, true, el.id);
-    else if (el.type === DataType.Document)
-      this.tabs.pushTab(DocumentComponent, true, el.id);
+  public async filterSecondaryTags() {
+    this.allowedSecondaryTags = this.selectedPrimaryTags.length > 0
+      ? await this.project.filterSecondaryTags(this.selectedPrimaryTags)
+      : this.tags;
   }
-  public getIconName(el: Document | Blueprint | Tag): string {
-    if (el.type === DataType.Blueprint)
-      return "account_tree";
-    else if (el.type === DataType.Tag)
-      return "tag";
-    else
-      return "description";
-  }
+
   public get tags(): Tag[] {
     return this.project.tags.filter(el => !el.primary) || [];
   }

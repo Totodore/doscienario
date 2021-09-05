@@ -1,5 +1,5 @@
+import { Document } from "./api/project.model";
 import { Blueprint } from "./sockets/blueprint-sock.model";
-import { DocumentModel } from "./sockets/document-sock.model";
 export abstract class DataModel {
 
   constructor(obj?: DataModel) {
@@ -14,4 +14,4 @@ export enum DataType {
   Tag
 }
 
-export type ElementModel = Blueprint | DocumentModel;
+export type ElementModel = Blueprint | Document;

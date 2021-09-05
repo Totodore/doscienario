@@ -342,8 +342,10 @@ export class ProjectService {
   }
 
   public async searchFromTags(tags: Tag[], needle?: string) {
-    console.log("test");
     return await this.searchWorker.postAsyncMessage<ElementModel[]>('searchFromTags', [tags, needle, [...this.docs, ...this.blueprints]]);
+  }
+  public async filterSecondaryTags(tags: Tag[]) {
+    return await this.searchWorker.postAsyncMessage<Tag[]>('filterSecondaryTags', [tags, [...this.docs, ...this.blueprints]]);
   }
 
   public saveData() {

@@ -1,4 +1,6 @@
+import { DataType, ElementModel } from 'src/app/models/default.model';
 import { Component, Input, OnInit } from '@angular/core';
+import { Blueprint } from 'src/app/models/sockets/blueprint-sock.model';
 
 @Component({
   selector: 'app-search-results',
@@ -7,14 +9,17 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class SearchResultsComponent {
 
-  private _results: string;
-
   @Input()
-  public set results(value: string | undefined) {
-    this._results = value || '';
+  public results!: ElementModel[];
+
+  public getIconName(el: ElementModel): string {
+    if ((el as Blueprint).type === DataType.Blueprint)
+      return "account_tree";
+    else
+      return "description";
   }
 
-  public get results(): string {
-    return this._results;
+  public onClick(el: ElementModel): void {
+    console.log(el);
   }
 }

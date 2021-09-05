@@ -13,11 +13,12 @@ addEventListener('message', (e: MessageEvent<[string, any] | string>) => {
 });
 
 function searchFromTags(tags: Tag[], needle: string | undefined, els: ElementModel[]) {
+  console.log(tags, needle);
   return tags.length > 0 ? els.filter(el =>
     el.tags.some(tag => tags.includes(tag))
     && (el as Blueprint).name?.toLowerCase()?.includes(needle?.toLowerCase() || '')
     || (el as DocumentModel).title?.toLowerCase()?.includes(needle?.toLowerCase() || ''))
-    .sort((a, b) => sortByRelevance(a, b, needle, el => (el as Blueprint).name || (el as DocumentModel).title)) : els;
+    .sort((a, b) => sortByRelevance(a, b, needle || '', el => (el as Blueprint).name || (el as DocumentModel).title)) : els;
 }
 /**
  * Get a tag tree (primary tag with their children) and the elements they have

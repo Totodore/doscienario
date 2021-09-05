@@ -226,3 +226,17 @@ button:focus {
 .toggle-btn.on {
 	border: solid 2px #b0bec5 !important;
 }
+
+.mat-chip.mat-standard-chip.mat-chip-selected {
+	background-color: #b5b5b5cf !important;
+}
+.mat-standard-chip {
+	padding: 4px 9px;
+	height: initial;
+	&.mat-chip-with-trailing-icon {
+		padding-top: 4px;
+		padding-bottom: 4px;
+		padding-right: 6px;
+		padding-left: 9px;
+	}
+}

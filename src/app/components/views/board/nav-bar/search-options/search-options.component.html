@@ -2,6 +2,5 @@
 	<app-search-tag-sort [tags]="primaryTags" [(selectedTags)]="selectedPrimaryTags" (selectedTagsChange)="search(needle)"></app-search-tag-sort>
 	<app-search-tag-sort [tags]="tags" [(selectedTags)]="selectedSecondaryTags" (selectedTagsChange)="search(needle)"></app-search-tag-sort>
 	<app-search-bar [(needle)]="needle" (needleChange)="search(needle)"></app-search-bar>
-	<app-search-results></app-search-results>
-	<mat-divider *ngIf="results && results.length > 0"></mat-divider>
+	<app-search-results [results]="results"></app-search-results>
 </div>

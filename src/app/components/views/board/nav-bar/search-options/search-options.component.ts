@@ -41,9 +41,8 @@ export class SearchOptionsComponent implements OnInit {
 
   public async search(query?: string) {
     this.progress.show();
-    this.results = query ?
-      await this.project.searchFromTags([...this.selectedPrimaryTags, ...this.selectedSecondaryTags], this.needle)
-      : [];
+    this.needle = query;
+    this.results = await this.project.searchFromTags([...this.selectedPrimaryTags, ...this.selectedSecondaryTags], this.needle);
     this.progress.hide();
   }
 

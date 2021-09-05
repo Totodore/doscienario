@@ -6,9 +6,9 @@ $nav-bar-size: 320px;
   .body {
     display: flex;
     flex-direction: column;
-    width: calc(100% - 320px);
+    width: calc(100% - 2 * 320px);
   }
-  app-nav-bar {
+  app-nav-bar, app-options-bar {
     width: $nav-bar-size;
   }
 }

@@ -1,1 +1,7 @@
-<p>options-bar works!</p>
+<div class="nav-bar">
+  <mat-divider [vertical]="true" class="separator"></mat-divider>
+  <div class="wrapper">
+    <app-document-options *ngIf="openedTab === 0"></app-document-options>
+    <app-blueprint-options *ngIf="openedTab === 1"></app-blueprint-options>
+  </div>
+</div>

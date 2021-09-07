@@ -3,7 +3,11 @@
     <app-header></app-header>
     <app-tab-view></app-tab-view>
   </div>
-	<app-options-bar *ngIf="showOptions"></app-options-bar>
-  <app-nav-bar></app-nav-bar>
+	<app-resizable-bar name="Options" [class.hidden]="!openOptions" *ngIf="showOptions" (toggle)="openOptions = !openOptions">
+		<app-options-bar></app-options-bar>
+	</app-resizable-bar>
+	<app-resizable-bar name="Explorateur" [class.hidden]="!openNav" (toggle)="openNav = !openNav">
+		<app-nav-bar></app-nav-bar>
+	</app-resizable-bar>
 </div>
 

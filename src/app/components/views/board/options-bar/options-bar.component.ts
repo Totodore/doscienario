@@ -1,5 +1,5 @@
 import { TabService } from './../../../../services/tab.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { TabTypes } from 'src/app/models/tab-element.model';
 
 @Component({
@@ -7,14 +7,11 @@ import { TabTypes } from 'src/app/models/tab-element.model';
   templateUrl: './options-bar.component.html',
   styleUrls: ['./options-bar.component.scss']
 })
-export class OptionsBarComponent implements OnInit {
+export class OptionsBarComponent {
 
   constructor(
     private readonly tabs: TabService,
   ) { }
-
-  ngOnInit(): void {
-  }
 
   public get openedTab(): TabTypes | undefined {
     return this.tabs.displayedTab?.[1]?.type;

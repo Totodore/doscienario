@@ -20,6 +20,8 @@ import { TabTypes } from 'src/app/models/tab-element.model';
 export class BoardComponent implements OnInit {
 
 
+  public openOptions = true;
+  public openNav = true;
   constructor(
     private readonly socket: SocketService,
     private readonly snackbar: MatSnackBar,

@@ -56,6 +56,7 @@ import { DateHttpInterceptor } from './interceptors/date.interceptor';
 import { SearchTagSortComponent } from './components/views/board/nav-bar/search-options/search-tag-sort/search-tag-sort.component';
 import { SearchResultsComponent } from './components/views/board/nav-bar/search-options/search-results/search-results.component';
 import { OptionsBarComponent } from './components/views/board/options-bar/options-bar.component';
+import { ResizableBarComponent } from './components/views/board/resizable-bar/resizable-bar.component';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -89,6 +90,7 @@ import { OptionsBarComponent } from './components/views/board/options-bar/option
     SearchTagSortComponent,
     SearchResultsComponent,
     OptionsBarComponent,
+    ResizableBarComponent,
   ],
   imports: [
     ReactiveFormsModule,

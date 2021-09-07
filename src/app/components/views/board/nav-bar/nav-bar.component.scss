@@ -1,7 +1,11 @@
-app-search-results {
+:host {
 	height: 100%;
-	overflow-y: auto;
+	display: contents;
 }
 app-search-options {
-	flex: 1;
+	flex-grow: 1;
+	display: block;
+}
+app-add-options {
+	display: block;
 }

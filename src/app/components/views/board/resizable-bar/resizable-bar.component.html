@@ -1,0 +1,10 @@
+<div class="nav-bar">
+  <mat-divider [vertical]="true" class="separator"></mat-divider>
+  <div class="wrapper">
+    <ng-content></ng-content>
+  </div>
+	<div class="handle" (click)="toggle.emit()">
+		<mat-icon>west</mat-icon>
+		<span *ngIf="name">{{ name }}</span>
+	</div>
+</div>

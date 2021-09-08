@@ -1,8 +1,6 @@
-import { findLevelByNode } from 'src/app/utils/tree.utils';
 import { TabService } from './tab.service';
 import { Blueprint, SendBlueprintReq, OpenBlueprintReq, CreateNodeReq, CreateRelationReq, RemoveRelationReq, PlaceNodeOut, PlaceNodeIn, Relationship, RemoveNodeIn, EditSumarryIn, WriteNodeContentIn } from './../models/sockets/blueprint-sock.model';
 import { Router } from '@angular/router';
-import { ApiService } from './api.service';
 import { DocumentModel, DocumentRes, Change, WriteDocumentRes, OpenDocumentRes } from './../models/sockets/document-sock.model';
 import { GetProjectRes, ProjectUserRes, Document, SearchQueryRes } from './../models/api/project.model';
 import { Injectable, OnInit } from '@angular/core';
@@ -10,8 +8,8 @@ import { Tag } from '../models/sockets/tag-sock.model';
 import { removeNodeFromTree } from '../utils/tree.utils';
 import { TabTypes } from '../models/tab-element.model';
 import { BlueprintComponent } from '../components/tabs/blueprint/blueprint.component';
-import { TagTree } from '../models/tag.model';
 import { WorkerManager, WorkerType } from '../utils/worker-manager.utils';
+import { ElementModel } from '../models/default.model';
 
 @Injectable({
   providedIn: 'root'
@@ -343,8 +341,11 @@ export class ProjectService {
     this.getBlueprint(packet.blueprint).nodes.find(el => el.id === packet.node).summary = packet.content;
   }
 
-  public async getTagTree(needle?: string) {
-    return await this.searchWorker.postAsyncMessage<TagTree[]>('getTagTree', [this.tags, needle, [...this.docs, ...this.blueprints]]);
+  public async searchFromTags(tags: Tag[], needle?: string) {
+    return await this.searchWorker.postAsyncMessage<ElementModel[]>('searchFromTags', [tags, needle, [...this.docs, ...this.blueprints]]);
+  }
+  public async filterSecondaryTags(tags: Tag[]) {
+    return await this.searchWorker.postAsyncMessage<Tag[]>('filterSecondaryTags', [tags, [...this.docs, ...this.blueprints]]);
   }
 
   public saveData() {

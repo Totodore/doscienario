@@ -1,33 +1,23 @@
 .wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  .search-wrapper {
-    .search {
-      width: 100%;
-      ::ng-deep {
-        .mat-form-field-wrapper {
-          padding: 0;
-        }
-      }
-    }
-    input {
-      color: whitesmoke;
-    }
-    .sort-chip {
-      display: flex;
-      justify-content: space-evenly;
-      margin: 7px 0;
-      ::ng-deep {
-        mat-chip {
-          cursor: pointer;
-          border: 2px solid red;
-          background-color: transparent !important;
-          &.selected {
-            background-color: initial !important;
-          }
-        }
-      }
-    }
+  color: whitesmoke;
+	app-tag-category {
+		width: 90%;
+		margin: auto;
+		margin-bottom: 5px;
+		margin-top: 7px;
+	}
+	app-search-tag-sort {
+		max-height: 25%;
+    overflow-y: auto;
+    overflow-x: hidden;
+	}
+  mat-chip, ::ng-deep mat-chip {
+    border: 2px solid #212121;
+		mat-icon {
+			height: auto;
+			width: auto;
+			font-size: 19px;
+			margin-right: 10px;
+		}
   }
 }

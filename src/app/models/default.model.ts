@@ -1,3 +1,5 @@
+import { Document } from "./api/project.model";
+import { Blueprint } from "./sockets/blueprint-sock.model";
 export abstract class DataModel {
 
   constructor(obj?: DataModel) {
@@ -11,3 +13,5 @@ export enum DataType {
   Document,
   Tag
 }
+
+export type ElementModel = Blueprint | Document;

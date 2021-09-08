@@ -1,0 +1,21 @@
+:host {
+	display: block;
+}
+.result {
+	display: flex;
+	align-items: center;
+	padding-top: 10px;
+	padding-left: 5px;
+	padding-bottom: 5px;
+	cursor: pointer;
+	border-bottom: 1px solid rgba(255,255,255,.12);
+	.name {
+		transition: all .2s ease-in-out;
+		margin-left: 5px;
+	}
+	&:hover {
+		.name {
+			transform: translateX(5px);
+		}
+	}
+}

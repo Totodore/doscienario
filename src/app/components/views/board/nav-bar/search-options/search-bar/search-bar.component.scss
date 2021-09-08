@@ -1,0 +1,36 @@
+:host {
+	display: block;
+}
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  .search-wrapper {
+    .search {
+      width: 100%;
+      ::ng-deep {
+        .mat-form-field-wrapper {
+          padding: 0;
+        }
+      }
+    }
+    input {
+      color: whitesmoke;
+    }
+    .sort-chip {
+      display: flex;
+      justify-content: space-evenly;
+      margin: 7px 0;
+      ::ng-deep {
+        mat-chip {
+          cursor: pointer;
+          border: 2px solid red;
+          background-color: transparent !important;
+          &.selected {
+            background-color: initial !important;
+          }
+        }
+      }
+    }
+  }
+}

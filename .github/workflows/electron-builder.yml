@@ -8,7 +8,6 @@ on:
 jobs:
   Windows:
     runs-on: windows-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v2
       - uses: olegtarasov/get-tag@v2.1
@@ -17,6 +16,7 @@ jobs:
         with:
           node-version: 16.0
       - name: Build Angular app
+        continue-on-error: true
         run: |
           npm install --force
           npm run build
@@ -31,7 +31,6 @@ jobs:
           retention-days: 1
   Linux:
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v2
       - uses: olegtarasov/get-tag@v2.1
@@ -40,6 +39,7 @@ jobs:
         with:
           node-version: 16.0
       - name: Build Angular app
+        continue-on-error: true
         run: |
           npm install --force
           npm run build

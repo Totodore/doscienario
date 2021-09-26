@@ -9,6 +9,7 @@ jobs:
   Windows:
     runs-on: windows-latest
     steps:
+      - uses: actions/checkout@v2
       - uses: olegtarasov/get-tag@v2.1
         id: tagName
       - uses: actions/setup-node@master
@@ -29,6 +30,7 @@ jobs:
   Linux:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - uses: olegtarasov/get-tag@v2.1
         id: tagName
       - uses: actions/setup-node@master

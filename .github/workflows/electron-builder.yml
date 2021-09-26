@@ -8,6 +8,7 @@ on:
 jobs:
   Windows:
     runs-on: windows-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v2
       - uses: olegtarasov/get-tag@v2.1
@@ -30,6 +31,7 @@ jobs:
           retention-days: 1
   Linux:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v2
       - uses: olegtarasov/get-tag@v2.1

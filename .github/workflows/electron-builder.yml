@@ -43,7 +43,12 @@ jobs:
         run: |
           npm install --force
           npm run build
-          npm run build:electron > /dev/null 2 > /dev/null
+          npm run build:electron
+      - name: Build Electron app
+        continue-on-error: true
+        run: npm run build:electron
+      - name: Build Linux executable
+        run: |  
           npm run build:linux
           ls ./build;
       - name: Upload Linux Artifact

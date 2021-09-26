@@ -4,36 +4,28 @@ on:
   push:
     tags:
       - v*
-  
+
 jobs:
   Windows:
     runs-on: windows-latest
     steps:
-    - uses: olegtarasov/get-tag@v2.1
-      id: tagName
-    - uses: actions/setup-node@master
-      with:
-        node-version: 16.0
-    - name: install node tools
-      run: npm install -g electron electron-builder typescript
-    - uses: actions/checkout@v2
-      with: 
-        repository: totodore/build-doscienario
-        token: ${{ secrets.CR_PAT }}
-        submodules: recursive
-    - name: Build Angular app
-      run:
-        ./build.ps1;
-        npm install;
-        tsc -b tsconfig.json;
-        electron-builder build -w --publish=never;
-        ls ./build;
-    - name: Upload Windows Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: windows_${{ steps.tagName.outputs.tag }}
-        path: ./build/*.exe
-        retention-days: 1
+      - uses: olegtarasov/get-tag@v2.1
+        id: tagName
+      - uses: actions/setup-node@master
+        with:
+          node-version: 16.0
+      - name: Build Angular app
+        run: 
+          npm run build
+          npm run build:electron ;
+          npm run build:windows
+          ls ./build;
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows_${{ steps.tagName.outputs.tag }}
+          path: ./build/*.exe
+          retention-days: 1
   Linux:
     runs-on: ubuntu-latest
     steps:
@@ -42,19 +34,11 @@ jobs:
       - uses: actions/setup-node@master
         with:
           node-version: 16.0
-      - name: install node tools
-        run: npm install -g electron electron-builder typescript
-      - uses: actions/checkout@v2
-        with: 
-          repository: totodore/build-doscienario
-          token: ${{ secrets.CR_PAT }}
-          submodules: recursive
       - name: Build Angular app
         run: 
-          ./build.bash;
-          npm install;
-          tsc -b tsconfig.json;
-          electron-builder build -l --publish=never;
+          npm run build
+          npm run build:electron ;
+          npm run build:linux
           ls ./build;
       - name: Upload Linux Artifact
         uses: actions/upload-artifact@v2

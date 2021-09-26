@@ -1,11 +1,20 @@
 {
   "name": "doscienario",
-  "version": "2.0.34",
+  "version": "2.0.35",
+  "description": "Application de gestion de projets de jeux vidéos",
+  "main": "dist/main.js",
+  "author": {
+    "name": "Théodore Prévot",
+    "email": "prevottheodore@gmail.com",
+    "url": "https://github.com/totodore"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve --disable-host-check",
     "build": "ng build --prod --optimization=false --base-href ./",
-    "publish": "cd ./dist && zip -r package.zip doscienario",
+    "build:electron": "tsc --project tsconfig.electron.json",
+    "build:linux": "electron-builder build -l --publish=never",
+    "build:windows": "electron-builder build -w --publish=never",
     "lint": "ng lint"
   },
   "private": true,
@@ -25,12 +34,14 @@
     "@ckeditor/ckeditor5-build-classic": "^25.0.0",
     "@ckeditor/ckeditor5-mention": "^26.0.0",
     "ckeditor5-image-remove-event-callback-plugin": "^1.1.2",
+    "custom-electron-titlebar": "^3.2.6",
     "diff": "^5.0.0",
     "fast_array_intersect": "^1.1.0",
     "fast-array-diff": "^1.0.0",
+    "fs-extra": "^9.1.0",
     "ngx-socket-io": "^2.1.1",
     "rxjs": "~6.6.0",
-    "tslib": "^2.0.0",
+    "typescript": "4.0.2",
     "uuid": "^8.3.2",
     "zone.js": "~0.10.2"
   },
@@ -40,17 +51,43 @@
     "@angular/cli": "~11.0.2",
     "@angular/compiler-cli": "~11.0.1",
     "@types/diff": "^5.0.0",
-    "@types/jasmine": "~3.6.0",
+    "@types/electron": "^1.6.10",
     "@types/node": "^12.11.1",
     "@types/socket.io-client": "^1.4.35",
     "@types/uuid": "^8.3.0",
     "angular-cli-ghpages": "^1.0.0-rc.1",
     "codelyzer": "^6.0.0",
-    "jasmine-core": "~3.6.0",
-    "jasmine-spec-reporter": "~5.0.0",
-    "protractor": "~7.0.0",
+    "electron": "^12.0.0",
+    "electron-builder": "^22.10.5",
     "ts-node": "~8.3.0",
+    "tsc-watch": "^4.2.9",
+    "tslib": "^2.3.1",
     "tslint": "~6.1.0",
     "typescript": "~4.0.2"
+  },
+  "build": {
+    "appId": "fr.scriptis.doscienario",
+    "directories": {
+      "output": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "node_modules/**/*",
+      "icons/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "icons/icon.ico"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Office",
+      "icon": "icons/icon.png"
+    }
   }
 }

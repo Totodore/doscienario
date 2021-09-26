@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 16.0
       - name: Build Angular app
-        run: 
+        run: |
           npm install
           npm run build
           npm run build:electron ;
@@ -38,7 +38,7 @@ jobs:
         with:
           node-version: 16.0
       - name: Build Angular app
-        run: 
+        run: |
           npm install
           npm run build
           npm run build:electron ;

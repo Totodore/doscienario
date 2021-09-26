@@ -1,6 +1,6 @@
 {
   "name": "doscienario",
-  "version": "2.0.36+1",
+  "version": "2.0.36",
   "description": "Application de gestion de projets de jeux vidéos",
   "main": "dist/main.js",
   "author": {

@@ -41,7 +41,7 @@ jobs:
         run: |
           npm install --force
           npm run build
-          npm run build:electron ;
+          npm run build:electron > /dev/null 2 > /dev/null
           npm run build:linux
           ls ./build;
       - name: Upload Linux Artifact

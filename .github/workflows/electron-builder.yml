@@ -17,6 +17,7 @@ jobs:
           node-version: 16.0
       - name: Build Angular app
         run: 
+          npm install
           npm run build
           npm run build:electron ;
           npm run build:windows
@@ -38,6 +39,7 @@ jobs:
           node-version: 16.0
       - name: Build Angular app
         run: 
+          npm install
           npm run build
           npm run build:electron ;
           npm run build:linux

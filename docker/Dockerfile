@@ -15,4 +15,4 @@ COPY ./docker/nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
 
-COPY --from=build /app/dist/doscienario /app
+COPY --from=build /app/dist/app /app

@@ -1,7 +1,7 @@
 import { EditorWorkerService } from './../../../services/document-worker.service';
 import { ApiService } from 'src/app/services/api.service';
 import { TabService } from './../../../services/tab.service';
-import { Change, DocumentModel } from './../../../models/sockets/document-sock.model';
+import { Change, DocumentSock } from './../../../models/sockets/document-sock.model';
 import { ProgressService } from 'src/app/services/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { SocketService } from './../../../services/socket.service';
@@ -135,7 +135,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   }
 
   private atTagNames(query: string): string[] {
-    return this.project.tags.filter(el => el.name.toLowerCase().startsWith(query.toLowerCase())).map(el => "#" + el.name);
+    return this.project.tags.filter(el => el.title.toLowerCase().startsWith(query.toLowerCase())).map(el => "#" + el.title);
   }
 
   private addTagsListener() {
@@ -152,7 +152,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     } else if (tag.startsWith("#")) {}
   }
 
-  get doc(): DocumentModel {
+  get doc(): DocumentSock {
     return this.project.openDocs[this.tabId];
   }
 

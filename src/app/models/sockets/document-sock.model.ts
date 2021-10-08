@@ -1,25 +1,16 @@
 import { Document } from "../api/project.model";
-import { UserDetailsRes } from "../api/user.model";
-import { DataType } from "../default.model";
+import { DataType, Element, IElement } from "../default.model";
 import { Tag } from "./tag-sock.model";
 
-export interface DocumentModel {
-  title: string;
-  content: string,
-  id: number,
-  lastEditor: UserDetailsRes,
-  createdBy: UserDetailsRes,
-  lastEditing: Date;
-  createdDate: Date;
-  tags: Tag[];
-  elIndex?: number;
-  changes: Map<number, Change[]>;
-  lastChangeId: number;
-  clientUpdateId?: number;
-  readonly type: DataType.Document;
+export class DocumentSock extends Document {
+  public id: number;
+  public elIndex?: number;
+  public changes: Map<number, Change[]>;
+  public lastChangeId: number;
+  public clientUpdateId?: number;
 }
 export interface DocumentRes {
-  doc: DocumentModel;
+  doc: DocumentSock;
   lastUpdate: number;
   reqId: string;
 }
@@ -56,7 +47,7 @@ export class RenameDocumentRes extends RenameDocumentReq { };
 export class EditTagDocumentReq {
   constructor(
     public docId: number,
-    public name: string
+    public title: string
   ) {}
 }
 

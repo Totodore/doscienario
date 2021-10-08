@@ -1,7 +1,7 @@
 import { TabTypes } from './../../../../../models/tab-element.model';
 import { ConfirmComponent } from './../../../../utils/confirm/confirm.component';
 import { Tag } from 'src/app/models/sockets/tag-sock.model';
-import { DocumentModel } from './../../../../../models/sockets/document-sock.model';
+import { DocumentSock } from './../../../../../models/sockets/document-sock.model';
 import { MatDialog } from '@angular/material/dialog';
 import { SocketService } from './../../../../../services/socket.service';
 import { ProjectService } from 'src/app/services/project.service';
@@ -51,10 +51,10 @@ export class DocumentOptionsComponent {
   }
 
   public onTagClick(tag: Tag) {
-    this.project.updateSearch('#' + tag.name);
+    this.project.updateSearch('#' + tag.title);
   }
 
-  get doc(): DocumentModel {
+  get doc(): DocumentSock {
     return this.project.openDocs[this.tabId];
   }
   get docId(): number {

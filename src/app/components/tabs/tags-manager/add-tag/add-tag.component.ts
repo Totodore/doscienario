@@ -30,7 +30,7 @@ export class AddTagComponent {
   ) {
     if (oldTag) {
       this.modify = true;
-      this.tagName = oldTag.name;
+      this.tagName = oldTag.title;
       if (oldTag.color) {
         const hex = oldTag.color;
         const [r, g, b] = [hex.slice(0, 2), hex.slice(2, 4), hex.slice(4, 6)].map(el => parseInt(el, 16));
@@ -47,9 +47,9 @@ export class AddTagComponent {
       if (this.modify) {
         this.project.updateProjectTag(this.oldTag, newTag);
         if (newTag.color != this.oldTag.color)
-          this.socket.socket.emit(Flags.COLOR_TAG, new UpdateTagColorReq(newTag.name, newTag.color));
-        if (newTag.name != this.oldTag.name)
-          this.socket.socket.emit(Flags.RENAME_TAG, new UpdateTagNameReq(this.oldTag.name, newTag.name));
+          this.socket.socket.emit(Flags.COLOR_TAG, new UpdateTagColorReq(newTag.title, newTag.color));
+        if (newTag.title != this.oldTag.title)
+          this.socket.socket.emit(Flags.RENAME_TAG, new UpdateTagNameReq(this.oldTag.title, newTag.title));
       }
       else {
         this.project.addProjectTag(newTag);
@@ -61,8 +61,8 @@ export class AddTagComponent {
   public removeTag() {
     const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer le tag ?" });
     dialog.componentInstance.confirm.subscribe(() => {
-      this.socket.socket.emit(Flags.REMOVE_TAG, this.oldTag.name);
-      this.project.removeProjectTag(this.oldTag.name);
+      this.socket.socket.emit(Flags.REMOVE_TAG, this.oldTag.title);
+      this.project.removeProjectTag(this.oldTag.title);
       dialog.close();
       this.dialogRef.close();
     });

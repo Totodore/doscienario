@@ -1,6 +1,6 @@
 import { SocketService } from './../../../../services/socket.service';
 import { Component, OnInit } from '@angular/core';
-import { ProjectUserRes } from 'src/app/models/api/project.model';
+import { User } from 'src/app/models/api/project.model';
 import { ApiService } from 'src/app/services/api.service';
 import { ProgressService } from 'src/app/services/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
@@ -25,14 +25,14 @@ export class UserAddComponent implements OnInit {
   public title: string = "Options";
   public show: boolean = true;
 
-  public allUsers: ProjectUserRes[];
-  private me: ProjectUserRes;
+  public allUsers: User[];
+  private me: User;
 
   async ngOnInit(): Promise<void> {
     try {
       setImmediate(() => this.progress.show());
       this.me = JSON.parse(localStorage.getItem("me"));
-      this.allUsers = await this.api.get<ProjectUserRes[]>("user/all");
+      this.allUsers = await this.api.get<User[]>("user/all");
       setImmediate(() => this.progress.hide());
     } catch (e) {
       console.error(e);
@@ -42,7 +42,7 @@ export class UserAddComponent implements OnInit {
   }
 
   public setUsers(userNames: string[]) {
-    const newUsers: ProjectUserRes[] = []; //Co
+    const newUsers: User[] = []; //Co
     for (const userName of userNames) {
       newUsers.push(this.allUsers.find(el => el.name == userName));
     }

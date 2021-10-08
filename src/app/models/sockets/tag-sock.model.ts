@@ -1,53 +1,37 @@
-import { DataModel, DataType } from '../default.model';
-import { UserDetailsRes } from './../api/user.model';
-export class Tag extends DataModel {
+import { DataModel, DataType, Element } from '../default.model';
+export class Tag extends Element<Tag> {
 
-  constructor(obj: DataModel);
+  constructor(obj: Partial<Tag>);
   constructor(name: string, color?: string, primary?: boolean);
 
   constructor(
-    name: string | DataModel,
+    name: string | Partial<Tag>,
     color?: string,
     primary?: boolean
   ) {
-    if (typeof name !== "string") {
-      super(name);
-    }
-    else {
-      super();
-      this.name = name;
+    super(typeof name !== "string" ? name : {});
+    if (typeof name === "string") {
+      this.title = name;
       this.color = color;
       this.primary = primary
     }
     this.type = DataType.Tag;
   }
 
-  name: string;
-
-  id: number;
-
-  primary: boolean;
-
-  projectId: number;
-
-  createdById: string;
-
-  color: string;
-
-  createdBy: UserDetailsRes;
-
-  type: DataType.Tag;
+  public primary: boolean;
+  public color: string;
+  public readonly type = DataType.Tag;
 }
 
 export class UpdateTagColorReq {
   constructor(
-    public name: string,
+    public title: string,
     public color: string
   ) { }
 }
 export class UpdateTagNameReq {
   constructor(
-    public oldName: string,
-    public name: string
+    public oldTitle: string,
+    public title: string
   ) { }
 }

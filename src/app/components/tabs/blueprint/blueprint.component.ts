@@ -422,9 +422,9 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   get title(): string {
     if (this.blueprint == null)
       return "Chargement...";
-    else if (this.blueprint.name?.length == 0)
+    else if (this.blueprint.title?.length == 0)
       return "Nouvel arbre";
-    else return this.blueprint.name;
+    else return this.blueprint.title;
   }
 
   get id(): number {

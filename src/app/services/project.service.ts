@@ -1,8 +1,8 @@
 import { TabService } from './tab.service';
 import { Blueprint, SendBlueprintReq, OpenBlueprintReq, CreateNodeReq, CreateRelationReq, RemoveRelationReq, PlaceNodeOut, PlaceNodeIn, Relationship, RemoveNodeIn, EditSumarryIn, WriteNodeContentIn } from './../models/sockets/blueprint-sock.model';
 import { Router } from '@angular/router';
-import { DocumentModel, DocumentRes, Change, WriteDocumentRes, OpenDocumentRes } from './../models/sockets/document-sock.model';
-import { GetProjectRes, ProjectUserRes, Document, SearchQueryRes } from './../models/api/project.model';
+import { DocumentSock, DocumentRes, Change, WriteDocumentRes, OpenDocumentRes } from './../models/sockets/document-sock.model';
+import { Project, User, Document, SearchQueryRes } from './../models/api/project.model';
 import { Injectable, OnInit } from '@angular/core';
 import { Tag } from '../models/sockets/tag-sock.model';
 import { removeNodeFromTree } from '../utils/tree.utils';
@@ -16,7 +16,7 @@ import { ElementModel } from '../models/default.model';
 })
 export class ProjectService {
 
-  public openDocs: { [k: string]: DocumentModel } = {};
+  public openDocs: { [k: string]: DocumentSock } = {};
   public openBlueprints: { [k: string]: Blueprint } = {};
 
   public updateSearch: (val?: string) => void;
@@ -28,8 +28,8 @@ export class ProjectService {
     this.searchWorker = new WorkerManager(WorkerType.Search);
   }
 
-  private data: GetProjectRes = JSON.parse(localStorage.getItem("project-data"), JSON.dateParser);
-  public async loadData(data: GetProjectRes) {
+  private data = new Project(JSON.parse(localStorage.getItem("project-data"), JSON.dateParser));
+  public async loadData(data: Project) {
     this.data = data;
     localStorage.setItem("project-data", JSON.stringify(data));
     this.openDocs = {};
@@ -43,14 +43,14 @@ export class ProjectService {
     this.data.name = name;
   }
 
-  public get projectUsers(): ProjectUserRes[] {
+  public get projectUsers(): User[] {
     return this.data.users;
   }
-  public addProjectUser(user: ProjectUserRes) {
+  public addProjectUser(user: User) {
     this.data.users.push(user);
     this.saveData();
   }
-  public removeProjectUser(user: ProjectUserRes) {
+  public removeProjectUser(user: User) {
     const index = this.data.users.findIndex(el => el.id == user.id);
     this.data.users.splice(index, 1);
     this.saveData();
@@ -61,14 +61,14 @@ export class ProjectService {
     this.saveData();
   }
   public removeProjectTag(name: string) {
-    this.data.tags.splice(this.tags.findIndex(el => el.name === name), 1);
+    this.data.tags.splice(this.tags.findIndex(el => el.title === name), 1);
     for (const doc of this.data.documents)
-      doc.tags.splice(doc.tags.findIndex(el => el.name === name), 1);
+      doc.tags.splice(doc.tags.findIndex(el => el.title === name), 1);
     this.updateSearch();
     this.saveData();
   }
   public updateProjectTag(tag: Tag, newTag?: Tag) {
-    const index = this.tags.findIndex(el => el.name === tag.name);
+    const index = this.tags.findIndex(el => el.title === tag.title);
     this.data.tags[index] = newTag ?? tag;
     this.updateSearch();
     this.saveData();
@@ -197,7 +197,7 @@ export class ProjectService {
     const docId = this.openDocs[tabId].id;
     this.data.documents.find(el => el.id == docId).tags = tags;
     for (const tag of tags) {
-      if (!this.data.tags.find(el => el.name.toLowerCase() === tag.name.toLowerCase()))
+      if (!this.data.tags.find(el => el.title.toLowerCase() === tag.title.toLowerCase()))
         this.data.tags.push(tag);
     }
     this.saveData();
@@ -228,7 +228,7 @@ export class ProjectService {
     delete this.openBlueprints[index];
   }
   public renameBlueprintFromSocket(title: string, blueprintId: number) {
-    this.data.blueprints.find(el => el.id == blueprintId).name = title;
+    this.data.blueprints.find(el => el.id == blueprintId).title = title;
     const doc = Object.values(this.openDocs).find(el => el.id == blueprintId);
     if (doc)
       doc.title = title;
@@ -236,9 +236,9 @@ export class ProjectService {
     this.updateSearch();
   }
   public renameBlueprint(tabId: string, title: string) {
-    this.openBlueprints[tabId].name = title;
+    this.openBlueprints[tabId].title = title;
     const docId = this.openBlueprints[tabId].id;
-    this.data.blueprints.find(el => el.id == docId).name = title;
+    this.data.blueprints.find(el => el.id == docId).title = title;
     this.saveData();
     this.updateSearch();
   }
@@ -308,7 +308,7 @@ export class ProjectService {
     const docId = this.openBlueprints[tabId].id;
     this.data.blueprints.find(el => el.id == docId).tags = tags;
     for (const tag of tags) {
-      if (!this.data.tags.find(el => el.name.toLowerCase() === tag.name.toLowerCase()))
+      if (!this.data.tags.find(el => el.title.toLowerCase() === tag.title.toLowerCase()))
         this.data.tags.push(tag);
     }
     // console.log(this.data.blueprints.find(el => el.id == docId).tags.length, tags.length);
@@ -358,7 +358,7 @@ export class ProjectService {
     this.router.navigateByUrl("/menu");
   }
 
-  public set projectUsers(users: ProjectUserRes[]) {
+  public set projectUsers(users: User[]) {
     this.data.users = users;
     this.saveData();
   }
@@ -370,7 +370,7 @@ export class ProjectService {
     this.data.tags = tags;
     this.saveData();
   }
-  public get owner(): ProjectUserRes {
+  public get owner(): User {
     return this.data.createdBy;
   }
   public get id(): number {

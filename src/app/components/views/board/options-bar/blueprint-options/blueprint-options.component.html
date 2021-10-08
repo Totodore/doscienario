@@ -2,11 +2,11 @@
 <div class="wrapper" *ngIf="blueprint">
   <mat-form-field color="accent">
     <mat-label>Titre du blueprint</mat-label>
-    <input type="text" #input matInput [(ngModel)]="blueprint.name" (ngModelChange)="onRename()">
+    <input type="text" #input matInput [(ngModel)]="blueprint.title" (ngModelChange)="onRename()">
   </mat-form-field>
   <div class="blueprint-tags">
     <mat-chip-list aria-label="blueprint tags" *ngIf="docTags && docTags.length > 0">
-      <mat-chip (click)="onTagClick(tag)" *ngFor="let tag of docTags" [style]="'border: 2px solid #616161; border-color: #' + tag.color">#{{ tag.name }}</mat-chip>
+      <mat-chip (click)="onTagClick(tag)" *ngFor="let tag of docTags" [style]="'border: 2px solid #616161; border-color: #' + tag.color">#{{ tag.title }}</mat-chip>
       <mat-chip (click)="openTagEdit()"><mat-icon color="accent">edit</mat-icon></mat-chip>
     </mat-chip-list>
     <div class="btns">

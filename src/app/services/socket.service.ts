@@ -1,7 +1,7 @@
 import { OpenBlueprintReq, SendBlueprintReq, CloseBlueprintReq, CreateNodeReq, RemoveNodeIn, CreateRelationReq, RemoveRelationReq, PlaceNodeIn, Relationship, EditSumarryIn, WriteNodeContentOut, WriteNodeContentIn } from './../models/sockets/blueprint-sock.model';
 import { Tag, UpdateTagColorReq, UpdateTagNameReq } from './../models/sockets/tag-sock.model';
 import { TabService } from './tab.service';
-import { WriteDocumentReq, Change, DocumentModel, DocumentRes, WriteDocumentRes, RenameDocumentRes, EditTagDocumentReq, AddTagDocumentRes, OpenDocumentRes } from './../models/sockets/document-sock.model';
+import { WriteDocumentReq, Change, DocumentSock, DocumentRes, WriteDocumentRes, RenameDocumentRes, EditTagDocumentReq, AddTagDocumentRes, OpenDocumentRes } from './../models/sockets/document-sock.model';
 import { ProjectService } from 'src/app/services/project.service';
 import { Flags } from './../models/sockets/flags.enum';
 import { ApiService } from './api.service';
@@ -9,8 +9,7 @@ import { environment } from '../../environments/environment';
 import { Socket, connect } from 'socket.io-client';
 import { EventHandler, registerHandler } from '../decorators/subscribe-event.decorator';
 import { Injectable } from '@angular/core';
-import { UserDetailsRes } from '../models/api/user.model';
-import { ProjectUserRes } from '../models/api/project.model';
+import { User } from '../models/api/project.model';
 @Injectable({
   providedIn: 'root'
 })
@@ -49,7 +48,7 @@ export class SocketService {
     this.socket.emit(Flags.RENAME_PROJECT, name);
   }
 
-  updateUserProject(users: ProjectUserRes[]) {
+  updateUserProject(users: User[]) {
     const addedUser = users.filter(el => !this.project.projectUsers.find(value => el.id === value.id))?.[0];
     const removedUser = this.project.projectUsers.filter(el => !users.find(value => el.id === value.id))?.[0];
     if (addedUser)
@@ -59,12 +58,12 @@ export class SocketService {
   }
 
   @EventHandler(Flags.ADD_USER_PROJECT)
-  onAddUserProject(user: UserDetailsRes) {
+  onAddUserProject(user: User) {
     this.project.addProjectUser(user);
   }
 
   @EventHandler(Flags.REMOVE_USER_PROJECT)
-  onRemoveUserProject(user: UserDetailsRes) {
+  onRemoveUserProject(user: User) {
     this.project.removeProjectUser(user);
   }
 
@@ -99,7 +98,7 @@ export class SocketService {
   }
 
   @EventHandler(Flags.RENAME_DOC)
-  onRenameDocument(doc: RenameDocumentRes) {
+  titleDocument(doc: RenameDocumentRes) {
     this.project.renameDocFromSocket(doc.title, doc.docId);
   }
 
@@ -111,7 +110,7 @@ export class SocketService {
 
   @EventHandler(Flags.CREATE_TAG)
   onCreateTag(tag: Tag) {
-    const projectTag = this.project.tags.find(el => el.name == tag.name);
+    const projectTag = this.project.tags.find(el => el.title == tag.title);
     if (projectTag && projectTag.id == null)
       this.project.updateProjectTag(tag);
     else this.project.addProjectTag(tag);
@@ -119,13 +118,13 @@ export class SocketService {
 
   @EventHandler(Flags.TAG_ADD_DOC)
   onAddTagDoc(packet: AddTagDocumentRes) {
-    const projectTag = this.project.tags.find(el => el.name == packet.tag.name);
+    const projectTag = this.project.tags.find(el => el.title == packet.tag.title);
     if (projectTag && projectTag.id == null)
       this.project.updateProjectTag(packet.tag);
     else if (!projectTag)
       this.project.addProjectTag(packet.tag);
     const doc = this.project.getDoc(packet.docId);
-    const tag = doc.tags.find(el => el.name == packet.tag.name);
+    const tag = doc.tags.find(el => el.title == packet.tag.title);
     if (tag)
       doc.tags[doc.tags.indexOf(tag)] = packet.tag;
     else
@@ -135,26 +134,26 @@ export class SocketService {
   @EventHandler(Flags.TAG_REMOVE_DOC)
   onRemoveTagDoc(packet: EditTagDocumentReq) {
     const tags = this.project.getDoc(packet.docId).tags;
-    tags.splice(tags.findIndex(el => el.name == packet.name.toLowerCase()), 1);
+    tags.splice(tags.findIndex(el => el.title == packet.title.toLowerCase()), 1);
   }
 
   @EventHandler(Flags.COLOR_TAG)
   onColorTag(packet: UpdateTagColorReq) {
-    const newTag = this.project.tags.find(el => el.name === packet.name);
+    const newTag = this.project.tags.find(el => el.title === packet.title);
     newTag.color = packet.color;
-    this.project.updateProjectTag(new Tag(packet.name), newTag);
+    this.project.updateProjectTag(new Tag(packet.title), newTag);
   }
 
   @EventHandler(Flags.RENAME_TAG)
-  onRenameTag(packet: UpdateTagNameReq) {
-    const newTag = this.project.tags.find(el => el.name === packet.oldName);
-    newTag.name = packet.name;
-    this.project.updateProjectTag(new Tag(packet.oldName), newTag);
+  titleTag(packet: UpdateTagNameReq) {
+    const newTag = this.project.tags.find(el => el.title === packet.title);
+    newTag.title = packet.title;
+    this.project.updateProjectTag(new Tag(packet.title), newTag);
   }
 
   @EventHandler(Flags.REMOVE_TAG)
-  onRemoveTag(tagName: string) {
-    this.project.removeProjectTag(tagName);
+  onRemoveTag(title: string) {
+    this.project.removeProjectTag(title);
   }
 
   @EventHandler(Flags.SEND_BLUEPRINT)
@@ -180,13 +179,13 @@ export class SocketService {
   }
   @EventHandler(Flags.TAG_ADD_BLUEPRINT)
   onAddTagBlueprint(packet: AddTagDocumentRes) {
-    const projectTag = this.project.tags.find(el => el.name == packet.tag.name);
+    const projectTag = this.project.tags.find(el => el.title == packet.tag.title);
     if (projectTag && projectTag.id == null)
       this.project.updateProjectTag(packet.tag);
     else if (!projectTag)
       this.project.addProjectTag(packet.tag);
     const doc = this.project.getBlueprint(packet.docId);
-    const tag = doc.tags.find(el => el.name == packet.tag.name);
+    const tag = doc.tags.find(el => el.title == packet.tag.title);
     if (tag)
       doc.tags[doc.tags.indexOf(tag)] = packet.tag;
     else
@@ -196,7 +195,7 @@ export class SocketService {
   @EventHandler(Flags.TAG_ADD_BLUEPRINT)
   onRemoveTagBlueprint(packet: EditTagDocumentReq) {
     const tags = this.project.getBlueprint(packet.docId).tags;
-    tags.splice(tags.findIndex(el => el.name == packet.name.toLowerCase()), 1);
+    tags.splice(tags.findIndex(el => el.title == packet.title.toLowerCase()), 1);
   }
   
   @EventHandler(Flags.CREATE_NODE)

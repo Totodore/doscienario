@@ -75,7 +75,7 @@ export class NodeEditorComponent implements OnInit {
   }
 
   private atTagNames(query: string): string[] {
-    return this.project.tags.filter(el => el.name.toLowerCase().startsWith(query.toLowerCase())).map(el => "#" + el.name);
+    return this.project.tags.filter(el => el.title.toLowerCase().startsWith(query.toLowerCase())).map(el => "#" + el.title);
   }
 
   private addTagsListener() {

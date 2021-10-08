@@ -2,7 +2,7 @@ import { TabTypes } from '../../../../../models/tab-element.model';
 import { Blueprint, RenameBlueprintOut } from '../../../../../models/sockets/blueprint-sock.model';
 import { ConfirmComponent } from '../../../../utils/confirm/confirm.component';
 import { Tag } from 'src/app/models/sockets/tag-sock.model';
-import { DocumentModel } from '../../../../../models/sockets/document-sock.model';
+import { DocumentSock } from '../../../../../models/sockets/document-sock.model';
 import { MatDialog } from '@angular/material/dialog';
 import { SocketService } from '../../../../../services/socket.service';
 import { ProjectService } from 'src/app/services/project.service';
@@ -29,8 +29,8 @@ export class BlueprintOptionsComponent {
   ) { }
 
   onRename() {
-    this.project.renameBlueprint(this.tabId, this.blueprint.name);
-    this.socket.socket.emit(Flags.RENAME_BLUEPRINT, new RenameBlueprintOut(this.blueprintId, this.blueprint.name));
+    this.project.renameBlueprint(this.tabId, this.blueprint.title);
+    this.socket.socket.emit(Flags.RENAME_BLUEPRINT, new RenameBlueprintOut(this.blueprintId, this.blueprint.title));
   }
   onZoom(e: KeyboardEvent, val: string) {
     let ratio: number;
@@ -44,7 +44,7 @@ export class BlueprintOptionsComponent {
   }
 
   public onTagClick(tag: Tag) {
-    this.project.updateSearch('#' + tag.name);
+    this.project.updateSearch('#' + tag.title);
   }
 
   openTagEdit() {

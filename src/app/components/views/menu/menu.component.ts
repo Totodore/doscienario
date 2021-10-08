@@ -1,9 +1,9 @@
 import { Router } from '@angular/router';
-import { CreateProjectReq, CreateProjectRes } from '../../../models/api/project.model';
+import { CreateProjectReq, Project, User } from '../../../models/api/project.model';
 import { AskInputComponent } from '../../utils/ask-input/ask-input.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SnackbarService } from '../../../services/snackbar.service';
-import { UserDetailsRes, UserProjectsRes } from '../../../models/api/user.model';
+import { UserProjectsRes } from '../../../models/api/user.model';
 import { ProgressService } from '../../../services/progress.service';
 import { ApiService } from '../../../services/api.service';
 import { Component, OnInit } from '@angular/core';
@@ -15,7 +15,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MenuComponent implements OnInit {
 
-  public data: UserDetailsRes;
+  public data: User;
   constructor(
     private readonly api: ApiService,
     private readonly progress: ProgressService,
@@ -27,7 +27,7 @@ export class MenuComponent implements OnInit {
   public async ngOnInit(): Promise<void> {
     this.progress.show();
     try {
-      this.data = await this.api.get<UserDetailsRes>("user/me");
+      this.data = await this.api.get<User>("user/me");
       localStorage.setItem("me", JSON.stringify(this.data));
       this.progress.hide();
     } catch (e) {
@@ -43,12 +43,8 @@ export class MenuComponent implements OnInit {
       dialog.close();
       this.progress.show();
       try {
-        const res = await this.api.post<CreateProjectReq, CreateProjectRes>("project", { name });
-        this.data.projects.push({
-          createdDate: res.createdDate,
-          id: res.id,
-          name: res.name
-        });
+        const res = await this.api.post<CreateProjectReq, Project>("project", { name });
+        this.data.projects.push(new Project(res));
         this.progress.hide();
       } catch (e) {
         console.error(e);

@@ -1,81 +1,45 @@
 import { Change } from './document-sock.model';
-import { DataType } from './../default.model';
-import { GetProjectRes, ProjectUserRes } from "../api/project.model";
+import { DataType, Element, IElement } from './../default.model';
+import { Project, User } from "../api/project.model";
 import { Tag } from "./tag-sock.model";
 import { DataModel } from "../default.model";
 
-export class Blueprint extends DataModel {
-  id: number;
-
-  name: string;
+export class Blueprint extends Element implements IElement {
 
   nodes: Node[];
-
   relationships: Relationship[];
-
-  createdDate: Date;
-
-  project: GetProjectRes;
-
-  createdBy: ProjectUserRes;
-
-  tags: Tag[];
-
-  lastEditor: ProjectUserRes;
-
-  lastEditing: Date;
-
   x: number;
   y: number;
 
   readonly type = DataType.Blueprint;
 }
 
-export class Node {
-  id: number;
-
-  x: number;
-
-  y: number;
-
-  createdDate: Date;
-
-  createdBy: ProjectUserRes;
-
-  lastEditor: ProjectUserRes;
-
-  lastEditing: Date
-
-  isRoot: boolean;
-
-  content: string;
-
-  summary: string;
-  
-  title: string;
-
-  blueprintId: number;
-
-  blueprint: Blueprint;
-
-  tags: Tag[];
-
-  locked: boolean;
-
-  height?: number;
-  width?: number;
-  changes?: Map<number, Change[]>;
+export class Node extends DataModel<Node> {
+  public id: number;
+  public x: number;
+  public y: number;
+  public isRoot: boolean;
+  public content: string;
+  public summary: string;
+  public title: string;
+  public blueprintId: number;
+  public blueprint: Blueprint;
+  public tags: Tag[];
+  public locked: boolean;
+  public height?: number;
+  public width?: number;
+  public changes?: Map<number, Change[]>;
 }
 
-export class Relationship extends DataModel {
-  id: number;
-  parentId: number;
-  childId: number;
-  blueprint: Blueprint;
-  ox: number;
-  oy: number;
-  ex: number;
-  ey: number;
+export class Relationship extends DataModel<Relationship> {
+  public id: number;
+  public parentId: number;
+  public childId: number;
+  public blueprint: Blueprint;
+  public ox: number;
+  public oy: number;
+  public ex: number;
+  public ey: number;
 }
 
 export class PlaceNodeOut {

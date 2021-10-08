@@ -1,8 +1,8 @@
 import { ProgressService } from './progress.service';
 import { ProjectService } from 'src/app/services/project.service';
-import { ProjectUserRes } from 'src/app/models/api/project.model';
+import { User } from 'src/app/models/api/project.model';
 import { Socket } from 'socket.io-client';
-import { GetProjectRes } from './../models/api/project.model';
+import { Project } from './../models/api/project.model';
 import { FileRes, ImageRes } from './../models/api/res.model';
 import { UserLoginReq } from './../models/api/user.model';
 import { HttpClient, HttpEvent, HttpEventType, HttpHeaders, HttpRequest } from '@angular/common/http';
@@ -143,7 +143,7 @@ export class ApiService {
   }
 
   public async openProject(projectId: number) {
-    const res = await this.get<GetProjectRes>(`project/${projectId}`);
+    const res = await this.get<Project>(`project/${projectId}`);
     localStorage.setItem("project", projectId.toString());
     this.project.loadData(res);
   }
@@ -158,7 +158,7 @@ export class ApiService {
   public get jwt(): string {
     return localStorage.getItem("jwt");
   }
-  public get user(): ProjectUserRes {
+  public get user(): User {
     return JSON.parse(localStorage.getItem("me"));
   }
 

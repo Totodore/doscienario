@@ -34,22 +34,22 @@ export class TagsManagerComponent implements ITabElement {
   }
 
   public updateSecondaryTags(newTagNames: string[]) {
-    const createdTags = newTagNames.filter(el => !this.project.tags.find(value => el === value.name)).map(el => new Tag(el));
-    const newTags = [...this.project.tags.filter(el => newTagNames.includes(el.name)), ...createdTags];
+    const createdTags = newTagNames.filter(el => !this.project.tags.find(value => el === value.title)).map(el => new Tag(el));
+    const newTags = [...this.project.tags.filter(el => newTagNames.includes(el.title)), ...createdTags];
     const oldTags = this.secondaryTags;
-    const diff = arrayDiff(oldTags, newTags, (a, b) => a.name === b.name);
+    const diff = arrayDiff(oldTags, newTags, (a, b) => a.title === b.title);
 
     this.project.tags = [...newTags, ...this.primaryTags];
 
     //Little patch with filter method to avoid repetitions in diff.added and removed
-    for (const addedTag of diff.added.filter(el => !diff.removed.find(val => val.name === el.name)))
+    for (const addedTag of diff.added.filter(el => !diff.removed.find(val => val.title === el.title)))
       this.socket.socket.emit(Flags.CREATE_TAG, addedTag);
-    for (const removedTag of diff.removed.filter(el => !diff.added.find(val => val.name == el.name)))
-      this.socket.socket.emit(Flags.REMOVE_TAG, removedTag.name);
+    for (const removedTag of diff.removed.filter(el => !diff.added.find(val => val.title == el.title)))
+      this.socket.socket.emit(Flags.REMOVE_TAG, removedTag.title);
   }
 
   public onSecondaryTagClick(tagName: string) {
-    const tag = this.secondaryTags.find(el => el.name === tagName);
+    const tag = this.secondaryTags.find(el => el.title === tagName);
     if (tag)
       this.dialog.open(AddTagComponent, { data: tag });
   }
@@ -62,25 +62,25 @@ export class TagsManagerComponent implements ITabElement {
     return this.project.tags.filter(el => !el.primary);
   }
   get secondaryTagNames(): string[] {
-    return this.secondaryTags.map(el => el.name);
+    return this.secondaryTags.map(el => el.title);
   }
   get secondaryTagColors(): Map<string, string> {
     const map = new Map<string, string>();
     for (const tag of this.secondaryTags)
-      map.set(tag.name, tag.color);
+      map.set(tag.title, tag.color);
     return map;
   }
 
   get docTags(): Tag[] {
     return Array.from(new Set(this.project.docs
-      .reduce<string[]>((prev, curr) => [...prev, ...curr.tags.map(el => el.name)], [])
-      .map(el => this.project.tags.find(val => val.name === el))
+      .reduce<string[]>((prev, curr) => [...prev, ...curr.tags.map(el => el.title)], [])
+      .map(el => this.project.tags.find(val => val.title === el))
       .filter(el => el != null && !el.primary)));
   }
   get blueprintTags(): Tag[] {
     return Array.from(new Set(this.project.blueprints
-      .reduce<string[]>((prev, curr) => [...prev, ...curr.tags.map(el => el.name)], [])
-      .map(el => this.project.tags.find(val => val.name === el))
+      .reduce<string[]>((prev, curr) => [...prev, ...curr.tags.map(el => el.title)], [])
+      .map(el => this.project.tags.find(val => val.title === el))
       .filter(el => el != null && !el.primary)));
   }
 }

@@ -8,7 +8,7 @@ import { ProjectService } from '../../../../../services/project.service';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { DataType, ElementModel } from 'src/app/models/default.model';
 import { ProgressService } from 'src/app/services/progress.service';
-import { DocumentModel } from 'src/app/models/sockets/document-sock.model';
+import { DocumentSock } from 'src/app/models/sockets/document-sock.model';
 
 @Component({
   selector: 'app-search-options',
@@ -47,7 +47,7 @@ export class SearchOptionsComponent implements OnInit {
     this.needle = query;
     this.results = this.selectedPrimaryTags.length > 0 || this.selectedSecondaryTags.length > 0 ?
       await this.project.searchFromTags([...this.selectedPrimaryTags, ...this.selectedSecondaryTags], this.needle)
-      : [...this.project.blueprints, ...this.project.docs].filter(el => ((el as Blueprint).name || (el as DocumentModel).title)?.toLowerCase()?.includes(this.needle?.toLowerCase() || ""));
+      : [...this.project.blueprints, ...this.project.docs].filter(el => el.title?.toLowerCase()?.includes(this.needle?.toLowerCase() || ""));
     this.progress.hide();
   }
 

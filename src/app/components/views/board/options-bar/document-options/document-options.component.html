@@ -6,7 +6,7 @@
   </mat-form-field>
   <div class="doc-tags">
     <mat-chip-list aria-label="doc tags" *ngIf="docTags && docTags.length > 0">
-      <mat-chip (click)="onTagClick(tag)" *ngFor="let tag of docTags" [style]="'border: 2px solid #616161; border-color: #' + tag.color">#{{ tag.name }}</mat-chip>
+      <mat-chip (click)="onTagClick(tag)" *ngFor="let tag of docTags" [style]="'border: 2px solid #616161; border-color: #' + tag.color">#{{ tag.title }}</mat-chip>
       <mat-chip (click)="openTagEdit()"><mat-icon color="accent">edit</mat-icon></mat-chip>
     </mat-chip-list>
     <div class="btns">

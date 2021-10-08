@@ -3,7 +3,7 @@ import { Document, SearchResults } from '../models/api/project.model';
 import { Tag } from '../models/sockets/tag-sock.model';
 import { sortByRelevance } from '../utils/helpers';
 import { ElementModel } from '../models/default.model';
-import { DocumentModel } from '../models/sockets/document-sock.model';
+import { DocumentSock } from '../models/sockets/document-sock.model';
 
 /// <reference lib="webworker" />
 addEventListener('message', (e: MessageEvent<[string, any] | string>) => {
@@ -21,11 +21,8 @@ addEventListener('message', (e: MessageEvent<[string, any] | string>) => {
 function searchFromTags(tags: Tag[], needle: string | undefined, els: ElementModel[]) {
   return tags.length > 0 ? els.filter(el =>
     tags.reduce((prev, curr) => prev && !!el.tags.find(tag => tag.id === curr.id), true)
-    && (
-      (el as Blueprint).name?.toLowerCase()?.includes(needle?.toLowerCase() || '')
-      || (el as DocumentModel).title?.toLowerCase()?.includes(needle?.toLowerCase() || '')
-    )
-  ).sort((a, b) => sortByRelevance(a, b, needle || '', el => (el as Blueprint).name || (el as DocumentModel).title)) : els;
+    && (el.title?.toLowerCase()?.includes(needle?.toLowerCase() || ''))
+  ).sort((a, b) => sortByRelevance(a, b, needle || '', el => el.title)) : els;
 }
 
 /**

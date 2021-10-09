@@ -12,7 +12,7 @@ export class User {
 
 export class Project extends DataModel<Project> {
   public id: number;
-  public title: string;
+  public name: string;
   public users: User[];
   public createdBy: User;
   public documents: Document[];

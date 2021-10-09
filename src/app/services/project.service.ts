@@ -37,10 +37,10 @@ export class ProjectService {
   }
 
   public get name(): string {
-    return this.data.title;
+    return this.data.name;
   }
   public set name(name: string) {
-    this.data.title = name;
+    this.data.name = name;
   }
 
   public get projectUsers(): User[] {
@@ -365,10 +365,6 @@ export class ProjectService {
 
   public get tags(): Tag[] {
     return this.data.tags;
-  }
-  public set tags(tags: Tag[]) {
-    this.data.tags = tags;
-    this.saveData();
   }
   public get owner(): User {
     return this.data.createdBy;

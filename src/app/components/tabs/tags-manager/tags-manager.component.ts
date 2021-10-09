@@ -36,7 +36,7 @@ export class TagsManagerComponent implements ITabElement {
   public updateSecondaryTags(newTagNames: string[]) {
     const createdTags = newTagNames.filter(el => !this.project.tags.find(value => el === value.title)).map(el => new Tag(el));
     const newTags = [...this.project.tags.filter(el => newTagNames.includes(el.title)), ...createdTags];
-    const oldTags = this.secondaryTags;
+    const oldTags = this.tags;
     const diff = arrayDiff(oldTags, newTags, (a, b) => a.title === b.title);
 
     // this.project.tags = [...newTags, ...this.primaryTags];
@@ -49,24 +49,20 @@ export class TagsManagerComponent implements ITabElement {
   }
 
   public onSecondaryTagClick(tagName: string) {
-    const tag = this.secondaryTags.find(el => el.title === tagName);
+    const tag = this.tags.find(el => el.title === tagName);
     if (tag)
       this.dialog.open(AddTagComponent, { data: tag });
   }
 
-  get primaryTags(): Tag[] {
-    return this.project.tags.filter(el => el.primary);
+  get tags(): Tag[] {
+    return this.project.tags;
   }
-
-  get secondaryTags(): Tag[] {
-    return this.project.tags.filter(el => !el.primary);
+  get tagNames(): string[] {
+    return this.tags.map(el => el.title);
   }
-  get secondaryTagNames(): string[] {
-    return this.secondaryTags.map(el => el.title);
-  }
-  get secondaryTagColors(): Map<string, string> {
+  get tagColors(): Map<string, string> {
     const map = new Map<string, string>();
-    for (const tag of this.secondaryTags)
+    for (const tag of this.tags)
       map.set(tag.title, tag.color);
     return map;
   }
@@ -75,12 +71,12 @@ export class TagsManagerComponent implements ITabElement {
     return Array.from(new Set(this.project.docs
       .reduce<string[]>((prev, curr) => [...prev, ...curr.tags.map(el => el.title)], [])
       .map(el => this.project.tags.find(val => val.title === el))
-      .filter(el => el != null && !el.primary)));
+      .filter(el => el != null)));
   }
   get blueprintTags(): Tag[] {
     return Array.from(new Set(this.project.blueprints
       .reduce<string[]>((prev, curr) => [...prev, ...curr.tags.map(el => el.title)], [])
       .map(el => this.project.tags.find(val => val.title === el))
-      .filter(el => el != null && !el.primary)));
+      .filter(el => el != null)));
   }
 }

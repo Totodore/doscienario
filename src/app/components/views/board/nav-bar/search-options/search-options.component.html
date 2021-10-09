@@ -1,6 +1,5 @@
 <div class="wrapper">
-	<app-search-tag-sort [tags]="primaryTags" [(selectedTags)]="selectedPrimaryTags" (selectedTagsChange)="filterSecondaryTags() && search(needle)"></app-search-tag-sort>
-	<app-search-tag-sort [tags]="allowedSecondaryTags" [(selectedTags)]="selectedSecondaryTags" (selectedTagsChange)="search(needle)"></app-search-tag-sort>
+	<app-search-tag-sort [tags]="tags" [(selectedTags)]="selectedTags" (selectedTagsChange)="filterSecondaryTags() && search(needle)"></app-search-tag-sort>
 	<app-search-bar [(needle)]="needle" (needleChange)="search(needle)"></app-search-bar>
 	<app-search-results [results]="results"></app-search-results>
 </div>

@@ -1,20 +1,20 @@
 <div class="wrapper" *ngIf="show">
   <h1>Gérer les tags</h1>
-  <section>
+  <!-- <section>
     <h3>Tags primaires :</h3>
     <mat-chip-list aria-label="doc tags" *ngIf="primaryTags && primaryTags.length > 0">
       <mat-chip (click)="updateTag(tag)" *ngFor="let tag of primaryTags" [style]="'border-color: #' + tag.color" class="tag">#{{ tag.title }}</mat-chip>
       <mat-chip (click)="addPrimaryTag()"><mat-icon color="accent">add</mat-icon></mat-chip>
     </mat-chip-list>
     <button mat-stroked-button (click)="addPrimaryTag()" *ngIf="!primaryTags || primaryTags.length == 0">Créer des tags primaires</button>
-  </section>
+  </section> -->
   <section>
     <app-select-chip
       [prefix]="'#'"
-      [addedEls]="secondaryTagNames"
+      [addedEls]="tagNames"
       [label]="'Tags secondaires :'"
-      [data]="secondaryTagNames"
-      [colors]="secondaryTagColors"
+      [data]="tagNames"
+      [colors]="tagColors"
       [canAddData]="true"
       (els)="updateSecondaryTags($event)"
       [placeholder]="'Nouveau tag'"

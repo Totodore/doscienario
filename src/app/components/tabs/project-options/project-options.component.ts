@@ -4,7 +4,7 @@ import { ConfirmComponent } from './../../utils/confirm/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SnackbarService } from './../../../services/snackbar.service';
 import { ApiService } from 'src/app/services/api.service';
-import { SocketService } from './../../../services/socket.service';
+import { SocketService } from '../../../services/sockets/socket.service';
 import { ProjectService } from '../../../services/project.service';
 import { ITabElement } from '../../../models/tab-element.model';
 import { ChangeDetectionStrategy, Component, OnInit, Provider, Type, ViewEncapsulation } from '@angular/core';

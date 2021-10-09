@@ -6,7 +6,7 @@ import { ProjectService } from 'src/app/services/project.service';
 import { ProgressService } from './../../../services/progress.service';
 import { ApiService } from './../../../services/api.service';
 import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
-import { SocketService } from './../../../services/socket.service';
+import { SocketService } from '../../../services/sockets/socket.service';
 import { Component, HostListener, OnInit } from '@angular/core';
 import { DocumentComponent } from '../../tabs/document/document.component';
 import { B, M, N, W } from '@angular/cdk/keycodes';

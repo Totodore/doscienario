@@ -1,7 +1,7 @@
 import { ConfirmComponent } from './../../../utils/confirm/confirm.component';
 import { UpdateTagNameReq } from './../../../../models/sockets/tag-sock.model';
 import { Flags } from './../../../../models/sockets/flags.enum';
-import { SocketService } from './../../../../services/socket.service';
+import { SocketService } from '../../../../services/sockets/socket.service';
 import { SnackbarService } from './../../../../services/snackbar.service';
 import { ProjectService } from './../../../../services/project.service';
 import { Component, Inject, Input, OnInit } from '@angular/core';

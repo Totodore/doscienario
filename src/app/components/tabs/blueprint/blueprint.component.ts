@@ -2,7 +2,7 @@ import { Vector, Vector3 } from './../../../../types/global.d';
 import { ConfirmComponent } from './../../utils/confirm/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ProgressService } from './../../../services/progress.service';
-import { SocketService } from './../../../services/socket.service';
+import { SocketService } from '../../../services/sockets/socket.service';
 import { Blueprint, Node, RemoveNodeOut, Relationship, CreateNodeRes, PlaceNodeOut, CreateRelationReq } from './../../../models/sockets/blueprint-sock.model';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { ProjectService } from './../../../services/project.service';

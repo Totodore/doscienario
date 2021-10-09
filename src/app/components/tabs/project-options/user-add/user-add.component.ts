@@ -1,4 +1,4 @@
-import { SocketService } from './../../../../services/socket.service';
+import { SocketService } from '../../../../services/sockets/socket.service';
 import { Component, OnInit } from '@angular/core';
 import { User } from 'src/app/models/api/project.model';
 import { ApiService } from 'src/app/services/api.service';

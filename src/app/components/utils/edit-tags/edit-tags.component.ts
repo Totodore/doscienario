@@ -1,7 +1,7 @@
 import { Blueprint } from './../../../models/sockets/blueprint-sock.model';
 import { TabTypes } from './../../../models/tab-element.model';
 import { Tag } from './../../../models/sockets/tag-sock.model';
-import { SocketService } from './../../../services/socket.service';
+import { SocketService } from '../../../services/sockets/socket.service';
 import { ProjectService } from './../../../services/project.service';
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';

@@ -1,4 +1,4 @@
-import { SocketService } from './../../../services/socket.service';
+import { SocketService } from '../../../services/sockets/socket.service';
 import { Tag } from 'src/app/models/sockets/tag-sock.model';
 import { AddTagComponent } from './add-tag/add-tag.component';
 import { MatDialog } from '@angular/material/dialog';

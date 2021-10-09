@@ -3,7 +3,7 @@ import { ProgressService } from './../../../../services/progress.service';
 import { NodeEditorComponent } from './node-editor/node-editor.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Flags } from 'src/app/models/sockets/flags.enum';
-import { SocketService } from './../../../../services/socket.service';
+import { SocketService } from '../../../../services/sockets/socket.service';
 import { Vector } from './../../../../../types/global.d';
 import { TabService } from './../../../../services/tab.service';
 import { Node, EditSumarryOut } from './../../../../models/sockets/blueprint-sock.model';

@@ -4,7 +4,7 @@ import { TabService } from './../../../services/tab.service';
 import { Change, DocumentSock } from './../../../models/sockets/document-sock.model';
 import { ProgressService } from 'src/app/services/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
-import { SocketService } from './../../../services/socket.service';
+import { SocketService } from '../../../services/sockets/socket.service';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { Component, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import * as CKEditor from "../../../../lib/ckeditor.js";

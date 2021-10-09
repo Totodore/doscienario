@@ -14,7 +14,6 @@ import { ITabElement, TabTypes } from '../models/tab-element.model';
 export class TabService {
 
   private _tabs: [Type<ITabElement>, ITabElement][] = [];
-  private factoryResolver: ComponentFactoryResolver;
   private rootViewContainer: ViewContainerRef;
   private projectId: number;
 
@@ -26,9 +25,10 @@ export class TabService {
     WelcomeTabComponent
   ];
 
-  constructor(@Inject(ComponentFactoryResolver) factoryResolver: ComponentFactoryResolver) {
-    this.factoryResolver = factoryResolver
-  }
+  constructor(
+    @Inject(ComponentFactoryResolver)
+    private readonly factoryResolver: ComponentFactoryResolver
+  ) { }
 
   public setRootViewContainerRef(viewContainerRef: ViewContainerRef) {
     this.rootViewContainer = viewContainerRef

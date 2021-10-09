@@ -12,6 +12,7 @@ import { Injectable } from '@angular/core';
 import { User } from '../../models/api/project.model';
 import { DocsSocketService } from './docs-socket.service';
 import { TreeSocketService } from './tree-socket.service';
+import { SnackbarService } from '../snackbar.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -20,6 +21,7 @@ export class SocketService {
   public socket: typeof Socket;
   constructor(
     private readonly api: ApiService,
+    private readonly snackbar: SnackbarService,
     private readonly project: ProjectService,
     private readonly docsSocket: DocsSocketService,
     private readonly treeSocket: TreeSocketService,
@@ -40,6 +42,12 @@ export class SocketService {
   @EventHandler("connect")
   onConnect() {
     console.info("Socket successfully connected");
+  }
+
+  @EventHandler("exception")
+  onException(error: WsException) {
+    console.error('Ws Exception:', error);
+    this.snackbar.snack("Erreur avec le serveur!", 1000);
   }
 
   @EventHandler(Flags.RENAME_PROJECT)
@@ -70,3 +78,5 @@ export class SocketService {
     this.project.removeProjectUser(user);
   }
 }
+
+type WsException = { status: string, message: string };

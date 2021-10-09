@@ -70,8 +70,8 @@ export class ProjectService {
   public updateProjectTag(tag: Tag, newTag?: Tag) {
     const index = this.tags.findIndex(el => el.title === tag.title);
     this.data.tags[index] = newTag ?? tag;
-    this.updateSearch();
     this.saveData();
+    this.updateSearch();
   }
 
   public addSendDoc(packet: DocumentRes) {

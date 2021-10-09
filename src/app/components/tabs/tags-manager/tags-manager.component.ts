@@ -39,7 +39,7 @@ export class TagsManagerComponent implements ITabElement {
     const oldTags = this.secondaryTags;
     const diff = arrayDiff(oldTags, newTags, (a, b) => a.title === b.title);
 
-    this.project.tags = [...newTags, ...this.primaryTags];
+    // this.project.tags = [...newTags, ...this.primaryTags];
 
     //Little patch with filter method to avoid repetitions in diff.added and removed
     for (const addedTag of diff.added.filter(el => !diff.removed.find(val => val.title === el.title)))

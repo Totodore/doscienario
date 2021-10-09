@@ -1,9 +1,7 @@
 import { Document } from "../api/project.model";
-import { DataType, Element, IElement } from "../default.model";
 import { Tag } from "./tag-sock.model";
 
 export class DocumentSock extends Document {
-  public id: number;
   public elIndex?: number;
   public changes: Map<number, Change[]>;
   public lastChangeId: number;

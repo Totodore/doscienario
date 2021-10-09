@@ -24,6 +24,7 @@ export enum DataType {
 
 export abstract class Element<T = any> extends DataModel<T> {
   public id: number;
+  public uid: string;
   public title: string;
   public tags: Tag[];
   public project: Project;

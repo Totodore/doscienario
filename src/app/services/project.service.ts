@@ -37,10 +37,10 @@ export class ProjectService {
   }
 
   public get name(): string {
-    return this.data.name;
+    return this.data.title;
   }
   public set name(name: string) {
-    this.data.name = name;
+    this.data.title = name;
   }
 
   public get projectUsers(): User[] {

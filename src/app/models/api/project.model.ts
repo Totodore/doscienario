@@ -12,7 +12,7 @@ export class User {
 
 export class Project extends DataModel<Project> {
   public id: number;
-  public name: string;
+  public title: string;
   public users: User[];
   public createdBy: User;
   public documents: Document[];
@@ -24,24 +24,18 @@ export class Project extends DataModel<Project> {
 export class Document extends Element implements IElement {
 
   public id: number;
-  public images?: GetProjectDocumentImageRes[];
+  public images?: Image[];
   public content: string;
   public readonly type = DataType.Document;
 }
 
-export interface GetProjectDocumentImageRes {
+export interface Image {
   id: string;
-
   size: number;
-
   height: number;
-
   width: number;
-
   uploadedDate: Date;
-
   documentPos: number;
-
   documentId: number;
 }
 

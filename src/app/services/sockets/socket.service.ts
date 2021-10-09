@@ -7,9 +7,11 @@ import { Flags } from '../../models/sockets/flags.enum';
 import { ApiService } from '../api.service';
 import { environment } from '../../../environments/environment';
 import { Socket, connect } from 'socket.io-client';
-import { EventHandler, registerHandler } from '../../decorators/subscribe-event.decorator';
+import { EventHandler, registerHandlers } from '../../decorators/subscribe-event.decorator';
 import { Injectable } from '@angular/core';
 import { User } from '../../models/api/project.model';
+import { DocsSocketService } from './docs-socket.service';
+import { TreeSocketService } from './tree-socket.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -19,7 +21,8 @@ export class SocketService {
   constructor(
     private readonly api: ApiService,
     private readonly project: ProjectService,
-    private readonly tabs: TabService
+    private readonly docsSocket: DocsSocketService,
+    private readonly treeSocket: TreeSocketService,
   ) {}
 
   connect() {
@@ -30,8 +33,8 @@ export class SocketService {
         "authorization": this.api.jwt
       }
     });
+    registerHandlers([this, this.docsSocket, this.treeSocket], this.socket);
     this.api.socket = this.socket;
-    registerHandler(this, this.socket);
   }
 
   @EventHandler("connect")
@@ -65,180 +68,5 @@ export class SocketService {
   @EventHandler(Flags.REMOVE_USER_PROJECT)
   onRemoveUserProject(user: User) {
     this.project.removeProjectUser(user);
-  }
-
-  @EventHandler(Flags.OPEN_DOC)
-  onOpenDocument(packet: OpenDocumentRes) {
-    this.project.addOpenDoc(packet);
-  }
-
-  @EventHandler(Flags.SEND_DOC)
-  onSendDocument(packet: DocumentRes) {
-    this.project.addSendDoc(packet);
-    this.tabs.updateDocTab(packet.reqId, packet.doc.id);
-  }
-
-  @EventHandler(Flags.CLOSE_DOC)
-  onCloseDocument(docId: number) {
-    this.project.removeOpenDoc(docId);
-  }
-
-  updateDocument(docId: number, tabId: string, changes: Change[], lastChangeId: number, clientUpdateId: number) {
-    const doc = this.project.openDocs[tabId];
-    console.log("Updating doc", docId, "tab", tabId);
-    doc.changes.set(clientUpdateId, changes);
-    this.socket.emit(Flags.WRITE_DOC, new WriteDocumentReq(changes, docId, lastChangeId, clientUpdateId, this.api.user.id));
-  }
-
-  @EventHandler(Flags.WRITE_DOC)
-  onUpdateDocument(doc: WriteDocumentRes) {
-    this.project.getDoc(doc.docId).lastChangeId = doc.updateId;
-    if (doc.userId != this.api.user.id)
-      this.project.updateDoc(doc);
-  }
-
-  @EventHandler(Flags.RENAME_DOC)
-  titleDocument(doc: RenameDocumentRes) {
-    this.project.renameDocFromSocket(doc.title, doc.docId);
-  }
-
-  @EventHandler(Flags.REMOVE_DOC)
-  onRemoveDoc(docId: number) {
-    this.tabs.removeDocTab(docId);
-    this.project.removeDoc(docId);
-  }
-
-  @EventHandler(Flags.CREATE_TAG)
-  onCreateTag(tag: Tag) {
-    const projectTag = this.project.tags.find(el => el.title == tag.title);
-    if (projectTag && projectTag.id == null)
-      this.project.updateProjectTag(tag);
-    else this.project.addProjectTag(tag);
-  }
-
-  @EventHandler(Flags.TAG_ADD_DOC)
-  onAddTagDoc(packet: AddTagDocumentRes) {
-    const projectTag = this.project.tags.find(el => el.title == packet.tag.title);
-    if (projectTag && projectTag.id == null)
-      this.project.updateProjectTag(packet.tag);
-    else if (!projectTag)
-      this.project.addProjectTag(packet.tag);
-    const doc = this.project.getDoc(packet.docId);
-    const tag = doc.tags.find(el => el.title == packet.tag.title);
-    if (tag)
-      doc.tags[doc.tags.indexOf(tag)] = packet.tag;
-    else
-      doc.tags.push(packet.tag);
-  }
-
-  @EventHandler(Flags.TAG_REMOVE_DOC)
-  onRemoveTagDoc(packet: EditTagDocumentReq) {
-    const tags = this.project.getDoc(packet.docId).tags;
-    tags.splice(tags.findIndex(el => el.title == packet.title.toLowerCase()), 1);
-  }
-
-  @EventHandler(Flags.COLOR_TAG)
-  onColorTag(packet: UpdateTagColorReq) {
-    const newTag = this.project.tags.find(el => el.title === packet.title);
-    newTag.color = packet.color;
-    this.project.updateProjectTag(new Tag(packet.title), newTag);
-  }
-
-  @EventHandler(Flags.RENAME_TAG)
-  titleTag(packet: UpdateTagNameReq) {
-    const newTag = this.project.tags.find(el => el.title === packet.title);
-    newTag.title = packet.title;
-    this.project.updateProjectTag(new Tag(packet.title), newTag);
-  }
-
-  @EventHandler(Flags.REMOVE_TAG)
-  onRemoveTag(title: string) {
-    this.project.removeProjectTag(title);
-  }
-
-  @EventHandler(Flags.SEND_BLUEPRINT)
-  onSendBlueprint(packet: SendBlueprintReq) {
-    this.project.addSendBlueprint(packet);
-    this.tabs.updateBlueprintTab(packet.reqId, packet.blueprint.id);
-  }
-
-  @EventHandler(Flags.OPEN_BLUEPRINT)
-  onOpenBlueprint(packet: OpenBlueprintReq) {
-    this.project.addOpenBlueprint(packet)
-  }
-
-  @EventHandler(Flags.CLOSE_BLUEPRINT)
-  onCloseBlueprint(packet: CloseBlueprintReq) {
-    this.project.removeOpenBlueprint(packet.id);
-  }
-
-  @EventHandler(Flags.REMOVE_BLUEPRINT)
-  onRemoveBlueprint(id: number) {
-    this.tabs.removeBlueprintTab(id);
-    this.project.removeBlueprint(id);
-  }
-  @EventHandler(Flags.TAG_ADD_BLUEPRINT)
-  onAddTagBlueprint(packet: AddTagDocumentRes) {
-    const projectTag = this.project.tags.find(el => el.title == packet.tag.title);
-    if (projectTag && projectTag.id == null)
-      this.project.updateProjectTag(packet.tag);
-    else if (!projectTag)
-      this.project.addProjectTag(packet.tag);
-    const doc = this.project.getBlueprint(packet.docId);
-    const tag = doc.tags.find(el => el.title == packet.tag.title);
-    if (tag)
-      doc.tags[doc.tags.indexOf(tag)] = packet.tag;
-    else
-      doc.tags.push(packet.tag);
-  }
-
-  @EventHandler(Flags.TAG_ADD_BLUEPRINT)
-  onRemoveTagBlueprint(packet: EditTagDocumentReq) {
-    const tags = this.project.getBlueprint(packet.docId).tags;
-    tags.splice(tags.findIndex(el => el.title == packet.title.toLowerCase()), 1);
-  }
-  
-  @EventHandler(Flags.CREATE_NODE)
-  onCreateNode(packet: CreateNodeReq) {
-    this.project.addBlueprintNode(packet);
-  }
-  @EventHandler(Flags.PLACE_NODE)
-  onPlaceNode(packet: PlaceNodeIn) {
-    this.project.placeBlueprintNode(packet);
-  }
-  @EventHandler(Flags.PLACE_RELATIONSHIP)
-  onPlaceRel(packet: Relationship) {
-    this.project.placeBlueprintRel(packet);
-  }
-  @EventHandler(Flags.REMOVE_NODE)
-  onRemoveNode(packet: RemoveNodeIn) {
-    this.project.removeBlueprintNode(packet);
-  }
-  @EventHandler(Flags.CREATE_RELATION)
-  onCreateRelation(packet: CreateRelationReq) {
-    this.project.addBlueprintRelation(packet);
-  }
-
-  @EventHandler(Flags.REMOVE_RELATION)
-  onRemoveRelation(packet: RemoveRelationReq) {
-    this.project.removeBlueprintRelation(packet);
-  }
-
-  @EventHandler(Flags.SUMARRY_NODE)
-  onSumarryNode(packet: EditSumarryIn) {
-    this.project.setSumarryNode(packet);
-  }
-
-  
-  @EventHandler(Flags.CONTENT_NODE)
-  onUpdateNode(packet: WriteNodeContentIn) {
-    if (packet.userId != this.api.user.id)
-      this.project.updateNode(packet);
-  }
-
-  updateNode(nodeId: number, tabId: string, changes: Change[], blueprintId: number) {
-    const doc = this.project.openBlueprints[tabId].nodes.find(el => el.id === nodeId);
-    console.log("Updating blueprint node", nodeId, "tab", tabId);
-    this.socket.emit(Flags.CONTENT_NODE, new WriteNodeContentOut(changes, nodeId, this.api.user.id, blueprintId));
   }
 }

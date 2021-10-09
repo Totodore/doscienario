@@ -3,7 +3,6 @@ import { ProgressService } from './../../../../services/progress.service';
 import { NodeEditorComponent } from './node-editor/node-editor.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Flags } from 'src/app/models/sockets/flags.enum';
-import { SocketService } from '../../../../services/sockets/socket.service';
 import { Vector } from './../../../../../types/global.d';
 import { TabService } from './../../../../services/tab.service';
 import { Node, EditSumarryOut } from './../../../../models/sockets/blueprint-sock.model';
@@ -13,6 +12,7 @@ import { ProjectService } from 'src/app/services/project.service';
 import { EditorWorkerService } from 'src/app/services/document-worker.service';
 import { Change } from 'src/app/models/sockets/document-sock.model';
 import { v4 } from 'uuid';
+import { TreeSocketService } from 'src/app/services/sockets/tree-socket.service';
 @Component({
   selector: 'app-node',
   templateUrl: './node.component.html',
@@ -79,7 +79,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
   constructor(
     private readonly project: ProjectService,
     private readonly tabs: TabService,
-    private readonly socket: SocketService,
+    private readonly socket: TreeSocketService,
     private readonly dialog: MatDialog,
     private readonly progress: ProgressService,
     private readonly editorWorker: EditorWorkerService,

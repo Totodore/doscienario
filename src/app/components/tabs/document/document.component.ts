@@ -4,13 +4,13 @@ import { TabService } from './../../../services/tab.service';
 import { Change, DocumentSock } from './../../../models/sockets/document-sock.model';
 import { ProgressService } from 'src/app/services/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
-import { SocketService } from '../../../services/sockets/socket.service';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { Component, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import * as CKEditor from "../../../../lib/ckeditor.js";
 import { CKEditor5, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { ElementComponent } from '../element.component';
+import { DocsSocketService } from 'src/app/services/sockets/docs-socket.service';
 @Component({
   selector: 'app-document',
   templateUrl: './document.component.html',
@@ -62,12 +62,12 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   private hasEdited: boolean = false;
 
   constructor(
-    private readonly socket: SocketService,
+    private readonly socket: DocsSocketService,
     private readonly project: ProjectService,
-    progress: ProgressService,
     private readonly tabs: TabService,
     private readonly docWorker: EditorWorkerService,
-    private readonly api: ApiService
+    private readonly api: ApiService,
+    progress: ProgressService,
   ) {
     super(progress);
   }

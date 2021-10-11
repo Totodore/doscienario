@@ -5,10 +5,7 @@
     <input type="text" #input matInput [(ngModel)]="doc.title" (ngModelChange)="onRename()">
   </mat-form-field>
   <div class="doc-tags">
-    <mat-chip-list aria-label="doc tags" *ngIf="docTags && docTags.length > 0">
-      <mat-chip (click)="onTagClick(tag)" (contextmenu)="onTagRightClick($event, tag)" *ngFor="let tag of docTags" [style]="'border: 2px solid #616161; border-color: #' + tag.color">#{{ tag.title }}</mat-chip>
-      <mat-chip (click)="openTagEdit()"><mat-icon color="accent">edit</mat-icon></mat-chip>
-    </mat-chip-list>
+		<app-element-tags [tabId]="tabId" [tabType]="0"></app-element-tags>
     <div class="btns">
       <button mat-stroked-button class="add-tags" *ngIf="!docTags?.length" (click)="openTagEdit()" color="accent">Ajouter des tags</button>
       <button mat-stroked-button class="remove-doc" [style]="docTags?.length ? 'margin-top: 10px' : ''" (click)="deleteDoc()" color="accent">Supprimer le doc</button>

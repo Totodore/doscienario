@@ -30,14 +30,6 @@ export class DocumentOptionsComponent {
     this.project.renameDoc(this.tabId, this.doc.title);
     this.socket.socket.emit(Flags.RENAME_DOC, new RenameDocumentReq(this.docId, this.doc.title));
   }
-  openTagEdit() {
-    this.dialog.open(EditTagsComponent, {
-      data: [this.tabId, TabTypes.DOCUMENT],
-      width: "600px",
-      maxWidth: "90%",
-      maxHeight: "90%"
-    });
-  }
 
   deleteDoc() {
     const dialog = this.dialog.open(ConfirmComponent, {
@@ -51,12 +43,13 @@ export class DocumentOptionsComponent {
     });
   }
 
-  public onTagClick(tag: Tag) {
-    this.project.toggleTag?.(tag);
-  }
-  public onTagRightClick(e: Event, tag: Tag) {
-    e.preventDefault();
-    this.dialog.open(EditMainTagComponent, { data: tag });
+  public openTagEdit() {
+    this.dialog.open(EditTagsComponent, {
+      data: [this.tabId, TabTypes.DOCUMENT],
+      width: "600px",
+      maxWidth: "90%",
+      maxHeight: "90%"
+    });
   }
 
   get doc(): DocumentSock {

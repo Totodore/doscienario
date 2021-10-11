@@ -44,14 +44,6 @@ export class BlueprintOptionsComponent {
     this.component.onWheel(ratio / 100);
   }
 
-  public onTagClick(tag: Tag) {
-    this.project.toggleTag?.(tag);
-  }
-  public onTagRightClick(e: Event, tag: Tag) {
-    e.preventDefault();
-    this.dialog.open(EditMainTagComponent, { data: tag });
-  }
-
   openTagEdit() {
     this.dialog.open(EditTagsComponent, {
       data: [this.tabId, TabTypes.BLUEPRINT],

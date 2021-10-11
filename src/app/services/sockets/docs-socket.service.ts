@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Socket } from 'socket.io-client';
 import { EventHandler } from 'src/app/decorators/subscribe-event.decorator';
 import { AddTagDocumentRes, Change, DocumentRes, EditTagDocumentReq, OpenDocumentRes, RenameDocumentRes, WriteDocumentReq, WriteDocumentRes } from 'src/app/models/sockets/document-sock.model';
+import { ColorElementRes } from 'src/app/models/sockets/element-sock.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { Tag } from 'src/app/models/sockets/tag-sock.model';
 import { ApiService } from '../api.service';
@@ -55,18 +56,15 @@ export class DocsSocketService {
     this.project.renameDocFromSocket(doc.title, doc.docId);
   }
 
+  @EventHandler(Flags.COLOR_DOC)
+  onColorDoc(packet: ColorElementRes) {
+    this.project.docs.find(el => el.id === packet.docId).color = packet.color;
+  }
+
   @EventHandler(Flags.REMOVE_DOC)
   onRemoveDoc(docId: number) {
     this.tabs.removeDocTab(docId);
     this.project.removeDoc(docId);
-  }
-
-  @EventHandler(Flags.CREATE_TAG)
-  onCreateTag(tag: Tag) {
-    const projectTag = this.project.tags.find(el => el.title == tag.title);
-    if (projectTag && projectTag.id == null)
-      this.project.updateProjectTag(tag);
-    else this.project.addProjectTag(tag);
   }
 
   @EventHandler(Flags.TAG_ADD_DOC)
@@ -89,6 +87,7 @@ export class DocsSocketService {
     const tags = this.project.getDoc(packet.docId).tags;
     tags.splice(tags.findIndex(el => el.title == packet.title.toLowerCase()), 1);
   }
+
 
   public get socket() { return this.api.socket; }
 }

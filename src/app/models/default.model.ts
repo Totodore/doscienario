@@ -29,6 +29,7 @@ export abstract class Element<T = any> extends DataModel<T> {
   public tags: Tag[];
   public project: Project;
   public projectId: number;
+  public color: string;
 }
 export interface IElement extends Element {
   type: DataType;

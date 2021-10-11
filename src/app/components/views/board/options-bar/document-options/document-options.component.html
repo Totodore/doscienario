@@ -1,9 +1,6 @@
 <div class="space"></div>
 <div class="wrapper" *ngIf="doc">
-  <mat-form-field color="accent">
-    <mat-label>Titre du document</mat-label>
-    <input type="text" #input matInput [(ngModel)]="doc.title" (ngModelChange)="onRename()">
-  </mat-form-field>
+  <app-rename-element [(title)]="doc.title" [(color)]="doc.color" (titleChange)="onRename($event)" (colorChange)="onColorChange($event)"></app-rename-element>
   <div class="doc-tags">
 		<app-element-tags [tabId]="tabId" [tabType]="0"></app-element-tags>
     <div class="btns">

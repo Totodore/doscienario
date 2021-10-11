@@ -173,6 +173,13 @@ export class ProjectService {
     this.updateSearch();
     this.saveData();
   }
+  public colorDoc(tabId: string, color: string) {
+    this.openDocs[tabId].color = color;
+    const docId = this.openDocs[tabId].id;
+    this.data.documents.find(el => el.id == docId).color = color;
+    this.updateSearch();
+    this.saveData();
+  }
   /**
    * Remove a doc from its tab id or docId
    * If it is tab id it means that the doc should be opened
@@ -243,6 +250,14 @@ export class ProjectService {
     this.data.blueprints.find(el => el.id == docId).title = title;
     this.saveData();
     this.updateSearch();
+  }
+
+  public colorBlueprint(tabId: string, color: string) {
+    this.openBlueprints[tabId].color = color;
+    const docId = this.openBlueprints[tabId].id;
+    this.data.blueprints.find(el => el.id == docId).color = color;
+    this.updateSearch();
+    this.saveData();
   }
   /**
    * Remove a blueprint from its tab id or docId

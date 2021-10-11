@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { EventHandler } from 'src/app/decorators/subscribe-event.decorator';
 import { CloseBlueprintReq, CreateNodeReq, CreateRelationReq, EditSumarryIn, OpenBlueprintReq, PlaceNodeIn, Relationship, RemoveNodeIn, RemoveRelationReq, SendBlueprintReq, WriteNodeContentIn, WriteNodeContentOut } from 'src/app/models/sockets/blueprint-sock.model';
 import { AddTagDocumentRes, Change, EditTagDocumentReq } from 'src/app/models/sockets/document-sock.model';
+import { ColorElementRes } from 'src/app/models/sockets/element-sock.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { ApiService } from '../api.service';
 import { ProjectService } from '../project.service';
@@ -33,6 +34,11 @@ export class TreeSocketService {
   @EventHandler(Flags.CLOSE_BLUEPRINT)
   onCloseBlueprint(packet: CloseBlueprintReq) {
     this.project.removeOpenBlueprint(packet.id);
+  }
+
+  @EventHandler(Flags.COLOR_BLUEPRINT)
+  onColorDoc(packet: ColorElementRes) {
+    this.project.blueprints.find(el => el.id === packet.docId).color = packet.color;
   }
 
   @EventHandler(Flags.REMOVE_BLUEPRINT)

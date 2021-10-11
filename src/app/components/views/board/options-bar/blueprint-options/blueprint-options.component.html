@@ -1,9 +1,6 @@
 <div class="space"></div>
 <div class="wrapper" *ngIf="blueprint">
-  <mat-form-field color="accent">
-    <mat-label>Titre du blueprint</mat-label>
-    <input type="text" #input matInput [(ngModel)]="blueprint.title" (ngModelChange)="onRename()">
-  </mat-form-field>
+  <app-rename-element [(color)]="blueprint.color" (colorChange)="onColorChange($event)" [(title)]="blueprint.title" (titleChange)="onRename($event)"></app-rename-element>
   <div class="blueprint-tags">
 		<app-element-tags [tabId]="tabId" [tabType]="1"></app-element-tags>
     <div class="btns">

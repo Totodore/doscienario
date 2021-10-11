@@ -14,6 +14,7 @@ import { EditTagsComponent } from 'src/app/components/modals/edit-tags/edit-tags
 import { DOWN_ARROW, UP_ARROW } from '@angular/cdk/keycodes';
 import { BlueprintComponent } from 'src/app/components/tabs/blueprint/blueprint.component';
 import { EditMainTagComponent } from 'src/app/components/modals/edit-main-tag/edit-main-tag.component';
+import { ColorElementReq } from 'src/app/models/sockets/element-sock.model';
 
 @Component({
   selector: 'app-blueprint-options',
@@ -29,10 +30,19 @@ export class BlueprintOptionsComponent {
     private readonly dialog: MatDialog,
   ) { }
 
-  onRename() {
+  public onRename(title: string) {
+    this.blueprint.title = title.length > 0 ? title : "Nouveau Blueprint";
     this.project.renameBlueprint(this.tabId, this.blueprint.title);
     this.socket.socket.emit(Flags.RENAME_BLUEPRINT, new RenameBlueprintOut(this.blueprintId, this.blueprint.title));
   }
+
+  public onColorChange(color: string) {
+    this.blueprint.color = color;
+    this.project.colorBlueprint(this.tabId, this.blueprint.color);
+    this.socket.socket.emit(Flags.COLOR_BLUEPRINT, new ColorElementReq(this.blueprintId, color));
+  }
+
+
   onZoom(e: KeyboardEvent, val: string) {
     let ratio: number;
     e.preventDefault();
@@ -77,6 +87,7 @@ export class BlueprintOptionsComponent {
   }
 
   get blueprint(): Blueprint {
+    console.log(this.project.openBlueprints[this.tabId]);
     return this.project.openBlueprints[this.tabId];
   }
   get blueprintId(): number {

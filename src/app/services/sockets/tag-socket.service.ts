@@ -11,8 +11,16 @@ export class TagSocketService {
 
   constructor(
     private readonly project: ProjectService,
-  ) {}
-  
+  ) { }
+
+  @EventHandler(Flags.CREATE_TAG)
+  onCreateTag(tag: Tag) {
+    const projectTag = this.project.tags.find(el => el.title == tag.title);
+    if (projectTag && projectTag.id == null)
+      this.project.updateProjectTag(tag);
+    else this.project.addProjectTag(tag);
+  }
+
   @EventHandler(Flags.COLOR_TAG)
   onColorTag(packet: UpdateTagColorReq) {
     const newTag = this.project.tags.find(el => el.title === packet.title);

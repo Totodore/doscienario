@@ -11,6 +11,7 @@ import { Flags } from 'src/app/models/sockets/flags.enum';
 import { RenameDocumentReq } from 'src/app/models/sockets/document-sock.model';
 import { EditTagsComponent } from 'src/app/components/modals/edit-tags/edit-tags.component';
 import { EditMainTagComponent } from 'src/app/components/modals/edit-main-tag/edit-main-tag.component';
+import { ColorElementReq } from 'src/app/models/sockets/element-sock.model';
 
 @Component({
   selector: 'app-document-options',
@@ -26,12 +27,19 @@ export class DocumentOptionsComponent {
     private readonly dialog: MatDialog
   ) { }
 
-  onRename() {
+  public onRename(title: string) {
+    this.doc.title = title.length > 0 ? title : "Nouveau document";
     this.project.renameDoc(this.tabId, this.doc.title);
     this.socket.socket.emit(Flags.RENAME_DOC, new RenameDocumentReq(this.docId, this.doc.title));
   }
 
-  deleteDoc() {
+  public onColorChange(color: string) {
+    this.doc.color = color;
+    this.project.colorDoc(this.tabId, this.doc.color);
+    this.socket.socket.emit(Flags.COLOR_DOC, new ColorElementReq(this.docId, color));
+  }
+
+  public deleteDoc() {
     const dialog = this.dialog.open(ConfirmComponent, {
       data: "Supprimer le doc ?"
     });

@@ -60,6 +60,7 @@ import { ResizableBarComponent } from './components/views/board/resizable-bar/re
 import { EditMainTagComponent } from './components/modals/edit-main-tag/edit-main-tag.component';
 import { CreateMainTagComponent } from './components/modals/create-main-tag/create-main-tag.component';
 import { ElementTagsComponent } from './components/views/board/options-bar/element-tags/element-tags.component';
+import { RenameElementComponent } from './components/views/board/options-bar/rename-element/rename-element.component';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -97,6 +98,7 @@ import { ElementTagsComponent } from './components/views/board/options-bar/eleme
     EditMainTagComponent,
     CreateMainTagComponent,
     ElementTagsComponent,
+    RenameElementComponent,
   ],
   imports: [
     ReactiveFormsModule,

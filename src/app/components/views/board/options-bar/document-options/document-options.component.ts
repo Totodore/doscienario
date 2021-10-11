@@ -9,7 +9,7 @@ import { TabService } from './../../../../../services/tab.service';
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { RenameDocumentReq } from 'src/app/models/sockets/document-sock.model';
-import { EditTagsComponent } from 'src/app/components/utils/edit-tags/edit-tags.component';
+import { EditTagsComponent } from 'src/app/components/modals/edit-tags/edit-tags.component';
 
 @Component({
   selector: 'app-document-options',

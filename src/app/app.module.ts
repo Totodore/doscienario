@@ -43,7 +43,7 @@ import { SelectChipComponent } from './components/utils/select-chip/select-chip.
 import { UserAddComponent } from './components/tabs/project-options/user-add/user-add.component';
 import { DocumentComponent } from './components/tabs/document/document.component';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
-import { EditTagsComponent } from './components/utils/edit-tags/edit-tags.component';
+import { EditTagsComponent } from './components/modals/edit-tags/edit-tags.component';
 import { TagsManagerComponent } from './components/tabs/tags-manager/tags-manager.component';
 import { MAT_COLOR_FORMATS, NgxMatColorPickerModule, NGX_MAT_COLOR_FORMATS } from '@angular-material-components/color-picker';
 import { ConfirmComponent } from './components/utils/confirm/confirm.component';
@@ -57,6 +57,7 @@ import { SearchTagSortComponent } from './components/views/board/nav-bar/search-
 import { SearchResultsComponent } from './components/views/board/nav-bar/search-options/search-results/search-results.component';
 import { OptionsBarComponent } from './components/views/board/options-bar/options-bar.component';
 import { ResizableBarComponent } from './components/views/board/resizable-bar/resizable-bar.component';
+import { EditMainTagComponent } from './components/modals/edit-main-tag/edit-main-tag.component';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -91,6 +92,7 @@ import { ResizableBarComponent } from './components/views/board/resizable-bar/re
     SearchResultsComponent,
     OptionsBarComponent,
     ResizableBarComponent,
+    EditMainTagComponent,
   ],
   imports: [
     ReactiveFormsModule,

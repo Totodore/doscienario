@@ -2,7 +2,7 @@ import { DataModel, DataType, Element } from '../default.model';
 export class Tag extends DataModel<Tag> {
 
   constructor(obj: Partial<Tag>);
-  constructor(name: string, color?: string, primary?: boolean);
+  constructor(name: string, color?: string);
 
   constructor(
     name: string | Partial<Tag>,

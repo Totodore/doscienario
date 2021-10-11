@@ -1,5 +1,7 @@
+import { MatDialog } from '@angular/material/dialog';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Tag } from 'src/app/models/sockets/tag-sock.model';
+import { EditMainTagComponent } from 'src/app/components/modals/edit-main-tag/edit-main-tag.component';
 
 @Component({
   selector: 'app-search-tag-sort',
@@ -7,6 +9,10 @@ import { Tag } from 'src/app/models/sockets/tag-sock.model';
   styleUrls: ['./search-tag-sort.component.scss']
 })
 export class SearchTagSortComponent {
+
+  constructor(
+    private readonly dialog: MatDialog
+  ) { }
 
   @Input()
   public tags!: Tag[];
@@ -25,5 +31,10 @@ export class SearchTagSortComponent {
       this.selectedTags.splice(index, 1);
     }
     this.selectedTagsChange.emit(this.selectedTags);
+  }
+
+  public onTagRightClick(e: Event, tag: Tag) {
+    e.preventDefault();
+    this.dialog.open(EditMainTagComponent, { data: tag });
   }
 }

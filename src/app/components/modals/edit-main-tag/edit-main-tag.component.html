@@ -1,0 +1,19 @@
+<h1 mat-dialog-title>Modifier le tag</h1>
+
+<div mat-dialog-content style="text-align: center;">
+	<mat-form-field color="accent" style="width: 100%;">
+		<mat-label>Modifier le tag</mat-label>
+		<input type="text" #input matInput [(ngModel)]="tag.title" (ngModelChange)="onTagChange($event)">
+	</mat-form-field> <br>
+	<mat-form-field color="accent" style="width: 100%;">
+		<mat-label>Couleur du tag</mat-label>
+		<input matInput [ngxMatColorPicker]="picker" [(ngModel)]="color" (ngModelChange)="onColorChange($event)">
+		<ngx-mat-color-toggle matSuffix [for]="picker"></ngx-mat-color-toggle>
+		<ngx-mat-color-picker #picker [touchUi]="false" [color]="color"></ngx-mat-color-picker>
+	</mat-form-field>
+	<button mat-stroked-button style="border: red solid 2px" (click)="removeTag()">Supprimer le tag</button>
+</div>
+
+<div mat-dialog-actions align="end">
+	<button mat-stroked-button color="accent" (click)="onConfirm()">Confirmer</button>
+</div>

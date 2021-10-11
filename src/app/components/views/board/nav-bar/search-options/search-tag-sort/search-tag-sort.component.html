@@ -1,7 +1,7 @@
 <ng-container *ngIf="tags && tags.length > 0">
 	<mat-chip-list [selectable]="true" [multiple]="true" [(ngModel)]="selectedTags"
 		(ngModelChange)="selectedTagsChange.emit($event)">
-		<mat-chip [selected]="selectedTags.includes(tag)" (click)="toggleTag(tag)"
+		<mat-chip (contextmenu)="onTagRightClick($event, tag)" [selected]="selectedTags.includes(tag)" (click)="toggleTag(tag)"
 			*ngFor="let tag of tags" [style]="'border-color: #' + tag.color">#{{ tag.title }}</mat-chip>
 	</mat-chip-list>
 	<mat-divider></mat-divider>

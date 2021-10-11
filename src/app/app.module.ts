@@ -58,6 +58,7 @@ import { SearchResultsComponent } from './components/views/board/nav-bar/search-
 import { OptionsBarComponent } from './components/views/board/options-bar/options-bar.component';
 import { ResizableBarComponent } from './components/views/board/resizable-bar/resizable-bar.component';
 import { EditMainTagComponent } from './components/modals/edit-main-tag/edit-main-tag.component';
+import { CreateMainTagComponent } from './components/modals/create-main-tag/create-main-tag.component';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -93,6 +94,7 @@ import { EditMainTagComponent } from './components/modals/edit-main-tag/edit-mai
     OptionsBarComponent,
     ResizableBarComponent,
     EditMainTagComponent,
+    CreateMainTagComponent,
   ],
   imports: [
     ReactiveFormsModule,

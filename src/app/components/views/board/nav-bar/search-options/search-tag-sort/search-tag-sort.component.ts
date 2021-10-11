@@ -1,3 +1,4 @@
+import { CreateMainTagComponent } from './../../../../../modals/create-main-tag/create-main-tag.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Tag } from 'src/app/models/sockets/tag-sock.model';
@@ -36,5 +37,9 @@ export class SearchTagSortComponent {
   public onTagRightClick(e: Event, tag: Tag) {
     e.preventDefault();
     this.dialog.open(EditMainTagComponent, { data: tag });
+  }
+
+  public onTagAdd() {
+    this.dialog.open(CreateMainTagComponent);
   }
 }

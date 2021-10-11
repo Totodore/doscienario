@@ -6,3 +6,9 @@ mat-divider {
 	width: 100%;
 	margin: 5px 0;
 }
+.add-icon {
+	mat-icon {
+		margin: 0;
+	}
+	cursor: pointer;
+}

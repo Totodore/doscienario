@@ -13,6 +13,7 @@ import { RenameDocumentReq } from 'src/app/models/sockets/document-sock.model';
 import { EditTagsComponent } from 'src/app/components/modals/edit-tags/edit-tags.component';
 import { DOWN_ARROW, UP_ARROW } from '@angular/cdk/keycodes';
 import { BlueprintComponent } from 'src/app/components/tabs/blueprint/blueprint.component';
+import { EditMainTagComponent } from 'src/app/components/modals/edit-main-tag/edit-main-tag.component';
 
 @Component({
   selector: 'app-blueprint-options',
@@ -44,7 +45,11 @@ export class BlueprintOptionsComponent {
   }
 
   public onTagClick(tag: Tag) {
-    this.project.updateSearch('#' + tag.title);
+    this.project.toggleTag?.(tag);
+  }
+  public onTagRightClick(e: Event, tag: Tag) {
+    e.preventDefault();
+    this.dialog.open(EditMainTagComponent, { data: tag });
   }
 
   openTagEdit() {

@@ -20,6 +20,8 @@ export class ProjectService {
   public openBlueprints: { [k: string]: Blueprint } = {};
 
   public updateSearch: (val?: string) => void;
+  public toggleTag: (tag: Tag) => void;
+
   private searchWorker: WorkerManager;
   constructor(
     private readonly router: Router,

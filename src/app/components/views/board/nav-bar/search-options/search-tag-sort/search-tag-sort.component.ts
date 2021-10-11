@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Tag } from 'src/app/models/sockets/tag-sock.model';
 import { EditMainTagComponent } from 'src/app/components/modals/edit-main-tag/edit-main-tag.component';
+import { ProjectService } from 'src/app/services/project.service';
 
 @Component({
   selector: 'app-search-tag-sort',
@@ -12,8 +13,11 @@ import { EditMainTagComponent } from 'src/app/components/modals/edit-main-tag/ed
 export class SearchTagSortComponent {
 
   constructor(
-    private readonly dialog: MatDialog
-  ) { }
+    private readonly dialog: MatDialog,
+    private readonly project: ProjectService,
+  ) {
+    this.project.toggleTag = tag => this.toggleTag(tag);
+  }
 
   @Input()
   public tags!: Tag[];

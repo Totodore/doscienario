@@ -1,5 +1,6 @@
 import { app as electron, BrowserWindow, shell } from "electron";
 import { globalShortcut } from "electron/main";
+import { checkAndUpdate } from "./updater";
 
 class App {
   private readonly url = `dist/app/index.html`;
@@ -7,6 +8,7 @@ class App {
   private window: BrowserWindow;
 
   public async init(): Promise<void> {
+    checkAndUpdate();
     await new Promise<void>(resolve => electron.on("ready", () => resolve()));
     this.window = new BrowserWindow({
       maximizable: true,

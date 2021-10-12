@@ -1,6 +1,6 @@
 {
   "name": "doscienario",
-  "version": "2.0.37",
+  "version": "2.0.41",
   "description": "Application de gestion de projets de jeux vidéos",
   "main": "dist/main.js",
   "author": {
@@ -36,6 +36,7 @@
     "ckeditor5-image-remove-event-callback-plugin": "^1.1.2",
     "custom-electron-titlebar": "^3.2.6",
     "diff": "^5.0.0",
+    "electron-updater": "^4.3.9",
     "fast_array_intersect": "^1.1.0",
     "fast-array-diff": "^1.0.0",
     "fs-extra": "^9.1.0",

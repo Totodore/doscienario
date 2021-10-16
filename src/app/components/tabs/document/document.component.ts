@@ -5,7 +5,7 @@ import { Change, DocumentSock } from './../../../models/sockets/document-sock.mo
 import { ProgressService } from 'src/app/services/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
-import { Component, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core';
 import * as CKEditor from "../../../../lib/ckeditor.js";
 import { CKEditor5, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 import { Flags } from 'src/app/models/sockets/flags.enum';
@@ -23,6 +23,8 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   @ViewChild("editorView", { static: false })
   private editorView: ElementRef<HTMLElement>;
 
+  public textSelectionPos?: DOMRect;
+
   public readonly type = TabTypes.DOCUMENT;
   public readonly editor: CKEditor5.EditorConstructor = CKEditor;
   public readonly editorCongig: CKEditor5.Config = {
@@ -36,6 +38,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       ],
       shouldNotGroupWhenFull: true
     },
+
     mention: {
       feeds: [
         {
@@ -93,6 +96,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       editor.ui.view.toolbar.element,
       editor.ui.getEditableElement()
     );
+    editor.model.document.on("change", e => !e.name.endsWith(":data") && this.onTextSelection());
     this.contentElement = this.editorView.nativeElement.querySelector(".ck-content");
     this.contentElement.scrollTo({ left: this.scroll?.[0], top: this.scroll?.[1], behavior: "auto" });
     window.setInterval(() => this.hasEdited && this.addTagsListener(), 1000);
@@ -150,6 +154,15 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       if (docId)
         this.tabs.pushTab(DocumentComponent, true, docId);
     } else if (tag.startsWith("#")) {}
+  }
+
+  public onTextSelection() {
+    const selection = window.getSelection();
+    const range = selection.getRangeAt(0);
+    if (selection.type === "Range" && selection.rangeCount > 0) {
+      const rect = range.getBoundingClientRect();
+      this.textSelectionPos = rect;
+    } else this.textSelectionPos = null;
   }
 
   get doc(): DocumentSock {

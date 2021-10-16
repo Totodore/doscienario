@@ -61,6 +61,7 @@ import { EditMainTagComponent } from './components/modals/edit-main-tag/edit-mai
 import { CreateMainTagComponent } from './components/modals/create-main-tag/create-main-tag.component';
 import { ElementTagsComponent } from './components/views/board/options-bar/element-tags/element-tags.component';
 import { RenameElementComponent } from './components/views/board/options-bar/rename-element/rename-element.component';
+import { AddSheetComponent } from './components/tabs/document/add-sheet/add-sheet.component';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -99,6 +100,7 @@ import { RenameElementComponent } from './components/views/board/options-bar/ren
     CreateMainTagComponent,
     ElementTagsComponent,
     RenameElementComponent,
+    AddSheetComponent,
   ],
   imports: [
     ReactiveFormsModule,

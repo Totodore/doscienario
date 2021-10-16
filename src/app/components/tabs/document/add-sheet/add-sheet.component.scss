@@ -1,0 +1,48 @@
+:host {
+	display: contents;
+}
+button {
+	position: absolute;
+	transform: translateX(-50%);
+	color: white;
+	background-color: #616161;
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	animation: FadeIn 150ms ease 0ms 1 normal forwards;
+	transition: all 100ms;
+	&:before {
+		transition: all 100ms;
+		content: "";
+    position: absolute;
+    top: 57%;
+    left: 50%;
+    border: 15px solid transparent;
+    border-bottom: 19px solid #616161;
+    transform: translateX(-50%) rotate(180deg);
+    z-index: -1;
+	}
+	&:hover {
+		background-color: #b0bec5;
+		::ng-deep mat-icon {
+			color: #212121;
+		}
+		&:before {
+			border-bottom-color: #b0bec5;
+		}
+	}
+	::ng-deep mat-icon {
+		font-size: 20px;
+	}
+}
+
+@keyframes FadeIn {
+	0% {
+		transform: translate(-50%, -5px);
+		opacity: 0;
+	}
+	100% {
+		transform: translateX(-50%, 0);
+		opacity: 1;
+	}
+}

@@ -175,9 +175,9 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   public onAddSheet() {
     const selection = window.getSelection();
     this.editorInstance.execute("mention", {
-      marker: "&",
+      marker: "$",
       mention: {
-        id: "&" + selection.toString(),
+        id: "$" + selection.toString(),
         name: selection.toString(),
         title: selection.toString(),
       },

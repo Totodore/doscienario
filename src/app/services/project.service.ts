@@ -1,3 +1,4 @@
+import { Sheet } from './../models/api/sheet.model';
 import { TabService } from './tab.service';
 import { Router } from '@angular/router';
 import { Project, User } from './../models/api/project.model';
@@ -114,7 +115,7 @@ export class ProjectService {
   @DataUpdater()
   public renameDocFromSocket(title: string, docId: number) {
     this.data.documents.find(el => el.id == docId).title = title;
-    const doc = Object.values(this.openDocs).find(el => el.id == docId);
+    const doc = this.getDoc(docId);
     if (doc)
       doc.title = title;
   }
@@ -280,6 +281,61 @@ export class ProjectService {
   public setSumarryNode(packet: EditSummaryIn) {
     this.getBlueprint(packet.blueprint).nodes.find(el => el.id === packet.node).summary = packet.content;
   }
+
+
+  @DataUpdater()
+  public addSendSheet(packet: SendElementIn) {
+    const id = packet.lastUpdate;
+    const sheet = new SheetSock(packet.element);
+    sheet.lastChangeId = id;
+    sheet.changes = new Map<number, Change[]>();
+    sheet.clientUpdateId = 0;
+    console.log("Add Send sheet");
+    this.openSheets[packet.reqId] = sheet;
+    const parentDoc = this.data.documents.find(el => el.id === sheet.documentId);
+    if (!parentDoc.sheets.find(el => el.id === sheet.id)) {
+      parentDoc.sheets.push(sheet);
+    }
+  }
+   @DataUpdater()
+   public addOpenSheet(sheet: Sheet) {
+     const doc = this.data.documents.find(el => el.id == sheet.documentId);
+     if (!doc.sheets.find(el => el.id == sheet.id))
+       doc.sheets.push(sheet);
+   }
+ 
+   public updateSheet(incomingSheet: WriteElementIn) {
+     const sheet = this.getSheet(incomingSheet.elementId);
+     sheet.content = applyTextChanges(sheet, incomingSheet);
+   }
+ 
+   public removeOpenSheet(sheetId: number) {
+     const index = Object.values(this.openSheets).findIndex(el => el.id == sheetId);
+     delete this.openSheets[index];
+   }
+ 
+   /**
+    * Remove a sheet from its tab id or docId
+    * If it is tab id it means that the doc should be opened
+    */
+   @DataUpdater()
+   public removeSheet(id: string | number, docId?: number) {
+     if (typeof id === 'string') {
+       const doc = this.data.documents.find(el => el.id == this.openSheets[id].documentId);
+       const sheetId = this.openSheets[id].id;
+       doc.sheets.splice(doc.sheets.findIndex(el => el.id == sheetId), 1);
+       delete this.openSheets[id];
+     } else if (typeof id === 'number') {
+       for (const tabId in this.openDocs) {
+         if (this.openDocs[tabId].id === docId) {
+           const sheets = this.data.documents.find(el => this.openDocs[tabId].id === el.id).sheets;
+           sheets.splice(sheets.findIndex(el => el.id == id), 1);
+           delete this.openSheets[tabId];
+           break;
+         }
+       }
+     }
+   }
 
   public async searchFromTags(tags: Tag[], needle?: string) {
     return await this.searchWorker.postAsyncMessage<Element[]>('searchFromTags', [tags, needle, [...this.docs, ...this.blueprints]]);

@@ -13,6 +13,7 @@ import { SheetSock } from '../models/api/sheet.model';
 import { Change, OpenElementIn, SendElementIn, WriteElementIn } from '../models/sockets/in/element.in';
 import { CreateNodeIn, CreateRelationIn, EditSummaryIn, PlaceNodeIn, RemoveNodeIn, RemoveRelationIn } from '../models/sockets/in/blueprint.in';
 import { Element } from '../models/default.model';
+import { DataUpdater } from '../decorators/data-updater.decorator';
 
 @Injectable({
   providedIn: 'root'
@@ -52,34 +53,32 @@ export class ProjectService {
   public get projectUsers(): User[] {
     return this.data.users;
   }
+  @DataUpdater()
   public addProjectUser(user: User) {
     this.data.users.push(user);
-    this.saveData();
   }
+  @DataUpdater()
   public removeProjectUser(user: User) {
     const index = this.data.users.findIndex(el => el.id == user.id);
     this.data.users.splice(index, 1);
-    this.saveData();
   }
+  @DataUpdater()
   public addProjectTag(tag: Tag) {
     this.data.tags.push(tag);
-    this.updateSearch();
-    this.saveData();
   }
+  @DataUpdater()
   public removeProjectTag(name: string) {
     this.data.tags.splice(this.tags.findIndex(el => el.title === name), 1);
     for (const doc of this.data.documents)
       doc.tags.splice(doc.tags.findIndex(el => el.title === name), 1);
-    this.updateSearch();
-    this.saveData();
   }
+  @DataUpdater()
   public updateProjectTag(tag: Tag, newTag?: Tag) {
     const index = this.tags.findIndex(el => el.title === tag.title);
     this.data.tags[index] = newTag ?? tag;
-    this.saveData();
-    this.updateSearch();
   }
 
+  @DataUpdater()
   public addSendDoc(packet: SendElementIn) {
     const id = packet.lastUpdate;
     const document = new DocumentSock(packet.element);
@@ -90,19 +89,15 @@ export class ProjectService {
     this.openDocs[packet.reqId] = document;
     if (!this.data.documents.find(el => el.id == packet.element.id)) {
       this.data.documents.push(document);
-      this.updateSearch();
-      this.saveData();
     }
   }
   /**
    * Add a doc to the local data if the doc has been created
    */
+  @DataUpdater()
   public addOpenDoc(packet: OpenElementIn) {
-    if (!this.data.documents.find(el => el.id == packet.element.id)) {
+    if (!this.data.documents.find(el => el.id == packet.element.id))
       this.data.documents.push(new Document(packet.element));
-      this.saveData();
-      this.updateSearch();
-    }
   }
 
   public updateDoc(incomingDoc: WriteElementIn) {
@@ -163,32 +158,31 @@ export class ProjectService {
     const index = Object.values(this.openDocs).findIndex(el => el.id == docId);
     delete this.openDocs[index];
   }
+
+  @DataUpdater()
   public renameDocFromSocket(title: string, docId: number) {
     this.data.documents.find(el => el.id == docId).title = title;
     const doc = Object.values(this.openDocs).find(el => el.id == docId);
     if (doc)
       doc.title = title;
-    this.updateSearch();
-    this.saveData();
   }
+  @DataUpdater()
   public renameDoc(tabId: string, title: string) {
     this.openDocs[tabId].title = title;
     const docId = this.openDocs[tabId].id;
     this.data.documents.find(el => el.id == docId).title = title;
-    this.updateSearch();
-    this.saveData();
   }
+  @DataUpdater()
   public colorDoc(tabId: string, color: string) {
     this.openDocs[tabId].color = color;
     const docId = this.openDocs[tabId].id;
     this.data.documents.find(el => el.id == docId).color = color;
-    this.updateSearch();
-    this.saveData();
   }
   /**
    * Remove a doc from its tab id or docId
    * If it is tab id it means that the doc should be opened
    */
+  @DataUpdater()
   public removeDoc(id: string | number) {
     if (typeof id === 'string') {
       const docId = this.openDocs[id].id;
@@ -203,9 +197,8 @@ export class ProjectService {
       }
       this.data.documents.splice(this.docs.findIndex(el => el.id == id), 1);
     }
-    this.updateSearch();
-    this.saveData();
   }
+  @DataUpdater()
   public updateDocTags(tabId: string, tags: Tag[]) {
     this.openDocs[tabId].tags = tags;
     const docId = this.openDocs[tabId].id;
@@ -214,26 +207,22 @@ export class ProjectService {
       if (!this.data.tags.find(el => el.title.toLowerCase() === tag.title.toLowerCase()))
         this.data.tags.push(tag);
     }
-    this.saveData();
   }
-
+  @DataUpdater()
   public addSendBlueprint(packet: SendElementIn) {
     console.log("Add Send blueprint");
     const blueprint = this.openBlueprints[packet.reqId] = new Blueprint(packet.element);
     if (!this.data.blueprints.find(el => el.id == blueprint.id)) {
       this.data.blueprints.push(blueprint);
-      this.saveData();
-      this.updateSearch();
     }
   }
   /**
    * Add a doc to the local data if the doc has been created
    */
+  @DataUpdater()
   public addOpenBlueprint(packet: OpenElementIn) {
     if (!this.data.blueprints.find(el => el.id == packet.element.id)) {
       this.data.blueprints.push(new Blueprint(packet.element));
-      this.saveData();
-      this.updateSearch();
     }
   }
 
@@ -241,33 +230,33 @@ export class ProjectService {
     const index = Object.values(this.openBlueprints).findIndex(el => el.id == blueprintId);
     delete this.openBlueprints[index];
   }
+
+  @DataUpdater()
   public renameBlueprintFromSocket(title: string, blueprintId: number) {
     this.data.blueprints.find(el => el.id == blueprintId).title = title;
     const doc = Object.values(this.openDocs).find(el => el.id == blueprintId);
     if (doc)
       doc.title = title;
-    this.saveData();
-    this.updateSearch();
   }
+
+  @DataUpdater()
   public renameBlueprint(tabId: string, title: string) {
     this.openBlueprints[tabId].title = title;
     const docId = this.openBlueprints[tabId].id;
     this.data.blueprints.find(el => el.id == docId).title = title;
-    this.saveData();
-    this.updateSearch();
   }
 
+  @DataUpdater()
   public colorBlueprint(tabId: string, color: string) {
     this.openBlueprints[tabId].color = color;
     const docId = this.openBlueprints[tabId].id;
     this.data.blueprints.find(el => el.id == docId).color = color;
-    this.updateSearch();
-    this.saveData();
   }
   /**
    * Remove a blueprint from its tab id or docId
    * If it is tab id it means that the doc should be opened
    */
+  @DataUpdater()
   public removeBlueprint(id: string | number) {
     if (typeof id === 'string') {
       const docId = this.openBlueprints[id].id;
@@ -282,9 +271,9 @@ export class ProjectService {
       }
       this.data.blueprints.splice(this.blueprints.findIndex(el => el.id == id), 1);
     }
-    this.saveData();
-    this.updateSearch();
   }
+
+  @DataUpdater()
   public async addBlueprintNode(packet: CreateNodeIn) {
     this.getBlueprint(packet.node.blueprint.id).nodes.push(packet.node);
     if (this.tabs.displayedTab[1].type === TabTypes.BLUEPRINT && this.tabs.displayedTab[1].id === packet.node.blueprint.id && packet.user === packet.node.createdBy.id) {
@@ -292,31 +281,30 @@ export class ProjectService {
         const component = this.tabs.displayedTab[1] as BlueprintComponent;
         if (component.autoMode)
           await component.autoPos(packet.node);
-        this.saveData();
       }, 0);
-    } else
-      this.saveData();
+    }
   }
+
+  @DataUpdater()
   public placeBlueprintNode(packet: PlaceNodeIn) {
     const node = this.getBlueprint(packet.blueprintId).nodes.find(el => el.id === packet.id);
     node.x = packet.pos[0];
     node.y = packet.pos[1];
-    this.saveData();
   }
+  @DataUpdater()
   public placeBlueprintRel(packet: Relationship) {
     const rel = this.getBlueprint(packet.blueprint.id).relationships.find(el => el.id === packet.id);
     rel.ex = packet.ex;
     rel.ey = packet.ey;
     rel.ox = packet.ox;
     rel.oy = packet.oy;
-    this.saveData();
   }
+  @DataUpdater()
   public removeBlueprintNode(packet: RemoveNodeIn) {
     const blueprint = this.getBlueprint(packet.blueprintId);
     const data = removeNodeFromTree(packet.nodeId, blueprint.nodes.map(el => el.id), blueprint.relationships.map(el => [el.parentId, el.childId, el.id]));
     blueprint.nodes = blueprint.nodes.filter(el => !data.nodes.includes(el.id));
     blueprint.relationships = blueprint.relationships.filter(el => !data.rels.includes(el.id));
-    this.saveData();
   }
   public addBlueprintRelation(packet: CreateRelationIn) {
     this.getBlueprint(packet.blueprint).relationships.push(packet.relation);
@@ -325,6 +313,8 @@ export class ProjectService {
     const index = this.getBlueprint(packet.blueprint).relationships.findIndex(el => el.id === packet.blueprint);
     this.getBlueprint(packet.blueprint).relationships.splice(index, 1);
   }
+
+  @DataUpdater()
   public updateBlueprintTags(tabId: string, tags: Tag[]) {
     this.openBlueprints[tabId].tags = tags;
     const docId = this.openBlueprints[tabId].id;
@@ -334,7 +324,6 @@ export class ProjectService {
         this.data.tags.push(tag);
     }
     // console.log(this.data.blueprints.find(el => el.id == docId).tags.length, tags.length);
-    this.saveData();
   }
   public setSumarryNode(packet: EditSummaryIn) {
     this.getBlueprint(packet.blueprint).nodes.find(el => el.id === packet.node).summary = packet.content;
@@ -359,7 +348,6 @@ export class ProjectService {
 
   public set projectUsers(users: User[]) {
     this.data.users = users;
-    this.saveData();
   }
 
   public get tags(): Tag[] {

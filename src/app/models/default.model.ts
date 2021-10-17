@@ -1,5 +1,6 @@
 import { Project, User } from "./api/project.model";
 import { Tag } from "./api/tag.model";
+import { Change } from "./sockets/in/element.in";
 export abstract class DataModel<T> {
 
   constructor(obj?: Partial<T>) {
@@ -37,4 +38,10 @@ export abstract class ContentElement extends Element {
 }
 export interface IElement {
   type: DataType;
+}
+export interface ISockContentElement extends ContentElement {
+  elIndex?: number;
+  changes: Map<number, Change[]>;
+  lastChangeId: number;
+  clientUpdateId?: number;
 }

@@ -1,4 +1,4 @@
-import { DataType, IElement } from 'src/app/models/default.model';
+import { DataType, IElement, ISockContentElement } from 'src/app/models/default.model';
 import { ContentElement } from "../default.model";
 import { Change } from '../sockets/in/element.in';
 
@@ -9,7 +9,7 @@ export class Sheet extends ContentElement implements IElement {
 
 }
 
-export class SheetSock extends Sheet {
+export class SheetSock extends Sheet implements ISockContentElement {
   public elIndex?: number;
   public changes: Map<number, Change[]>;
   public lastChangeId: number;

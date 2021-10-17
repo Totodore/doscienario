@@ -1,4 +1,4 @@
-import { ContentElement, DataType } from "../default.model";
+import { ContentElement, DataType, ISockContentElement } from "../default.model";
 import { Change } from "../sockets/in/element.in";
 import { Sheet } from "./sheet.model";
 import { Tag } from "./tag.model";
@@ -12,7 +12,7 @@ export class Document extends ContentElement {
   readonly type = DataType.Document;
 }
 
-export class DocumentSock extends Document {
+export class DocumentSock extends Document implements ISockContentElement {
   public elIndex?: number;
   public changes: Map<number, Change[]>;
   public lastChangeId: number;

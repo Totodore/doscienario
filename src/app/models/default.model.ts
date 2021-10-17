@@ -1,6 +1,5 @@
-import { Document, Project, User } from "./api/project.model";
-import { Blueprint } from "./sockets/blueprint-sock.model";
-import { Tag } from "./sockets/tag-sock.model";
+import { Project, User } from "./api/project.model";
+import { Tag } from "./api/tag.model";
 export abstract class DataModel<T> {
 
   constructor(obj?: Partial<T>) {
@@ -19,10 +18,11 @@ export abstract class DataModel<T> {
 export enum DataType {
   Blueprint,
   Document,
-  Tag
+  Tag,
+  Sheet
 }
 
-export abstract class Element<T = any> extends DataModel<T> {
+export abstract class Element<T = any> extends DataModel<T> implements IElement {
   public id: number;
   public uid: string;
   public title: string;
@@ -30,8 +30,11 @@ export abstract class Element<T = any> extends DataModel<T> {
   public project: Project;
   public projectId: number;
   public color: string;
+  public type: DataType;
 }
-export interface IElement extends Element {
+export abstract class ContentElement extends Element {
+  public content: string;
+}
+export interface IElement {
   type: DataType;
 }
-export type ElementModel = Blueprint | Document;

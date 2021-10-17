@@ -1,13 +1,14 @@
+import { RenameTagOut } from 'src/app/models/sockets/out/tag.out';
+import { ColorTagOut } from './../../../../models/sockets/out/tag.out';
 import { ConfirmComponent } from './../../../utils/confirm/confirm.component';
-import { UpdateTagNameReq } from './../../../../models/sockets/tag-sock.model';
 import { Flags } from './../../../../models/sockets/flags.enum';
 import { SocketService } from '../../../../services/sockets/socket.service';
 import { SnackbarService } from './../../../../services/snackbar.service';
 import { ProjectService } from './../../../../services/project.service';
 import { Component, Inject, Input, OnInit } from '@angular/core';
-import { Tag, UpdateTagColorReq } from 'src/app/models/sockets/tag-sock.model';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Color } from '@angular-material-components/color-picker';
+import { Tag } from 'src/app/models/api/tag.model';
 
 @Component({
   selector: 'app-add-tag',
@@ -47,9 +48,9 @@ export class AddTagComponent {
       if (this.modify) {
         this.project.updateProjectTag(this.oldTag, newTag);
         if (newTag.color != this.oldTag.color)
-          this.socket.socket.emit(Flags.COLOR_TAG, new UpdateTagColorReq(newTag.title, newTag.color));
+          this.socket.socket.emit(Flags.COLOR_TAG, new ColorTagOut(newTag.title, newTag.color));
         if (newTag.title != this.oldTag.title)
-          this.socket.socket.emit(Flags.RENAME_TAG, new UpdateTagNameReq(this.oldTag.title, newTag.title));
+          this.socket.socket.emit(Flags.RENAME_TAG, new RenameTagOut(this.oldTag.title, newTag.title));
       }
       else {
         this.project.addProjectTag(newTag);

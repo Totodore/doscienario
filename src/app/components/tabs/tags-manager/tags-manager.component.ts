@@ -1,5 +1,4 @@
 import { SocketService } from '../../../services/sockets/socket.service';
-import { Tag } from 'src/app/models/sockets/tag-sock.model';
 import { AddTagComponent } from './add-tag/add-tag.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ProjectService } from './../../../services/project.service';
@@ -7,6 +6,7 @@ import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { Component } from '@angular/core';
 import { diff as arrayDiff } from "fast-array-diff";
 import { Flags } from 'src/app/models/sockets/flags.enum';
+import { Tag } from 'src/app/models/api/tag.model';
 @Component({
   selector: 'app-tags-manager',
   templateUrl: './tags-manager.component.html',

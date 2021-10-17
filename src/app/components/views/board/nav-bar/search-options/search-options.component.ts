@@ -1,9 +1,9 @@
 import { TabService } from '../../../../../services/tab.service';
-import { Tag } from '../../../../../models/sockets/tag-sock.model';
 import { ProjectService } from '../../../../../services/project.service';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { ElementModel } from 'src/app/models/default.model';
 import { ProgressService } from 'src/app/services/progress.service';
+import { Element } from 'src/app/models/default.model';
+import { Tag } from 'src/app/models/api/tag.model';
 
 @Component({
   selector: 'app-search-options',
@@ -21,7 +21,7 @@ export class SearchOptionsComponent implements OnInit {
 
   public allowedTags: Tag[] = this.tags;
 
-  public results: ElementModel[] = [];
+  public results: Element[] = [];
 
   constructor(
     private readonly project: ProjectService,

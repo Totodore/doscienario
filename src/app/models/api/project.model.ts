@@ -1,6 +1,7 @@
-import { Blueprint } from './../sockets/blueprint-sock.model';
-import { Tag } from './../sockets/tag-sock.model';
-import { DataModel, DataType, Element, IElement } from '../default.model';
+import { DataModel } from '../default.model';
+import { Blueprint } from './blueprint.model';
+import { Document } from './document.model';
+import { Tag } from './tag.model';
 export interface CreateProjectReq {
   name: string;
 }
@@ -19,14 +20,6 @@ export class Project extends DataModel<Project> {
   public blueprints: Blueprint[];
   public tags: Tag[];
   public files: File[];
-}
-
-export class Document extends Element implements IElement {
-
-  public id: number;
-  public images?: Image[];
-  public content: string;
-  public readonly type = DataType.Document;
 }
 
 export interface Image {

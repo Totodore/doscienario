@@ -2,7 +2,6 @@ import { ProgressService } from './progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { Socket } from 'socket.io-client';
 import { Project } from './../models/api/project.model';
-import { FileRes, ImageRes } from './../models/api/res.model';
 import { HttpClient, HttpEvent, HttpEventType, HttpHeaders, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -22,27 +21,7 @@ export class ApiService extends ApiUtil {
     super(http);
   }
 
-  public postFile(file: File, path: string): Observable<HttpEvent<FileRes>> {
-    const form = new FormData();
-    form.append("file", file);
-    form.append("path", path);
-    form.append("projectId", this.projectId);
-    const req = new HttpRequest("POST", `${this.root}/res/file`, form, { reportProgress: true, headers: this.headers });
 
-    return this.http.request<FileRes>(req);
-  }
-
-  public async postImage(imgUrl: string, pos: number, docId: number): Promise<Observable<HttpEvent<ImageRes>>> {
-    const form = new FormData();
-    const blob = await (await fetch(imgUrl)).blob();
-    form.append("file", blob);
-    form.append("documentPos", pos.toString());
-    form.append("documentId", docId.toString());
-    form.append("projectId", this.projectId);
-    const req = new HttpRequest("POST", `${this.root}/res/image`, form, { reportProgress: true, headers: this.headers });
-
-    return this.http.request<ImageRes>(req);
-  }
   public async importProject(file: Blob): Promise<boolean> {
     this.progress.show(true);
     const form = new FormData();

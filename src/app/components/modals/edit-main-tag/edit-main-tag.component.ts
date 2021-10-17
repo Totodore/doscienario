@@ -1,8 +1,10 @@
+import { ColorTagOut } from './../../../models/sockets/out/tag.out';
 import { Color } from '@angular-material-components/color-picker';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Tag } from 'src/app/models/api/tag.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
-import { Tag, UpdateTagColorReq, UpdateTagNameReq } from 'src/app/models/sockets/tag-sock.model';
+import { RenameTagOut } from 'src/app/models/sockets/out/tag.out';
 import { ProjectService } from 'src/app/services/project.service';
 import { SocketService } from 'src/app/services/sockets/socket.service';
 import { ConfirmComponent } from '../../utils/confirm/confirm.component';
@@ -50,9 +52,9 @@ export class EditMainTagComponent {
 
   public onConfirm() {
     if (this.tag.color != this.oldTag.color)
-      this.socket.socket.emit(Flags.COLOR_TAG, new UpdateTagColorReq(this.oldTag.title, this.tag.color));
+      this.socket.socket.emit(Flags.COLOR_TAG, new ColorTagOut(this.oldTag.title, this.tag.color));
     if (this.tag.title != this.oldTag.title)
-      this.socket.socket.emit(Flags.RENAME_TAG, new UpdateTagNameReq(this.oldTag.title, this.tag.title));
+      this.socket.socket.emit(Flags.RENAME_TAG, new RenameTagOut(this.oldTag.title, this.tag.title));
     this.project.updateProjectTag(this.oldTag, this.tag);
     this.dialogRef.close();
   }

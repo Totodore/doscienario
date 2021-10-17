@@ -1,13 +1,12 @@
+import { Change, ColorElementIn, OpenElementIn, RenameElementIn, SendElementIn, WriteElementIn } from './../../models/sockets/in/element.in';
 import { Injectable } from '@angular/core';
-import { Socket } from 'socket.io-client';
 import { EventHandler } from 'src/app/decorators/subscribe-event.decorator';
-import { AddTagDocumentRes, Change, DocumentRes, EditTagDocumentReq, OpenDocumentRes, RenameDocumentRes, WriteDocumentReq, WriteDocumentRes } from 'src/app/models/sockets/document-sock.model';
-import { ColorElementRes } from 'src/app/models/sockets/element-sock.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
-import { Tag } from 'src/app/models/sockets/tag-sock.model';
 import { ApiService } from '../api.service';
 import { ProjectService } from '../project.service';
 import { TabService } from '../tab.service';
+import { WriteElementOut } from 'src/app/models/sockets/out/element.out';
+import { AddTagElementIn, RemoveTagElementIn } from 'src/app/models/sockets/in/tag.in';
 
 @Injectable({
   providedIn: 'root'
@@ -22,14 +21,14 @@ export class DocsSocketService {
 
 
   @EventHandler(Flags.OPEN_DOC)
-  onOpenDocument(packet: OpenDocumentRes) {
+  onOpenDocument(packet: OpenElementIn) {
     this.project.addOpenDoc(packet);
   }
 
   @EventHandler(Flags.SEND_DOC)
-  onSendDocument(packet: DocumentRes) {
+  onSendDocument(packet: SendElementIn) {
     this.project.addSendDoc(packet);
-    this.tabs.updateDocTab(packet.reqId, packet.doc.id);
+    this.tabs.updateDocTab(packet.reqId, packet.element.id);
   }
 
   @EventHandler(Flags.CLOSE_DOC)
@@ -41,24 +40,24 @@ export class DocsSocketService {
     const doc = this.project.openDocs[tabId];
     console.log("Updating doc", docId, "tab", tabId);
     doc.changes.set(clientUpdateId, changes);
-    this.socket.emit(Flags.WRITE_DOC, new WriteDocumentReq(changes, docId, lastChangeId, clientUpdateId, this.api.user.id));
+    this.socket.emit(Flags.WRITE_DOC, new WriteElementOut(docId, lastChangeId, changes, this.api.user.id, clientUpdateId));
   }
 
   @EventHandler(Flags.WRITE_DOC)
-  onUpdateDocument(doc: WriteDocumentRes) {
-    this.project.getDoc(doc.docId).lastChangeId = doc.updateId;
+  onUpdateDocument(doc: WriteElementIn) {
+    this.project.getDoc(doc.elementId).lastChangeId = doc.updateId;
     if (doc.userId != this.api.user.id)
       this.project.updateDoc(doc);
   }
 
   @EventHandler(Flags.RENAME_DOC)
-  titleDocument(doc: RenameDocumentRes) {
-    this.project.renameDocFromSocket(doc.title, doc.docId);
+  titleDocument(doc: RenameElementIn) {
+    this.project.renameDocFromSocket(doc.title, doc.elementId);
   }
 
   @EventHandler(Flags.COLOR_DOC)
-  onColorDoc(packet: ColorElementRes) {
-    this.project.docs.find(el => el.id === packet.docId).color = packet.color;
+  onColorDoc(packet: ColorElementIn) {
+    this.project.docs.find(el => el.id === packet.elementId).color = packet.color;
   }
 
   @EventHandler(Flags.REMOVE_DOC)
@@ -68,7 +67,7 @@ export class DocsSocketService {
   }
 
   @EventHandler(Flags.TAG_ADD_DOC)
-  onAddTagDoc(packet: AddTagDocumentRes) {
+  onAddTagDoc(packet: AddTagElementIn) {
     const projectTag = this.project.tags.find(el => el.title == packet.tag.title);
     if (projectTag && projectTag.id == null)
       this.project.updateProjectTag(packet.tag);
@@ -83,8 +82,8 @@ export class DocsSocketService {
   }
 
   @EventHandler(Flags.TAG_REMOVE_DOC)
-  onRemoveTagDoc(packet: EditTagDocumentReq) {
-    const tags = this.project.getDoc(packet.docId).tags;
+  onRemoveTagDoc(packet: RemoveTagElementIn) {
+    const tags = this.project.getDoc(packet.elementId).tags;
     tags.splice(tags.findIndex(el => el.title == packet.title.toLowerCase()), 1);
   }
 

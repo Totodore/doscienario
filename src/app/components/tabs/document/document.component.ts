@@ -1,7 +1,6 @@
 import { EditorWorkerService } from './../../../services/document-worker.service';
 import { ApiService } from 'src/app/services/api.service';
 import { TabService } from './../../../services/tab.service';
-import { Change, DocumentSock } from './../../../models/sockets/document-sock.model';
 import { ProgressService } from 'src/app/services/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
@@ -11,6 +10,8 @@ import { CKEditor5, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { ElementComponent } from '../element.component';
 import { DocsSocketService } from 'src/app/services/sockets/docs-socket.service';
+import { Change } from 'src/app/models/sockets/in/element.in';
+import { DocumentSock } from 'src/app/models/api/document.model';
 @Component({
   selector: 'app-document',
   templateUrl: './document.component.html',
@@ -22,6 +23,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
 
   @ViewChild("editorView", { static: false })
   private editorView: ElementRef<HTMLElement>;
+  private editorInstance: CKEditor5.Editor;
 
   public textSelectionPos?: DOMRect;
 
@@ -41,6 +43,10 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
 
     mention: {
       feeds: [
+        {
+          marker: "&",
+          feed: () => []
+        },
         {
           marker: '@',
           feed: (query: string) => this.atDocNames(query),
@@ -97,6 +103,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       editor.ui.getEditableElement()
     );
     editor.model.document.on("change", e => !e.name.endsWith(":data") && this.onTextSelection());
+    this.editorInstance = editor;
     this.contentElement = this.editorView.nativeElement.querySelector(".ck-content");
     this.contentElement.scrollTo({ left: this.scroll?.[0], top: this.scroll?.[1], behavior: "auto" });
     window.setInterval(() => this.hasEdited && this.addTagsListener(), 1000);
@@ -153,16 +160,32 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       const docId = this.project.docs.find(el => el.title.toLowerCase() === tag.substr(1).toLowerCase())?.id;
       if (docId)
         this.tabs.pushTab(DocumentComponent, true, docId);
-    } else if (tag.startsWith("#")) {}
+    } else if (tag.startsWith("#")) {
+
+    } else if (tag.startsWith("&")) {
+      
+    }
   }
 
   public onTextSelection() {
     const selection = window.getSelection();
-    const range = selection.getRangeAt(0);
-    if (selection.type === "Range" && selection.rangeCount > 0) {
-      const rect = range.getBoundingClientRect();
-      this.textSelectionPos = rect;
-    } else this.textSelectionPos = null;
+    this.textSelectionPos = selection.type === "Range" && selection.rangeCount > 0 ? selection.getRangeAt(0).getBoundingClientRect() : null;
+  }
+
+  public onAddSheet() {
+    const selection = window.getSelection();
+    this.editorInstance.execute("mention", {
+      marker: "&",
+      mention: {
+        id: "&" + selection.toString(),
+        name: selection.toString(),
+        title: selection.toString(),
+      },
+      range: this.editorInstance.model.document.selection.getFirstRange(),
+    });
+    selection.collapseToEnd();
+    this.editorInstance.editing.view.focus();
+    this.textSelectionPos = null;
   }
 
   get doc(): DocumentSock {

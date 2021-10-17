@@ -1,15 +1,18 @@
 import { TabService } from './tab.service';
-import { Blueprint, SendBlueprintReq, OpenBlueprintReq, CreateNodeReq, CreateRelationReq, RemoveRelationReq, PlaceNodeOut, PlaceNodeIn, Relationship, RemoveNodeIn, EditSumarryIn, WriteNodeContentIn } from './../models/sockets/blueprint-sock.model';
 import { Router } from '@angular/router';
-import { DocumentSock, DocumentRes, Change, WriteDocumentRes, OpenDocumentRes } from './../models/sockets/document-sock.model';
-import { Project, User, Document, SearchQueryRes } from './../models/api/project.model';
-import { Injectable, OnInit } from '@angular/core';
-import { Tag } from '../models/sockets/tag-sock.model';
+import { Project, User } from './../models/api/project.model';
+import { Injectable } from '@angular/core';
 import { removeNodeFromTree } from '../utils/tree.utils';
 import { TabTypes } from '../models/tab-element.model';
 import { BlueprintComponent } from '../components/tabs/blueprint/blueprint.component';
 import { WorkerManager, WorkerType } from '../utils/worker-manager.utils';
-import { ElementModel } from '../models/default.model';
+import { Document, DocumentSock } from '../models/api/document.model';
+import { Blueprint, Relationship } from '../models/api/blueprint.model';
+import { Tag } from '../models/api/tag.model';
+import { SheetSock } from '../models/api/sheet.model';
+import { Change, OpenElementIn, SendElementIn, WriteElementIn } from '../models/sockets/in/element.in';
+import { CreateNodeIn, CreateRelationIn, EditSummaryIn, PlaceNodeIn, RemoveNodeIn, RemoveRelationIn } from '../models/sockets/in/blueprint.in';
+import { Element } from '../models/default.model';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +21,7 @@ export class ProjectService {
 
   public openDocs: { [k: string]: DocumentSock } = {};
   public openBlueprints: { [k: string]: Blueprint } = {};
+  public openSheets: { [k: string]: SheetSock } = {};
 
   public updateSearch: (val?: string) => void;
   public toggleTag: (tag: Tag) => void;
@@ -76,15 +80,16 @@ export class ProjectService {
     this.updateSearch();
   }
 
-  public addSendDoc(packet: DocumentRes) {
+  public addSendDoc(packet: SendElementIn) {
     const id = packet.lastUpdate;
-    packet.doc.lastChangeId = id;
-    packet.doc.changes = new Map<number, Change[]>();
-    packet.doc.clientUpdateId = 0;
+    const document = new DocumentSock(packet.element);
+    document.lastChangeId = id;
+    document.changes = new Map<number, Change[]>();
+    document.clientUpdateId = 0;
     console.log("Add Send doc");
-    this.openDocs[packet.reqId] = packet.doc;
-    if (!this.data.documents.find(el => el.id == packet.doc.id)) {
-      this.data.documents.push(packet.doc);
+    this.openDocs[packet.reqId] = document;
+    if (!this.data.documents.find(el => el.id == packet.element.id)) {
+      this.data.documents.push(document);
       this.updateSearch();
       this.saveData();
     }
@@ -92,16 +97,16 @@ export class ProjectService {
   /**
    * Add a doc to the local data if the doc has been created
    */
-  public addOpenDoc(packet: OpenDocumentRes) {
-    if (!this.data.documents.find(el => el.id == packet.doc.id)) {
-      this.data.documents.push(packet.doc);
+  public addOpenDoc(packet: OpenElementIn) {
+    if (!this.data.documents.find(el => el.id == packet.element.id)) {
+      this.data.documents.push(new Document(packet.element));
       this.saveData();
       this.updateSearch();
     }
   }
 
-  public updateDoc(incomingDoc: WriteDocumentRes) {
-    const doc = this.getDoc(incomingDoc.docId);
+  public updateDoc(incomingDoc: WriteElementIn) {
+    const doc = this.getDoc(incomingDoc.elementId);
     let content: string = "";
     //On part du dernier ID du packet recu jusqu'au dernière id du document,
     for (let updateIndex = incomingDoc.lastClientUpdateId + 1; updateIndex <= doc.clientUpdateId; updateIndex++) {
@@ -212,11 +217,11 @@ export class ProjectService {
     this.saveData();
   }
 
-  public addSendBlueprint(packet: SendBlueprintReq) {
+  public addSendBlueprint(packet: SendElementIn) {
     console.log("Add Send blueprint");
-    this.openBlueprints[packet.reqId] = packet.blueprint;
-    if (!this.data.blueprints.find(el => el.id == packet.blueprint.id)) {
-      this.data.blueprints.push(packet.blueprint);
+    const blueprint = this.openBlueprints[packet.reqId] = new Blueprint(packet.element);
+    if (!this.data.blueprints.find(el => el.id == blueprint.id)) {
+      this.data.blueprints.push(blueprint);
       this.saveData();
       this.updateSearch();
     }
@@ -224,9 +229,9 @@ export class ProjectService {
   /**
    * Add a doc to the local data if the doc has been created
    */
-  public addOpenBlueprint(packet: OpenBlueprintReq) {
-    if (!this.data.blueprints.find(el => el.id == packet.blueprint.id)) {
-      this.data.blueprints.push(packet.blueprint);
+  public addOpenBlueprint(packet: OpenElementIn) {
+    if (!this.data.blueprints.find(el => el.id == packet.element.id)) {
+      this.data.blueprints.push(new Blueprint(packet.element));
       this.saveData();
       this.updateSearch();
     }
@@ -280,7 +285,7 @@ export class ProjectService {
     this.saveData();
     this.updateSearch();
   }
-  public async addBlueprintNode(packet: CreateNodeReq) {
+  public async addBlueprintNode(packet: CreateNodeIn) {
     this.getBlueprint(packet.node.blueprint.id).nodes.push(packet.node);
     if (this.tabs.displayedTab[1].type === TabTypes.BLUEPRINT && this.tabs.displayedTab[1].id === packet.node.blueprint.id && packet.user === packet.node.createdBy.id) {
       window.setTimeout(async () => {
@@ -313,11 +318,11 @@ export class ProjectService {
     blueprint.relationships = blueprint.relationships.filter(el => !data.rels.includes(el.id));
     this.saveData();
   }
-  public addBlueprintRelation(packet: CreateRelationReq) {
+  public addBlueprintRelation(packet: CreateRelationIn) {
     this.getBlueprint(packet.blueprint).relationships.push(packet.relation);
   }
-  public removeBlueprintRelation(packet: RemoveRelationReq) {
-    const index = this.getBlueprint(packet.blueprint).relationships.findIndex(el => el.id === packet.id);
+  public removeBlueprintRelation(packet: RemoveRelationIn) {
+    const index = this.getBlueprint(packet.blueprint).relationships.findIndex(el => el.id === packet.blueprint);
     this.getBlueprint(packet.blueprint).relationships.splice(index, 1);
   }
   public updateBlueprintTags(tabId: string, tags: Tag[]) {
@@ -331,35 +336,12 @@ export class ProjectService {
     // console.log(this.data.blueprints.find(el => el.id == docId).tags.length, tags.length);
     this.saveData();
   }
-
-  public updateNode(packet: WriteNodeContentIn) {
-    const node = this.getBlueprint(packet.blueprintId).nodes.find(el => el.id === packet.nodeId);
-    let content = node.content;
-    let stepIndex: number = 0;
-    //Pour chaque nouveau changement on fait la mise à jour à partir du packet modifié par l'agorithme ci-dessus
-    for (const change of packet.changes) {
-      switch (change[0]) {
-        case 1:
-          content = content.insert(change[1] + stepIndex, change[2]);
-          break;
-        case -1:
-          content = content.delete(change[1] + stepIndex, change[2].length);
-          stepIndex -= change[2].length;
-          break;
-        case 2:
-          content = change[2];
-          stepIndex = change[2].length;
-        default: break;
-      }
-    }
-    node.content = content;
-  }
-  public setSumarryNode(packet: EditSumarryIn) {
+  public setSumarryNode(packet: EditSummaryIn) {
     this.getBlueprint(packet.blueprint).nodes.find(el => el.id === packet.node).summary = packet.content;
   }
 
   public async searchFromTags(tags: Tag[], needle?: string) {
-    return await this.searchWorker.postAsyncMessage<ElementModel[]>('searchFromTags', [tags, needle, [...this.docs, ...this.blueprints]]);
+    return await this.searchWorker.postAsyncMessage<Element[]>('searchFromTags', [tags, needle, [...this.docs, ...this.blueprints]]);
   }
   public async filterSecondaryTags(tags: Tag[]) {
     return await this.searchWorker.postAsyncMessage<Tag[]>('filterSecondaryTags', [tags, [...this.docs, ...this.blueprints]]);
@@ -418,5 +400,8 @@ export class ProjectService {
   }
   public getBlueprint(blueprintId: number) {
     return Object.values(this.openBlueprints).find(el => el.id == blueprintId);
+  }
+  public getSheet(sheetId: number) {
+    return Object.values(this.openSheets).find(el => el.id == sheetId);
   }
 }

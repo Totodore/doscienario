@@ -140,6 +140,11 @@ ckeditor {
 		overflow-y: auto !important;
 		.mention {
 			cursor: pointer !important;
+			display: inline-block !important;
+			&[data-mention^="&"]::first-letter {
+				visibility: hidden !important;
+				font-size: 0px;
+			}
 		}
 		.image {
 			@include mat-elevation(1);

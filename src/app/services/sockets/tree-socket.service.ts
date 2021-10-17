@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { EventHandler } from 'src/app/decorators/subscribe-event.decorator';
-import { CloseBlueprintReq, CreateNodeReq, CreateRelationReq, EditSumarryIn, OpenBlueprintReq, PlaceNodeIn, Relationship, RemoveNodeIn, RemoveRelationReq, SendBlueprintReq, WriteNodeContentIn, WriteNodeContentOut } from 'src/app/models/sockets/blueprint-sock.model';
-import { AddTagDocumentRes, Change, EditTagDocumentReq } from 'src/app/models/sockets/document-sock.model';
-import { ColorElementRes } from 'src/app/models/sockets/element-sock.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
+import { CloseElementIn, ColorElementIn, OpenElementIn, SendElementIn } from 'src/app/models/sockets/in/element.in';
+import { AddTagElementIn, RemoveTagElementIn } from 'src/app/models/sockets/in/tag.in';
 import { ApiService } from '../api.service';
 import { ProjectService } from '../project.service';
 import { TabService } from '../tab.service';
+import { CreateNodeIn, CreateRelationIn, EditSummaryIn, PlaceNodeIn, RemoveNodeIn, RemoveRelationIn } from 'src/app/models/sockets/in/blueprint.in';
+import { Relationship } from 'src/app/models/api/blueprint.model';
 
 @Injectable({
   providedIn: 'root'
@@ -21,24 +22,24 @@ export class TreeSocketService {
 
 
   @EventHandler(Flags.SEND_BLUEPRINT)
-  onSendBlueprint(packet: SendBlueprintReq) {
+  onSendBlueprint(packet: SendElementIn) {
     this.project.addSendBlueprint(packet);
-    this.tabs.updateBlueprintTab(packet.reqId, packet.blueprint.id);
+    this.tabs.updateBlueprintTab(packet.reqId, packet.element.id);
   }
 
   @EventHandler(Flags.OPEN_BLUEPRINT)
-  onOpenBlueprint(packet: OpenBlueprintReq) {
+  onOpenBlueprint(packet: OpenElementIn) {
     this.project.addOpenBlueprint(packet)
   }
 
   @EventHandler(Flags.CLOSE_BLUEPRINT)
-  onCloseBlueprint(packet: CloseBlueprintReq) {
-    this.project.removeOpenBlueprint(packet.id);
+  onCloseBlueprint(packet: CloseElementIn) {
+    this.project.removeOpenBlueprint(packet.elementId);
   }
 
   @EventHandler(Flags.COLOR_BLUEPRINT)
-  onColorDoc(packet: ColorElementRes) {
-    this.project.blueprints.find(el => el.id === packet.docId).color = packet.color;
+  onColorDoc(packet: ColorElementIn) {
+    this.project.blueprints.find(el => el.id === packet.elementId).color = packet.color;
   }
 
   @EventHandler(Flags.REMOVE_BLUEPRINT)
@@ -47,7 +48,7 @@ export class TreeSocketService {
     this.project.removeBlueprint(id);
   }
   @EventHandler(Flags.TAG_ADD_BLUEPRINT)
-  onAddTagBlueprint(packet: AddTagDocumentRes) {
+  onAddTagBlueprint(packet: AddTagElementIn) {
     const projectTag = this.project.tags.find(el => el.title == packet.tag.title);
     if (projectTag && projectTag.id == null)
       this.project.updateProjectTag(packet.tag);
@@ -61,14 +62,14 @@ export class TreeSocketService {
       doc.tags.push(packet.tag);
   }
 
-  @EventHandler(Flags.TAG_ADD_BLUEPRINT)
-  onRemoveTagBlueprint(packet: EditTagDocumentReq) {
-    const tags = this.project.getBlueprint(packet.docId).tags;
+  @EventHandler(Flags.TAG_REMOVE_BLUEPRINT)
+  onRemoveTagBlueprint(packet: RemoveTagElementIn) {
+    const tags = this.project.getBlueprint(packet.elementId).tags;
     tags.splice(tags.findIndex(el => el.title == packet.title.toLowerCase()), 1);
   }
 
   @EventHandler(Flags.CREATE_NODE)
-  onCreateNode(packet: CreateNodeReq) {
+  onCreateNode(packet: CreateNodeIn) {
     this.project.addBlueprintNode(packet);
   }
   @EventHandler(Flags.PLACE_NODE)
@@ -84,32 +85,18 @@ export class TreeSocketService {
     this.project.removeBlueprintNode(packet);
   }
   @EventHandler(Flags.CREATE_RELATION)
-  onCreateRelation(packet: CreateRelationReq) {
+  onCreateRelation(packet: CreateRelationIn) {
     this.project.addBlueprintRelation(packet);
   }
 
   @EventHandler(Flags.REMOVE_RELATION)
-  onRemoveRelation(packet: RemoveRelationReq) {
+  onRemoveRelation(packet: RemoveRelationIn) {
     this.project.removeBlueprintRelation(packet);
   }
 
   @EventHandler(Flags.SUMARRY_NODE)
-  onSumarryNode(packet: EditSumarryIn) {
+  onSumarryNode(packet: EditSummaryIn) {
     this.project.setSumarryNode(packet);
   }
-
-
-  @EventHandler(Flags.CONTENT_NODE)
-  onUpdateNode(packet: WriteNodeContentIn) {
-    if (packet.userId != this.api.user.id)
-      this.project.updateNode(packet);
-  }
-
-  updateNode(nodeId: number, tabId: string, changes: Change[], blueprintId: number) {
-    const doc = this.project.openBlueprints[tabId].nodes.find(el => el.id === nodeId);
-    console.log("Updating blueprint node", nodeId, "tab", tabId);
-    this.socket.emit(Flags.CONTENT_NODE, new WriteNodeContentOut(changes, nodeId, this.api.user.id, blueprintId));
-  }
-
   public get socket() { return this.api.socket; }
 }

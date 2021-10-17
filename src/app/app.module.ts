@@ -63,6 +63,7 @@ import { ElementTagsComponent } from './components/views/board/options-bar/eleme
 import { RenameElementComponent } from './components/views/board/options-bar/rename-element/rename-element.component';
 import { AddSheetComponent } from './components/tabs/document/add-sheet/add-sheet.component';
 import { SheetEditorComponent } from './components/tabs/document/sheet-editor/sheet-editor.component';
+import { DocumentSheetListComponent } from './components/views/board/options-bar/document-sheet-list/document-sheet-list.component';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -103,6 +104,7 @@ import { SheetEditorComponent } from './components/tabs/document/sheet-editor/sh
     RenameElementComponent,
     AddSheetComponent,
     SheetEditorComponent,
+    DocumentSheetListComponent,
   ],
   imports: [
     ReactiveFormsModule,

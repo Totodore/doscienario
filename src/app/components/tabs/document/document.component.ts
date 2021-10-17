@@ -14,6 +14,7 @@ import { Change } from 'src/app/models/sockets/in/element.in';
 import { DocumentSock } from 'src/app/models/api/document.model';
 import { MatDialog } from '@angular/material/dialog';
 import { SheetEditorComponent } from './sheet-editor/sheet-editor.component';
+import { Sheet } from 'src/app/models/api/sheet.model';
 @Component({
   selector: 'app-document',
   templateUrl: './document.component.html',
@@ -190,12 +191,20 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     selection.collapseToEnd();
     this.editorInstance.editing.view.focus();
     this.textSelectionPos = null;
-    this.openSheet();
+    this.openSheet(selection.toString());
   }
 
-  private openSheet(id?: number) {
+  public scrollToSheet(sheet: Sheet) {
+    const element = this.contentElement.querySelector(`[data-mention="$${sheet.title}"]`);
+    if (element) {
+      const rect = element.getBoundingClientRect();
+      this.contentElement.scrollTo({ left: rect.left, top: rect.top, behavior: "smooth" });
+    }
+  }
+
+  private openSheet(idOrTitle: number | string) {
     const dial = this.dialog.open(SheetEditorComponent, {
-      data: [this.id, id],
+      data: [this.id, idOrTitle],
       closeOnNavigation: false,
       height: "90%",
       width: "80%",

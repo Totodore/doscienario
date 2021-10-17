@@ -11,6 +11,7 @@ import { Flags } from 'src/app/models/sockets/flags.enum';
 import { EditorWorkerService } from 'src/app/services/document-worker.service';
 import { Change } from 'src/app/models/sockets/in/element.in';
 import { ProgressService } from 'src/app/services/progress.service';
+import { OpenSheetOut } from 'src/app/models/sockets/out/sheet.out';
 
 @Component({
   templateUrl: './sheet-editor.component.html',
@@ -44,6 +45,7 @@ export class SheetEditorComponent implements OnInit {
   }
 
   private hasEdited = false;
+  private title = "";
 
   private docId: number;
   private sheetId: number;
@@ -53,7 +55,7 @@ export class SheetEditorComponent implements OnInit {
   private wrapper: ElementRef<HTMLDivElement>;
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) data: [number, number?],
+    @Inject(MAT_DIALOG_DATA) data: [number, number | string],
     private readonly project: ProjectService,
     private readonly tabs: TabService,
     private readonly socket: SheetSocketService,
@@ -62,13 +64,16 @@ export class SheetEditorComponent implements OnInit {
     private readonly dialogRef: MatDialogRef<SheetEditorComponent>,
   ) {
     this.docId = data[0];
-    this.sheetId = data[1];
+    if (typeof data[1] === "number")
+      this.sheetId = data[1];
+    else
+      this.title = data[1];
     this.tabId = uuid();
   }
 
   public ngOnInit(): void {
     this.progress.show();
-    this.socket.socket.emit(Flags.OPEN_SHEET, [this.tabId, this.docId, this.sheetId]);
+    this.socket.socket.emit(Flags.OPEN_SHEET, new OpenSheetOut(this.tabId, this.docId, this.sheetId, this.title));
     this.editorWorker.worker.addEventListener<Change[]>(`diff-${this.tabId}`, data => this.onChangeParsed(data));
   }
 

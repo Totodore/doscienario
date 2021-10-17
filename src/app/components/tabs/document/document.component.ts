@@ -12,6 +12,8 @@ import { ElementComponent } from '../element.component';
 import { DocsSocketService } from 'src/app/services/sockets/docs-socket.service';
 import { Change } from 'src/app/models/sockets/in/element.in';
 import { DocumentSock } from 'src/app/models/api/document.model';
+import { MatDialog } from '@angular/material/dialog';
+import { SheetEditorComponent } from './sheet-editor/sheet-editor.component';
 @Component({
   selector: 'app-document',
   templateUrl: './document.component.html',
@@ -24,6 +26,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   @ViewChild("editorView", { static: false })
   private editorView: ElementRef<HTMLElement>;
   private editorInstance: CKEditor5.Editor;
+  public openedSheet?: SheetEditorComponent;
 
   public textSelectionPos?: DOMRect;
 
@@ -76,6 +79,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     private readonly tabs: TabService,
     private readonly docWorker: EditorWorkerService,
     private readonly api: ApiService,
+    private readonly dialog: MatDialog,
     progress: ProgressService,
   ) {
     super(progress);
@@ -172,7 +176,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     this.textSelectionPos = selection.type === "Range" && selection.rangeCount > 0 ? selection.getRangeAt(0).getBoundingClientRect() : null;
   }
 
-  public onAddSheet() {
+  public async onAddSheet() {
     const selection = window.getSelection();
     this.editorInstance.execute("mention", {
       marker: "$",
@@ -186,6 +190,20 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     selection.collapseToEnd();
     this.editorInstance.editing.view.focus();
     this.textSelectionPos = null;
+    this.openSheet();
+  }
+
+  private openSheet(id?: number) {
+    const dial = this.dialog.open(SheetEditorComponent, {
+      data: [this.id, id],
+      closeOnNavigation: false,
+      height: "90%",
+      width: "80%",
+      maxWidth: "100%",
+      id: "editor-dialog",
+    });
+    this.openedSheet = dial.componentInstance;
+    dial.afterClosed().subscribe(() => this.openedSheet = undefined);
   }
 
   get doc(): DocumentSock {

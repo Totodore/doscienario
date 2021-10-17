@@ -1,16 +1,22 @@
+import { SheetSocketService } from './../../../../services/sockets/sheet-socket.service';
 import { TabService } from './../../../../services/tab.service';
 import { ProjectService } from './../../../../services/project.service';
 import { Component, OnInit, EventEmitter, Inject, ViewChild, ElementRef } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CKEditor5, CKEditorComponent, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 import * as CKEditor from "../../../../../lib/ckeditor.js";
 import { DocumentComponent } from '../document.component';
+import { v4 as uuid } from 'uuid';
+import { Flags } from 'src/app/models/sockets/flags.enum';
+import { EditorWorkerService } from 'src/app/services/document-worker.service';
+import { Change } from 'src/app/models/sockets/in/element.in';
+import { ProgressService } from 'src/app/services/progress.service';
 
 @Component({
   templateUrl: './sheet-editor.component.html',
   styleUrls: ['./sheet-editor.component.scss']
 })
-export class SheetEditorComponent {
+export class SheetEditorComponent implements OnInit {
 
   public readonly editor: CKEditor5.EditorConstructor = CKEditor;
   public readonly editorCongig: CKEditor5.Config = {
@@ -41,23 +47,46 @@ export class SheetEditorComponent {
 
   private docId: number;
   private sheetId: number;
+  private readonly tabId: string;
 
   @ViewChild("wrapper")
   private wrapper: ElementRef<HTMLDivElement>;
-  
+
   constructor(
-    @Inject(MAT_DIALOG_DATA) public readonly data: [number, number],
+    @Inject(MAT_DIALOG_DATA) data: [number, number?],
     private readonly project: ProjectService,
     private readonly tabs: TabService,
+    private readonly socket: SheetSocketService,
+    private readonly editorWorker: EditorWorkerService,
+    private readonly progress: ProgressService,
+    private readonly dialogRef: MatDialogRef<SheetEditorComponent>,
   ) {
     this.docId = data[0];
     this.sheetId = data[1];
+    this.tabId = uuid();
   }
 
-  public onContentUpdate(e: ChangeEvent) {
-    this.hasEdited = true;
+  public ngOnInit(): void {
+    this.progress.show();
+    this.socket.socket.emit(Flags.OPEN_SHEET, [this.tabId, this.docId, this.sheetId]);
+    this.editorWorker.worker.addEventListener<Change[]>(`diff-${this.tabId}`, data => this.onChangeParsed(data));
   }
-  
+
+  public loadedSheet() {
+    this.progress.hide();
+  }
+
+  public onChange(e: ChangeEvent) {
+    this.hasEdited = true;
+    const data = e.editor.getData();
+    if (Math.abs(data.length - this.sheet.content.length) > 500) {
+      const change: Change = [2, null, data];
+      this.socket.updateSheet(this.id, this.tabId, [change], this.sheet.lastChangeId, ++this.sheet.clientUpdateId);
+    } else
+      this.editorWorker.worker.postMessage<[string, string]>(`diff-${this.tabId}`, [this.sheet.content, data]);
+    this.project.openSheets[this.tabId].content = data;
+  }
+
   public editorLoaded(editor: CKEditor5.Editor): void {
     editor.ui.getEditableElement().parentElement.insertBefore(
       editor.ui.view.toolbar.element,
@@ -65,6 +94,14 @@ export class SheetEditorComponent {
     );
     this.addTagsListener();
     window.setInterval(() => this.hasEdited && this.addTagsListener(), 1000);
+  }
+
+  public onChangeParsed(changes: Change[]) {
+    this.socket.updateSheet(this.id, this.tabId, changes, this.sheet.lastChangeId, ++this.sheet.clientUpdateId);
+  }
+
+  public onSheetClose() {
+    this.dialogRef.close();
   }
 
   private atDocNames(query: string): string[] {
@@ -92,7 +129,9 @@ export class SheetEditorComponent {
   }
 
   public get sheet() {
-    return this.project.docs.find(el => el.id === this.docId).sheets.find(el => el.id === this.sheetId);
+    return this.project.openSheets[this.tabId];
   }
+  public get id() { return this.sheet?.id; }
+  public get content() { return this.sheet?.content; }
 
 }

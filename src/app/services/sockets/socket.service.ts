@@ -9,6 +9,7 @@ import { User } from '../../models/api/project.model';
 import { DocsSocketService } from './docs-socket.service';
 import { TreeSocketService } from './tree-socket.service';
 import { SnackbarService } from '../snackbar.service';
+import { SheetSocketService } from './sheet-socket.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -21,6 +22,7 @@ export class SocketService {
     private readonly project: ProjectService,
     private readonly docsSocket: DocsSocketService,
     private readonly treeSocket: TreeSocketService,
+    private readonly sheetSocket: SheetSocketService,
   ) {}
 
   connect() {
@@ -31,7 +33,7 @@ export class SocketService {
         "authorization": this.api.jwt
       }
     });
-    registerHandlers([this, this.docsSocket, this.treeSocket], this.socket);
+    registerHandlers([this, this.docsSocket, this.treeSocket, this.sheetSocket], this.socket);
     this.api.socket = this.socket;
   }
 

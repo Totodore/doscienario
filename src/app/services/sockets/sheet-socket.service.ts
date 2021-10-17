@@ -8,6 +8,8 @@ import { Change, OpenElementIn, SendElementIn } from 'src/app/models/sockets/in/
 import { ApiService } from '../api.service';
 import { ProjectService } from '../project.service';
 import { TabService } from '../tab.service';
+import { TabTypes } from 'src/app/models/tab-element.model';
+import { DocumentComponent } from 'src/app/components/tabs/document/document.component';
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +31,8 @@ export class SheetSocketService {
   @EventHandler(Flags.SEND_SHEET)
   onSendSheet(packet: SendElementIn) {
     this.project.addSendSheet(packet);
-    // this.tabs.update(packet.reqId, packet.element.id);
+    const tab = this.getDocumentComponent(packet.element as Sheet);
+    tab.openedSheet?.loadedSheet();
   }
 
   @EventHandler(Flags.CLOSE_SHEET)
@@ -57,9 +60,14 @@ export class SheetSocketService {
   // }
 
   @EventHandler(Flags.REMOVE_SHEET)
-  onRemoveElement(elementId: number) {
-    // this.tabs.removeElementTab(elementId);
+  onRemoveElement([elementId, documentId]: [number, number]) {
+    const tab = this.getDocumentComponent(documentId);
+    tab.openedSheet?.onSheetClose();
     this.project.removeSheet(elementId);
+  }
+
+  private getDocumentComponent(sheet: Sheet | number) {
+    return this.tabs.getTab<DocumentComponent>(TabTypes.DOCUMENT, typeof sheet === 'number' ? sheet : sheet.documentId);
   }
 
   public get socket() { return this.api.socket; }

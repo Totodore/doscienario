@@ -126,6 +126,9 @@ export class TabService {
       this.removeTab(0, false);
     localStorage.removeItem("tab-index");
   }
+  public getTab<T extends ITabElement>(tabType: TabTypes, id: number): T {
+    return this.tabs.find(el => el.type == tabType && el.id === id) as T;
+  }
 
   private addTabToStorage(tab: Type<ITabElement>, id?: number | string) {
     const index = this.availableTabs.indexOf(tab);

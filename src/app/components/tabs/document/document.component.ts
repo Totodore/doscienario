@@ -167,8 +167,10 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
         this.tabs.pushTab(DocumentComponent, true, docId);
     } else if (tag.startsWith("#")) {
 
-    } else if (tag.startsWith("&")) {
-      
+    } else if (tag.startsWith("$")) {
+      const sheet = this.doc.sheets.find(el => el.title.toLowerCase() === tag.substr(1).toLowerCase());
+      if (sheet)
+        this.openSheet(sheet.id);
     }
   }
 
@@ -202,7 +204,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     }
   }
 
-  private openSheet(idOrTitle: number | string) {
+  public openSheet(idOrTitle: number | string) {
     const dial = this.dialog.open(SheetEditorComponent, {
       data: [this.id, idOrTitle],
       closeOnNavigation: false,

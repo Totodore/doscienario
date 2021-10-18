@@ -18,7 +18,7 @@ export class DocumentSheetListComponent {
   ) { }
 
   public onClick(sheet: Sheet) {
-    
+    this.docComponent.openSheet(sheet.id);
   }
 
   public onRightClick(e: Event, sheet: Sheet) {

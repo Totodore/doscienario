@@ -309,19 +309,14 @@ export class ProjectService {
      sheet.content = applyTextChanges(sheet, incomingSheet);
    }
  
-   public removeOpenSheet(sheetId: number) {
-     const index = Object.values(this.openSheets).findIndex(el => el.id == sheetId);
-     delete this.openSheets[index];
-   }
- 
    /**
     * Remove a sheet from its tab id or docId
     * If it is tab id it means that the doc should be opened
     */
    @DataUpdater()
-   public removeSheet(id: string | number, docId?: number) {
+   public removeSheet(id: string | number, docId: number) {
      if (typeof id === 'string') {
-       const doc = this.data.documents.find(el => el.id == this.openSheets[id].documentId);
+       const doc = this.data.documents.find(el => el.id == docId);
        const sheetId = this.openSheets[id].id;
        doc.sheets.splice(doc.sheets.findIndex(el => el.id == sheetId), 1);
        delete this.openSheets[id];

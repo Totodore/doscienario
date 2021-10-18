@@ -2,7 +2,7 @@ import { SheetSocketService } from './../../../../services/sockets/sheet-socket.
 import { TabService } from './../../../../services/tab.service';
 import { ProjectService } from './../../../../services/project.service';
 import { Component, OnInit, EventEmitter, Inject, ViewChild, ElementRef } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CKEditor5, CKEditorComponent, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 import * as CKEditor from "../../../../../lib/ckeditor.js";
 import { DocumentComponent } from '../document.component';
@@ -12,6 +12,7 @@ import { EditorWorkerService } from 'src/app/services/document-worker.service';
 import { Change } from 'src/app/models/sockets/in/element.in';
 import { ProgressService } from 'src/app/services/progress.service';
 import { OpenSheetOut } from 'src/app/models/sockets/out/sheet.out';
+import { ConfirmComponent } from 'src/app/components/utils/confirm/confirm.component';
 
 @Component({
   templateUrl: './sheet-editor.component.html',
@@ -62,6 +63,7 @@ export class SheetEditorComponent implements OnInit {
     private readonly editorWorker: EditorWorkerService,
     private readonly progress: ProgressService,
     private readonly dialogRef: MatDialogRef<SheetEditorComponent>,
+    private readonly dialog: MatDialog,
   ) {
     this.docId = data[0];
     if (typeof data[1] === "number")
@@ -106,7 +108,17 @@ export class SheetEditorComponent implements OnInit {
   }
 
   public onSheetClose() {
+    delete this.project.openSheets[this.tabId];
     this.dialogRef.close();
+  }
+  public onSheetDelete() {
+    const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer cette note ?" });
+    dialog.componentInstance.confirm.subscribe(() => {
+      this.socket.socket.emit(Flags.REMOVE_SHEET, [this.id, this.docId]);
+      this.project.removeSheet(this.tabId, this.docId);
+      this.onSheetClose();
+      dialog.close();
+    });
   }
 
   private atDocNames(query: string): string[] {

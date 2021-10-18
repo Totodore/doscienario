@@ -49,7 +49,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       feeds: [
         {
           marker: "&",
-          feed: () => []
+          feed: (query: string) => this.atSheets(query),
         },
         {
           marker: '@',
@@ -154,6 +154,11 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     return this.project.tags.filter(el => el.title.toLowerCase().startsWith(query.toLowerCase())).map(el => "#" + el.title);
   }
 
+  private atSheets(newSheetName: string): string[] {
+    console.log(newSheetName);
+    return [];
+  }
+
   private addTagsListener() {
     this.contentElement.querySelectorAll(".mention")
       .forEach((el: HTMLSpanElement) => el.onclick = () => this.onTagClick(el.getAttribute("data-mention")));
@@ -216,6 +221,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     this.openedSheet = dial.componentInstance;
     dial.afterClosed().subscribe(() => this.openedSheet = undefined);
   }
+  public on
 
   get doc(): DocumentSock {
     return this.project.openDocs[this.tabId];

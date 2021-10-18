@@ -1,6 +1,6 @@
 <div class="wrapper" *ngIf="doc">
 	<div class="sheet" *ngFor="let sheet of sheets" mat-ripple (click)="onClick(sheet)" (contextmenu)="onRightClick($event, sheet)">
 		<mat-icon>note</mat-icon>
-		<span class="name">"{{ sheet.title }}"</span>
+		<span class="name">{{ sheet.title }}</span>
 	</div>
 </div>

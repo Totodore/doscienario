@@ -35,11 +35,6 @@ export class SheetSocketService {
     tab.openedSheet?.loadedSheet();
   }
 
-  @EventHandler(Flags.CLOSE_SHEET)
-  onCloseSheet(elementId: number) {
-    this.project.removeOpenSheet(elementId);
-  }
-
   public updateSheet(elementId: number, tabId: string, changes: Change[], lastChangeId: number, clientUpdateId: number) {
     const sheet = this.project.openSheets[tabId];
     console.log("Updating sheet", elementId, "tab", tabId);
@@ -63,7 +58,7 @@ export class SheetSocketService {
   onRemoveElement([elementId, documentId]: [number, number]) {
     const tab = this.getDocumentComponent(documentId);
     tab.openedSheet?.onSheetClose();
-    this.project.removeSheet(elementId);
+    this.project.removeSheet(elementId, documentId);
   }
 
   private getDocumentComponent(sheet: Sheet | number) {

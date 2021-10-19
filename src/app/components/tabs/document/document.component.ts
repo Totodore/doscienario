@@ -48,7 +48,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     mention: {
       feeds: [
         {
-          marker: "&",
+          marker: "/",
           feed: (query: string) => this.atSheets(query),
         },
         {
@@ -187,9 +187,9 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   public async onAddSheet() {
     const selection = window.getSelection();
     this.editorInstance.execute("mention", {
-      marker: "$",
+      marker: "/",
       mention: {
-        id: "$" + selection.toString(),
+        id: "/" + selection.toString(),
         name: selection.toString(),
         title: selection.toString(),
       },

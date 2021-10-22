@@ -69,13 +69,13 @@ export class SheetEditorComponent implements OnInit {
     if (typeof data[1] === "number")
       this.sheetId = data[1];
     else
-      this.title = data[1].toLowerCase();
+      this.title = data[1];
     this.tabId = uuid();
   }
 
   public ngOnInit(): void {
     this.progress.show();
-    this.socket.socket.emit(Flags.OPEN_SHEET, new OpenSheetOut(this.tabId, this.docId, this.sheetId, this.title.toLowerCase()));
+    this.socket.socket.emit(Flags.OPEN_SHEET, new OpenSheetOut(this.tabId, this.docId, this.sheetId, this.title));
     this.editorWorker.worker.addEventListener<Change[]>(`diff-${this.tabId}`, data => this.onChangeParsed(data));
   }
 

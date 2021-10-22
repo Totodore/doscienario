@@ -172,7 +172,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
         this.tabs.pushTab(DocumentComponent, true, docId);
     } else if (tag.startsWith("#")) {
 
-    } else if (tag.startsWith("$")) {
+    } else if (tag.startsWith("/")) {
       const sheet = this.doc.sheets.find(el => el.title.toLowerCase() === tag.substr(1).toLowerCase());
       if (sheet)
         this.openSheet(sheet.id);
@@ -181,24 +181,31 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
 
   public onTextSelection() {
     const selection = window.getSelection();
-    this.textSelectionPos = selection.type === "Range" && selection.rangeCount > 0 ? selection.getRangeAt(0).getBoundingClientRect() : null;
+    const mentions = Array.from(this.editorView.nativeElement.querySelectorAll(".mention"));
+    const containsNode = mentions && mentions.reduce((prev, curr) => prev || selection.containsNode(curr, true), false);
+    if (selection.type === "Range" && selection.toString().trim().length > 0 && !containsNode)
+      this.textSelectionPos = selection.getRangeAt(0).getBoundingClientRect()
+    else 
+      this.textSelectionPos = null;
   }
 
   public async onAddSheet() {
     const selection = window.getSelection();
+    const title = selection.toString();
     this.editorInstance.execute("mention", {
       marker: "/",
       mention: {
-        id: "/" + selection.toString(),
-        name: selection.toString(),
-        title: selection.toString(),
+        id: "/" + title,
+        name: title,
+        title,
       },
       range: this.editorInstance.model.document.selection.getFirstRange(),
     });
+    this.hasEdited = true;
+    this.openSheet(title);
+    this.textSelectionPos = null;
     selection.collapseToEnd();
     this.editorInstance.editing.view.focus();
-    this.textSelectionPos = null;
-    this.openSheet(selection.toString());
   }
 
   public scrollToSheet(sheet: Sheet) {

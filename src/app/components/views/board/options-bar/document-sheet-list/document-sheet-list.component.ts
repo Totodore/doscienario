@@ -40,7 +40,10 @@ export class DocumentSheetListComponent {
     return this.docComponent.tabId;
   }
   public get sheets() {
-    return this.doc.sheets;
+    return this.docComponent.getSortedSheets()[0];
+  }
+  public get notFoundSheets() {
+    return this.docComponent.getSortedSheets()[1];
   }
 
 }

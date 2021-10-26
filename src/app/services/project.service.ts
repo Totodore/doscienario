@@ -296,6 +296,9 @@ export class ProjectService {
     if (!parentDoc.sheets.find(el => el.id === sheet.id)) {
       parentDoc.sheets.push(sheet);
     }
+    if (this.getDoc(sheet.documentId)) {
+      this.getDoc(sheet.documentId).sheets.push(sheet);
+    }
   }
    @DataUpdater()
    public addOpenSheet(sheet: Sheet) {

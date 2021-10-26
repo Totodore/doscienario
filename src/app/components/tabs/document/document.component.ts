@@ -224,7 +224,20 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     this.openedSheet = dial.componentInstance;
     dial.afterClosed().subscribe(() => this.openedSheet = undefined);
   }
-  // public on
+  
+  public getSortedSheets(): [Sheet[], Sheet[]] {
+    const mentions = this.contentElement?.querySelectorAll("span.mention[data-mention^='/']") || [];
+    let sheets = [];
+    for (let i = 0; i < mentions.length; i++) {
+      const title = mentions[i].getAttribute("data-mention");
+      if (title.startsWith("/")) {
+        const sheet = this.doc.sheets.find(el => el.title.toLowerCase() === title.substr(1).toLowerCase());
+        if (sheet)
+          sheets.insert(i, sheet);
+      }
+    }
+    return [sheets, this.doc.sheets.filter(el => !sheets.includes(el))];
+  }
 
   get doc(): DocumentSock {
     return this.project.openDocs[this.tabId];

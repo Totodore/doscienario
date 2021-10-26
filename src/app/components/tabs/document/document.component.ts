@@ -205,7 +205,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   }
 
   public scrollToSheet(sheet: Sheet) {
-    const element = this.contentElement.querySelector(`[data-mention="$${sheet.title}"]`);
+    const element = this.contentElement.querySelector(`[data-mention="/${sheet.title}"]`);
     if (element) {
       const rect = element.getBoundingClientRect();
       this.contentElement.scrollTo({ left: rect.left, top: rect.top, behavior: "smooth" });

@@ -4,6 +4,7 @@
 .wrapper {
 	display: block;
 	flex: 1;
+	overflow-y: auto;
 }
 .sheet {
 	display: flex;

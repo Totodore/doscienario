@@ -49,7 +49,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       feeds: [
         {
           marker: "/",
-          feed: (query: string) => this.atSheets(query),
+          feed: (query: string) => [],
         },
         {
           marker: '@',
@@ -154,14 +154,9 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     return this.project.tags.filter(el => el.title.toLowerCase().startsWith(query.toLowerCase())).map(el => "#" + el.title);
   }
 
-  private atSheets(newSheetName: string): string[] {
-    console.log(newSheetName);
-    return [];
-  }
-
   private addTagsListener() {
     this.contentElement.querySelectorAll(".mention")
-      .forEach((el: HTMLSpanElement) => el.onclick = () => this.onTagClick(el.getAttribute("data-mention")));
+      .forEach((el: HTMLSpanElement) => el.onclick ??= () => this.onTagClick(el.getAttribute("data-mention")));
     this.hasEdited = false;
   }
 
@@ -191,7 +186,8 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
 
   public async onAddSheet() {
     const selection = window.getSelection();
-    const title = selection.toString();
+    let title = selection.toString();
+    if (title.startsWith("/")) title = title.substr(1);
     this.editorInstance.execute("mention", {
       marker: "/",
       mention: {
@@ -202,7 +198,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       range: this.editorInstance.model.document.selection.getFirstRange(),
     });
     this.hasEdited = true;
-    this.openSheet(title);
+    this.openSheet(this.doc.sheets.find(el => el.title.toLowerCase() == title.toLowerCase())?.id || title);
     this.textSelectionPos = null;
     selection.collapseToEnd();
     this.editorInstance.editing.view.focus();
@@ -228,7 +224,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     this.openedSheet = dial.componentInstance;
     dial.afterClosed().subscribe(() => this.openedSheet = undefined);
   }
-  public on
+  // public on
 
   get doc(): DocumentSock {
     return this.project.openDocs[this.tabId];

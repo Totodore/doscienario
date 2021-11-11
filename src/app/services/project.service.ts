@@ -302,10 +302,14 @@ export class ProjectService {
     if (!parentDoc!.sheets.find(el => el.id === sheet.id)) {
       parentDoc!.sheets.push(sheet);
     }
-    const doc = this.getDoc(sheet.documentId);
-    if (doc) {
-      doc.sheets.push(sheet);
-    }
+    // const doc = this.getDoc(sheet.documentId);
+    // if (doc) {
+    //   const sheetIndex = doc.sheets.findIndex(el => el.id === sheet.id);
+    //   if (sheetIndex >= 0)
+    //     doc.sheets[sheetIndex] = sheet;
+    //   else
+    //     doc.sheets.push(sheet);
+    // }
   }
    @DataUpdater()
    public addOpenSheet(sheet: Sheet) {

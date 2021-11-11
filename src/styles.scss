@@ -77,6 +77,11 @@ app-menu {
 	}
 }
 ckeditor {
+	.ck.ck-editor__main {
+    max-height: calc(100vh - 50px) !important;
+    flex-direction: column !important;
+    display: flex !important;
+	}
 	.ck-editor__editable_inline {
 		height: calc(99vh - 48px - 43px);
 		background-color: $grey-dark-color !important;

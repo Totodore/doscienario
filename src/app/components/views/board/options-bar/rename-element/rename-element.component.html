@@ -3,5 +3,5 @@
 	<input type="text" #input matInput [(ngModel)]="title" (ngModelChange)="titleChange.emit($event)">
 	<input style="display: none;" matInput [ngxMatColorPicker]="picker" [(ngModel)]="colorObject" (ngModelChange)="onColorObjectChange($event)">
 	<ngx-mat-color-toggle matSuffix [for]="picker"></ngx-mat-color-toggle>
-	<ngx-mat-color-picker #picker [touchUi]="false" [color]="colorObject" ></ngx-mat-color-picker>
+	<ngx-mat-color-picker #picker [touchUi]="false" [color]="$any(colorObject)" ></ngx-mat-color-picker>
 </mat-form-field>

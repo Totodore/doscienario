@@ -5,6 +5,7 @@ import { ProgressService } from 'src/app/services/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { Component, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core';
+//@ts-ignore
 import * as CKEditor from "../../../../lib/ckeditor.js";
 import { CKEditor5, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 import { Flags } from 'src/app/models/sockets/flags.enum';
@@ -25,8 +26,8 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   public lastChangeId: number;
 
   @ViewChild("editorView", { static: false })
-  private editorView: ElementRef<HTMLElement>;
-  private editorInstance: CKEditor5.Editor;
+  private editorView?: ElementRef<HTMLElement>;
+  private editorInstance?: CKEditor5.Editor;
   public openedSheet?: SheetEditorComponent;
 
   public textSelectionPos?: DOMRect;
@@ -91,10 +92,12 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     super.onClose();
   }
 
-  public openTab(id?: number): string {
+  public openTab(id: string | number): string {
     super.openTab(id);
     this.socket.socket.emit(Flags.OPEN_DOC, [this.tabId, id]);
     this.docWorker.worker.addEventListener<Change[]>(`diff-${this.tabId}`, (data) => this.onDocParsed(data));
+    if (!this.tabId)
+      throw new Error("No tabId for document");
     return this.tabId;
   }
 
@@ -107,9 +110,9 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       editor.ui.view.toolbar.element,
       editor.ui.getEditableElement()
     );
-    editor.model.document.on("change", e => !e.name.endsWith(":data") && this.onTextSelection());
+    editor.model.document.on("change", (e: any) => !e.name.endsWith(":data") && this.onTextSelection());
     this.editorInstance = editor;
-    this.contentElement = this.editorView.nativeElement.querySelector(".ck-content");
+    this.contentElement = this.editorView?.nativeElement.querySelector(".ck-content") as HTMLElement;
     this.contentElement.scrollTo({ left: this.scroll?.[0], top: this.scroll?.[1], behavior: "auto" });
     window.setInterval(() => this.hasEdited && this.addTagsListener(), 1000);
     this.addTagsListener();
@@ -117,7 +120,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
 
   public loadedTab() {
     super.loadedTab();
-    this.project.openDocs[this.tabId].content = this.doc.content;
+    this.project.openDocs[this.tabId!].content = this.doc.content;
   }
 
   public onChange(e: ChangeEvent) {
@@ -125,19 +128,19 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     this.hasEdited = true;
     if (Math.abs(data.length - this.doc.content.length) > 500) {
       const change: Change = [2, null, data];
-      this.socket.updateDocument(this.id, this.tabId, [change], this.doc.lastChangeId, ++this.doc.clientUpdateId);
+      this.socket.updateDocument(this.id, this.tabId!, [change], this.doc.lastChangeId, ++this.doc.clientUpdateId!);
     } else {
       this.docWorker.worker.postMessage<[string, string]>(`diff-${this.tabId}`, [this.doc.content, data]);
       this.progressWatcher();
     }
-    this.project.openDocs[this.tabId].content = data;
+    this.project.openDocs[this.tabId!].content = data;
   }
 
   private onDocParsed(changes: Change[]) {
     this.displayProgress = false;
     this.progress.hide();
     try {
-      this.socket.updateDocument(this.id, this.tabId, changes, this.doc.lastChangeId, ++this.doc.clientUpdateId);
+      this.socket.updateDocument(this.id, this.tabId!, changes, this.doc.lastChangeId, ++this.doc.clientUpdateId);
     } catch (error) {   }
   }
 
@@ -222,16 +225,16 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       id: "editor-dialog",
     });
     this.openedSheet = dial.componentInstance;
-    dial.afterClosed().subscribe(() => this.openedSheet = undefined);
+    // dial.afterClosed().subscribe(() => this.openedSheet = undefined);
   }
   
   public getSortedSheets(): [Sheet[], Sheet[]] {
     const mentions = this.contentElement?.querySelectorAll("span.mention[data-mention^='/']") || [];
-    let sheets = [];
+    let sheets: Sheet[] = [];
     for (let i = 0; i < mentions.length; i++) {
       const title = mentions[i].getAttribute("data-mention");
-      if (title.startsWith("/")) {
-        const sheet = this.doc.sheets.find(el => el.title.toLowerCase() === title.substr(1).toLowerCase());
+      if (title?.startsWith("/")) {
+        const sheet = this.doc.sheets.find(el => el.title?.toLowerCase() === title.substr(1).toLowerCase());
         if (sheet)
           sheets.insert(i, sheet);
       }
@@ -240,7 +243,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   }
 
   get doc(): DocumentSock {
-    return this.project.openDocs[this.tabId];
+    return this.project.openDocs[this.tabId!]!;
   }
 
   get title(): string {
@@ -251,8 +254,8 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     else return this.doc.title;
   }
 
-  get id(): number {
-     return this.doc?.id;
+  get id(): number | undefined {
+    return this.doc?.id;
   }
 
 }

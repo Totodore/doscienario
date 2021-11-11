@@ -1,4 +1,4 @@
 <div class="result" *ngFor="let result of results" mat-ripple (click)="onClick(result)">
 	<mat-icon [style.color]="'#' + result.color" >{{ getIconName(result) }}</mat-icon>
-	<span class="name">{{ result.name || result.title }}</span>
+	<span class="name">{{ result.title }}</span>
 </div>

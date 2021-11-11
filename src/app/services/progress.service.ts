@@ -5,10 +5,10 @@ import { ChangeDetectorRef, Injectable } from '@angular/core';
 })
 export class ProgressService {
 
-  private _mode: "determinate" | "indeterminate";
+  private _mode?: "determinate" | "indeterminate";
   private _showing: boolean = false;
   private _value: number = 0;
-  private _changeDetector: ChangeDetectorRef;
+  private _changeDetector!: ChangeDetectorRef;
 
   public show(determinate = false) {
     this._mode = determinate ? "determinate" : "indeterminate";
@@ -27,7 +27,7 @@ export class ProgressService {
   }
 
   get mode(): "determinate" | "indeterminate" {
-    return this._mode;
+    return this._mode ?? "indeterminate";
   }
   get showing(): boolean {
     return this._showing;

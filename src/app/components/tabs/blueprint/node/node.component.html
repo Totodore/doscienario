@@ -1,5 +1,5 @@
 <div class="wrapper" #wrapper>
-  <mat-form-field color="accent">
+  <mat-form-field color="accent" [appearance]="$any('none')">
     <textarea *ngIf="data" matInput
               cdkTextareaAutosize
               #autosize="cdkTextareaAutosize"

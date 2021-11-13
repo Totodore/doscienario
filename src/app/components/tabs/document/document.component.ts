@@ -177,6 +177,27 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     }
   }
 
+  /**
+   * Find a mention inside the ckeditor model from a mention title
+   * @param mention The title of the mention
+   * @returns A Mention object
+   */
+  private findMentionFromModel(mention: string): any {
+    const childIterate = (element: any) => {
+      for (const attr of element.getAttributes()) {
+        if (attr[0] === "mention" && attr[1].id === `/${mention}`)
+          return element;
+      }
+      if (element.is("element"))
+        for (const child of element.getChildren()) {
+          const mention = childIterate(child);
+          if (mention)
+            return mention;
+        }
+    }
+    return childIterate(this.editorInstance.model.document.getRoot());
+  }
+
   public onTextSelection() {
     const selection = window.getSelection();
     const mentions = Array.from(this.editorView.nativeElement.querySelectorAll(".mention"));
@@ -204,6 +225,20 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     this.openSheet(this.doc.sheets.find(el => el.title.toLowerCase() == title.toLowerCase())?.id || title);
     this.textSelectionPos = null;
     selection.collapseToEnd();
+    this.editorInstance.editing.view.focus();
+  }
+
+  /**
+   * This will transform the sheet tag to a normal text
+   */
+  public async onRemoveSheet(sheet: Sheet) {
+    this.editorInstance.model.change(writer => {
+      const mention = this.findMentionFromModel(sheet.title);
+      const text = writer.createText(sheet.title);
+      const pos = writer.createPositionAt(mention.parent, mention.index);
+      writer.insert(text, pos);
+      writer.remove(mention);
+    });
     this.editorInstance.editing.view.focus();
   }
 

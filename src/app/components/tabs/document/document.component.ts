@@ -266,15 +266,16 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   public getSortedSheets(): [Sheet[], Sheet[]] {
     const mentions = this.contentElement?.querySelectorAll("span.mention[data-mention^='/']") || [];
     let sheets: Sheet[] = [];
+    const doc = this.project.docs.find(el => el.id === this.id);
     for (let i = 0; i < mentions.length; i++) {
       const title = mentions[i].getAttribute("data-mention");
       if (title?.startsWith("/")) {
-        const sheet = this.doc.sheets.find(el => el.title?.toLowerCase() === title.substr(1).toLowerCase());
+        const sheet = doc.sheets.find(el => el.title?.toLowerCase() === title.substr(1).toLowerCase());
         if (sheet)
           sheets.insert(i, sheet);
       }
     }
-    return [sheets, this.doc.sheets.filter(el => !sheets.includes(el))];
+    return [sheets, doc.sheets.filter(el => !sheets.includes(el))];
   }
 
   get doc(): DocumentSock {

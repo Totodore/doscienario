@@ -182,18 +182,21 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
    * @param mention The title of the mention
    * @returns A Mention object
    */
-  private findMentionFromModel(mention: string): any {
+  private findMentionsFromModel(mention: string): any[] {
     const childIterate = (element: any) => {
+      const mentions = [];
       for (const attr of element.getAttributes()) {
         if (attr[0] === "mention" && attr[1].id === `/${mention}`)
-          return element;
+          mentions.push(element);
       }
-      if (element.is("element"))
+      if (element.is("element")) {
         for (const child of element.getChildren()) {
           const mention = childIterate(child);
           if (mention)
-            return mention;
+            mentions.push(...mention);
         }
+      }
+      return mentions;
     }
     return childIterate(this.editorInstance.model.document.getRoot());
   }
@@ -222,7 +225,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       range: this.editorInstance.model.document.selection.getFirstRange(),
     });
     this.hasEdited = true;
-    this.openSheet(this.doc.sheets.find(el => el.title.toLowerCase() == title.toLowerCase())?.id || title);
+    this.openSheet(this.project.docs.find(el => el.id === this.id).sheets.find(el => el.title.toLowerCase() == title.toLowerCase())?.id || title);
     this.textSelectionPos = null;
     selection.collapseToEnd();
     this.editorInstance.editing.view.focus();
@@ -233,11 +236,13 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
    */
   public async onRemoveSheet(sheet: Sheet) {
     this.editorInstance.model.change(writer => {
-      const mention = this.findMentionFromModel(sheet.title);
-      const text = writer.createText(sheet.title);
-      const pos = writer.createPositionAt(mention.parent, mention.index);
-      writer.insert(text, pos);
-      writer.remove(mention);
+      const mentions = this.findMentionsFromModel(sheet.title);
+      for (const mention of mentions) {
+        const text = writer.createText(sheet.title);
+        const pos = writer.createPositionAt(mention.parent, mention.index);
+        writer.insert(text, pos);
+        writer.remove(mention);
+      }
     });
     this.editorInstance.editing.view.focus();
   }
@@ -265,17 +270,17 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   
   public getSortedSheets(): [Sheet[], Sheet[]] {
     const mentions = this.contentElement?.querySelectorAll("span.mention[data-mention^='/']") || [];
-    let sheets: Sheet[] = [];
+    const sheets = new Set<Sheet>();
     const doc = this.project.docs.find(el => el.id === this.id);
     for (let i = 0; i < mentions.length; i++) {
       const title = mentions[i].getAttribute("data-mention");
       if (title?.startsWith("/")) {
         const sheet = doc.sheets.find(el => el.title?.toLowerCase() === title.substr(1).toLowerCase());
         if (sheet)
-          sheets.insert(i, sheet);
+          sheets.add(sheet);
       }
     }
-    return [sheets, doc.sheets.filter(el => !sheets.includes(el))];
+    return [Array.from(sheets), doc.sheets.filter(el => !sheets.has(el))];
   }
 
   get doc(): DocumentSock {

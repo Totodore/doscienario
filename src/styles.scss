@@ -206,31 +206,6 @@ button:focus {
 	background-color: $grey-medium-color !important;
 	color: whitesmoke !important;
 }
-
-.mat-tab-label-container {
-	&::-webkit-scrollbar {
-		height: 2px;
-	}
-	&::-webkit-scrollbar-thumb {
-		background-color: rgba(255, 255, 255, 0.35);
-		border-radius: 30px;
-	}
-	scrollbar-width: thin;
-	overflow-x: auto !important;
-	.mat-tab-label {
-		padding: 0 !important;
-		min-width: 0 !important;
-		justify-content: flex-start !important;
-		.mat-tab-label-content {
-			justify-content: space-between;
-			padding-left: 15px;
-			.mat-icon-button {
-				padding: 0 !important;
-				margin-left: 5px;
-			}
-		}
-	}
-}
 .toggle-btn.on {
 	border: solid 2px #b0bec5 !important;
 }

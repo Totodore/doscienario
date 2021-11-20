@@ -1,13 +1,14 @@
-import { Blueprint } from './../../../models/sockets/blueprint-sock.model';
-import { TabTypes } from './../../../models/tab-element.model';
-import { Tag } from './../../../models/sockets/tag-sock.model';
+import { AddTagElementOut, RemoveTagElementOut } from './../../../models/sockets/out/tag.out';
 import { SocketService } from '../../../services/sockets/socket.service';
 import { ProjectService } from './../../../services/project.service';
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { diff as arrayDiff } from "fast-array-diff";
 import { Flags } from 'src/app/models/sockets/flags.enum';
-import { DocumentSock, EditTagDocumentReq } from 'src/app/models/sockets/document-sock.model';
+import { TabTypes } from 'src/app/models/tab-element.model';
+import { DocumentSock } from 'src/app/models/api/document.model';
+import { Blueprint } from 'src/app/models/api/blueprint.model';
+import { Tag } from 'src/app/models/api/tag.model';
 
 @Component({
   selector: 'app-edit-tags',
@@ -34,9 +35,9 @@ export class EditTagsComponent {
   
       //Little patch with filter method to avoid repetitions in diff.added and removed
       for (const addedTag of diff.added.filter(el => !diff.removed.find(val => val.title === el.title)))
-        this.socket.socket.emit(Flags.TAG_ADD_DOC, new EditTagDocumentReq(docId, addedTag.title));
+        this.socket.socket.emit(Flags.TAG_ADD_DOC, new AddTagElementOut(docId, addedTag.title));
       for (const removedTag of diff.removed.filter(el => !diff.added.find(val => val.title == el.title)))
-        this.socket.socket.emit(Flags.TAG_REMOVE_DOC, new EditTagDocumentReq(docId, removedTag.title));
+        this.socket.socket.emit(Flags.TAG_REMOVE_DOC, new RemoveTagElementOut(docId, removedTag.title));
     }
     else if (this.data[1] === TabTypes.BLUEPRINT) {
       this.project.updateBlueprintTags(this.data[0], newTags);
@@ -44,9 +45,9 @@ export class EditTagsComponent {
       
       //Little patch with filter method to avoid repetitions in diff.added and removed
       for (const addedTag of diff.added.filter(el => !diff.removed.find(val => val.title === el.title))) 
-        this.socket.socket.emit(Flags.TAG_ADD_BLUEPRINT, new EditTagDocumentReq(docId, addedTag.title));
+        this.socket.socket.emit(Flags.TAG_ADD_BLUEPRINT, new AddTagElementOut(docId, addedTag.title));
       for (const removedTag of diff.removed.filter(el => !diff.added.find(val => val.title == el.title)))
-        this.socket.socket.emit(Flags.TAG_REMOVE_BLUEPRINT, new EditTagDocumentReq(docId, removedTag.title));
+        this.socket.socket.emit(Flags.TAG_REMOVE_BLUEPRINT, new RemoveTagElementOut(docId, removedTag.title));
     }
   }
   public tagClick(tagName: string) {

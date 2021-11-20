@@ -1,6 +1,6 @@
 <div class="outer-wrapper" *ngIf="show">
 	<div class="wrapper" #wrapper [class.grabbing]="drawState === 'moving'" (wheel)="onWheel($event)"
-		(scroll)="onScroll($event)">
+		(scroll)="onScroll($any($event))">
 		<div class="overlay" *ngIf="blueprint" #overlayEl [class.dragging]="drawState == 'dragging'"
 			(mousedown)="onMouseDown($event)" (mouseup)="onMouseUp($event)" (mousemove)="onMouseMove($event)"
 			(mouseout)="onMouseUp($event)" (click)="onClick($event)"

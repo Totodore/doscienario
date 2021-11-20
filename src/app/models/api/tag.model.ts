@@ -1,4 +1,5 @@
-import { DataModel, DataType, Element } from '../default.model';
+import { DataModel, DataType } from "../default.model";
+
 export class Tag extends DataModel<Tag> {
 
   constructor(obj: Partial<Tag>);
@@ -20,17 +21,4 @@ export class Tag extends DataModel<Tag> {
   public title: string;
   public color: string;
   public readonly type = DataType.Tag;
-}
-
-export class UpdateTagColorReq {
-  constructor(
-    public title: string,
-    public color: string
-  ) { }
-}
-export class UpdateTagNameReq {
-  constructor(
-    public oldTitle: string,
-    public title: string
-  ) { }
 }

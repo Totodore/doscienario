@@ -7,6 +7,7 @@ declare global {
 
   interface Array<T> {
     equals<T>(this: Array<T>, array1: Array<T>): boolean;
+    insert<T>(this: Array<T>, index: number, item: T): void;
     // includes<T>(this: Array<T>, el: T, custom?: (el: T, arr) => ): boolean;
   }
 

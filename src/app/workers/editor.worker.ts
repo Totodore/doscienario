@@ -1,5 +1,5 @@
-import { Change } from '../models/sockets/document-sock.model';
 import * as diff from "diff";
+import { Change } from "../models/sockets/in/element.in";
 /// <reference lib="webworker" />
 
 addEventListener('message', (e: MessageEvent<[string, any] | string>) => {

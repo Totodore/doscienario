@@ -19,13 +19,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
     public readonly tabService: TabService,
   ) { }
 
-  ngOnInit(): void {
-    this.tabViewport = document.querySelector(".mat-tab-label-container");
+  public ngOnInit(): void {
+    this.tabViewport = document.querySelector(".mat-tab-header");
     this.tabViewport.addEventListener("mouseenter", this.mouseEnter);
     this.tabViewport.addEventListener("mouseleave", this.mouseLeave);
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.tabViewport.removeEventListener("mouseenter", this.mouseEnter);
     this.tabViewport.removeEventListener("mouseleave", this.mouseLeave);
   }

@@ -77,6 +77,11 @@ app-menu {
 	}
 }
 ckeditor {
+	.ck.ck-editor__main {
+    max-height: calc(100vh - 50px) !important;
+    flex-direction: column !important;
+    display: flex !important;
+	}
 	.ck-editor__editable_inline {
 		height: calc(99vh - 48px - 43px);
 		background-color: $grey-dark-color !important;
@@ -140,6 +145,9 @@ ckeditor {
 		overflow-y: auto !important;
 		.mention {
 			cursor: pointer !important;
+			display: inline-block !important;
+			color : #6495ed !important;
+			background-color : transparent !important;
 		}
 		.image {
 			@include mat-elevation(1);
@@ -197,31 +205,6 @@ button:focus {
 .ngx-mat-colorpicker-content {
 	background-color: $grey-medium-color !important;
 	color: whitesmoke !important;
-}
-
-.mat-tab-label-container {
-	&::-webkit-scrollbar {
-		height: 2px;
-	}
-	&::-webkit-scrollbar-thumb {
-		background-color: rgba(255, 255, 255, 0.35);
-		border-radius: 30px;
-	}
-	scrollbar-width: thin;
-	overflow-x: auto !important;
-	.mat-tab-label {
-		padding: 0 !important;
-		min-width: 0 !important;
-		justify-content: flex-start !important;
-		.mat-tab-label-content {
-			justify-content: space-between;
-			padding-left: 15px;
-			.mat-icon-button {
-				padding: 0 !important;
-				margin-left: 5px;
-			}
-		}
-	}
 }
 .toggle-btn.on {
 	border: solid 2px #b0bec5 !important;

@@ -5,14 +5,15 @@ import { MatDialog } from '@angular/material/dialog';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { Vector } from './../../../../../types/global.d';
 import { TabService } from './../../../../services/tab.service';
-import { Node, EditSumarryOut } from './../../../../models/sockets/blueprint-sock.model';
 import { Component, Input, OnInit, Output, EventEmitter, HostListener, ViewChild, ElementRef, OnDestroy, AfterViewInit } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { ProjectService } from 'src/app/services/project.service';
 import { EditorWorkerService } from 'src/app/services/document-worker.service';
-import { Change } from 'src/app/models/sockets/document-sock.model';
 import { v4 } from 'uuid';
 import { TreeSocketService } from 'src/app/services/sockets/tree-socket.service';
+import { Change } from 'src/app/models/sockets/in/element.in';
+import { Node } from 'src/app/models/api/blueprint.model';
+import { EditSummaryOut } from 'src/app/models/sockets/out/blueprint.out';
 @Component({
   selector: 'app-node',
   templateUrl: './node.component.html',
@@ -133,7 +134,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
     this.remove.emit();
   }
   public onChange(val: string) {
-    this.socket.socket.emit(Flags.SUMARRY_NODE, new EditSumarryOut(this.data.id, val, this.blueprintId));
+    this.socket.socket.emit(Flags.SUMARRY_NODE, new EditSummaryOut(this.data.id, val, this.blueprintId));
   }
 
   public openDetailsView() {
@@ -151,22 +152,22 @@ export class NodeComponent implements AfterViewInit, OnInit {
   }
 
   public async onContentData(val: string) {
-    if (Math.abs(val.length - this.data.content?.length) > 500) {
-      const change: Change = [2, null, val];
-      this.socket.updateNode(this.data.id, this.tabId, [change], this.blueprintId);
-    } else {
-      this.progressWatcher();
-      this.editorWorker.worker.postMessage<Vector<string>>(`diff-${this.nodeUuid}`, [this.data.content || "", val]);
-    }
-    this.data.content = val;
+    // if (Math.abs(val.length - this.data.content?.length) > 500) {
+    //   const change: Change = [2, null, val];
+    //   this.socket.updateNode(this.data.id, this.tabId, [change], this.blueprintId);
+    // } else {
+    //   this.progressWatcher();
+    //   this.editorWorker.worker.postMessage<Vector<string>>(`diff-${this.nodeUuid}`, [this.data.content || "", val]);
+    // }
+    // this.data.content = val;
   }
 
   private onContentDataResult(changes: Change[]) {
-    this.displayProgress = false;
-    this.progress.hide();
-    try {
-      this.socket.updateNode(this.data.id, this.tabId, changes, this.blueprintId);
-    } catch (error) {   }
+    // this.displayProgress = false;
+    // this.progress.hide();
+    // try {
+    //   this.socket.updateNode(this.data.id, this.tabId, changes, this.blueprintId);
+    // } catch (error) {   }
   }
 
   private progressWatcher() {

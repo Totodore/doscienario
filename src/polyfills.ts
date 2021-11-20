@@ -77,6 +77,9 @@ Array.prototype.equals = function<T = any>(this: Array<T>, array: Array<T>) {
   }
   return true;
 }
+Array.prototype.insert = function <T = any>(this: Array<T>, index: number, item: T) {
+  this.splice( index, 0, item );
+}
 /** 
  * Compute the factorial of a number (!x)
  * If the number is < 0 it returns -1

@@ -1,0 +1,18 @@
+<div #wrapper id="node-editor-wrapper">
+	<ckeditor
+		*ngIf="sheet"
+		[editor]="editor"
+		[config]="editorCongig"
+		[data]="content"
+		(change)="onChange($event)"
+		name="edit"
+		ngDefaultControl
+		(ready)="editorLoaded($event)"
+		#editorEl
+	></ckeditor>
+	<h1 *ngIf="!sheet">Chargement...</h1>
+</div>
+<div mat-dialog-actions align="end">
+	<button mat-stroked-button color="accent" (click)="onSheetDelete()" style="border: red solid 1px;">Supprimer</button>
+  <button mat-stroked-button color="accent" (click)="onSheetClose()">Fermer</button>
+</div>

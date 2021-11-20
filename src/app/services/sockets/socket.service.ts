@@ -1,7 +1,3 @@
-import { OpenBlueprintReq, SendBlueprintReq, CloseBlueprintReq, CreateNodeReq, RemoveNodeIn, CreateRelationReq, RemoveRelationReq, PlaceNodeIn, Relationship, EditSumarryIn, WriteNodeContentOut, WriteNodeContentIn } from '../../models/sockets/blueprint-sock.model';
-import { Tag, UpdateTagColorReq, UpdateTagNameReq } from '../../models/sockets/tag-sock.model';
-import { TabService } from '../tab.service';
-import { WriteDocumentReq, Change, DocumentSock, DocumentRes, WriteDocumentRes, RenameDocumentRes, EditTagDocumentReq, AddTagDocumentRes, OpenDocumentRes } from '../../models/sockets/document-sock.model';
 import { ProjectService } from 'src/app/services/project.service';
 import { Flags } from '../../models/sockets/flags.enum';
 import { ApiService } from '../api.service';
@@ -13,6 +9,7 @@ import { User } from '../../models/api/project.model';
 import { DocsSocketService } from './docs-socket.service';
 import { TreeSocketService } from './tree-socket.service';
 import { SnackbarService } from '../snackbar.service';
+import { SheetSocketService } from './sheet-socket.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -25,6 +22,7 @@ export class SocketService {
     private readonly project: ProjectService,
     private readonly docsSocket: DocsSocketService,
     private readonly treeSocket: TreeSocketService,
+    private readonly sheetSocket: SheetSocketService,
   ) {}
 
   connect() {
@@ -35,7 +33,7 @@ export class SocketService {
         "authorization": this.api.jwt
       }
     });
-    registerHandlers([this, this.docsSocket, this.treeSocket], this.socket);
+    registerHandlers([this, this.docsSocket, this.treeSocket, this.sheetSocket], this.socket);
     this.api.socket = this.socket;
   }
 

@@ -3,11 +3,9 @@ import { ConfirmComponent } from './../../utils/confirm/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ProgressService } from './../../../services/progress.service';
 import { SocketService } from '../../../services/sockets/socket.service';
-import { Blueprint, Node, RemoveNodeOut, Relationship, CreateNodeRes, PlaceNodeOut, CreateRelationReq } from './../../../models/sockets/blueprint-sock.model';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { ProjectService } from './../../../services/project.service';
 import { Component, ViewChild, ElementRef, AfterViewChecked, ViewChildren, QueryList, OnInit, ChangeDetectorRef } from '@angular/core';
-import { v4 as uuid4 } from "uuid";
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { Poles, NodeComponent } from './node/node.component';
 import { findChildRels, findLevelByNode, findNodesByLevel, findParentRels, removeNodeFromTree } from 'src/app/utils/tree.utils';
@@ -15,6 +13,8 @@ import { WorkerManager, WorkerType } from 'src/app/utils/worker-manager.utils';
 import { SnackbarService } from 'src/app/services/snackbar.service';
 import { environment } from 'src/environments/environment';
 import { ElementComponent } from '../element.component';
+import { CreateNodeOut, PlaceNodeOut, RemoveNodeOut } from 'src/app/models/sockets/out/blueprint.out';
+import { Blueprint, Node, Relationship } from 'src/app/models/api/blueprint.model';
 
 
 @Component({
@@ -126,7 +126,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   }
 
   private createNewNode([ox, oy]: Vector, [ex, ey]: Vector, parentId: number) {
-    this.socket.socket.emit(Flags.CREATE_NODE, new CreateNodeRes(
+    this.socket.socket.emit(Flags.CREATE_NODE, new CreateNodeOut(
       parentId,
       this.id,
       ex,

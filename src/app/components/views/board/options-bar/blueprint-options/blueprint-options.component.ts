@@ -1,20 +1,17 @@
 import { TabTypes } from '../../../../../models/tab-element.model';
-import { Blueprint, RenameBlueprintOut } from '../../../../../models/sockets/blueprint-sock.model';
 import { ConfirmComponent } from '../../../../utils/confirm/confirm.component';
-import { Tag } from 'src/app/models/sockets/tag-sock.model';
-import { DocumentSock } from '../../../../../models/sockets/document-sock.model';
 import { MatDialog } from '@angular/material/dialog';
 import { SocketService } from '../../../../../services/sockets/socket.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { TabService } from '../../../../../services/tab.service';
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component } from '@angular/core';
 import { Flags } from 'src/app/models/sockets/flags.enum';
-import { RenameDocumentReq } from 'src/app/models/sockets/document-sock.model';
 import { EditTagsComponent } from 'src/app/components/modals/edit-tags/edit-tags.component';
 import { DOWN_ARROW, UP_ARROW } from '@angular/cdk/keycodes';
 import { BlueprintComponent } from 'src/app/components/tabs/blueprint/blueprint.component';
-import { EditMainTagComponent } from 'src/app/components/modals/edit-main-tag/edit-main-tag.component';
-import { ColorElementReq } from 'src/app/models/sockets/element-sock.model';
+import { ColorElementOut, RenameElementOut } from 'src/app/models/sockets/out/element.out';
+import { Tag } from 'src/app/models/api/tag.model';
+import { Blueprint } from 'src/app/models/api/blueprint.model';
 
 @Component({
   selector: 'app-blueprint-options',
@@ -33,13 +30,13 @@ export class BlueprintOptionsComponent {
   public onRename(title: string) {
     this.blueprint.title = title.length > 0 ? title : "Nouveau Blueprint";
     this.project.renameBlueprint(this.tabId, this.blueprint.title);
-    this.socket.socket.emit(Flags.RENAME_BLUEPRINT, new RenameBlueprintOut(this.blueprintId, this.blueprint.title));
+    this.socket.socket.emit(Flags.RENAME_BLUEPRINT, new RenameElementOut(this.blueprintId, this.blueprint.title));
   }
 
   public onColorChange(color: string) {
     this.blueprint.color = color;
     this.project.colorBlueprint(this.tabId, this.blueprint.color);
-    this.socket.socket.emit(Flags.COLOR_BLUEPRINT, new ColorElementReq(this.blueprintId, color));
+    this.socket.socket.emit(Flags.COLOR_BLUEPRINT, new ColorElementOut(this.blueprintId, color));
   }
 
 
@@ -87,7 +84,6 @@ export class BlueprintOptionsComponent {
   }
 
   get blueprint(): Blueprint {
-    console.log(this.project.openBlueprints[this.tabId]);
     return this.project.openBlueprints[this.tabId];
   }
   get blueprintId(): number {

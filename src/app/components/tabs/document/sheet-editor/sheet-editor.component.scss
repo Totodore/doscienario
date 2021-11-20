@@ -1,0 +1,18 @@
+#node-editor-wrapper {
+	::ng-deep {
+		.ck-editor {
+			margin-top: 3px !important;
+			height: 80vh !important;
+			overflow: hidden !important;
+			.ck-editor__main {
+				height: 100% !important;
+			}
+			.ck-content {
+				height: calc(100% - 41.6px) !important;
+			}
+		}
+	}
+}
+div[mat-dialog-actions] {
+	margin-right: 15px;
+}

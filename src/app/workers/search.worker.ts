@@ -1,9 +1,6 @@
-import { Blueprint } from '../models/sockets/blueprint-sock.model';
-import { Document, SearchResults } from '../models/api/project.model';
-import { Tag } from '../models/sockets/tag-sock.model';
 import { sortByRelevance } from '../utils/helpers';
-import { ElementModel } from '../models/default.model';
-import { DocumentSock } from '../models/sockets/document-sock.model';
+import { Element } from '../models/default.model';
+import { Tag } from '../models/api/tag.model';
 
 /// <reference lib="webworker" />
 addEventListener('message', (e: MessageEvent<[string, any] | string>) => {
@@ -18,7 +15,7 @@ addEventListener('message', (e: MessageEvent<[string, any] | string>) => {
 /** 
  * We get all the elements if they have the selected @param tags and the @param needle as title
  */
-function searchFromTags(tags: Tag[], needle: string | undefined, els: ElementModel[]) {
+function searchFromTags(tags: Tag[], needle: string | undefined, els: Element[]) {
   return tags.length > 0 ? els.filter(el =>
     tags.reduce((prev, curr) => prev && !!el.tags.find(tag => tag.id === curr.id), true)
     && (el.title?.toLowerCase()?.includes(needle?.toLowerCase() || ''))
@@ -28,7 +25,7 @@ function searchFromTags(tags: Tag[], needle: string | undefined, els: ElementMod
 /**
  * We get all the tags if they are common with other elements 
  */
-function filterSecondaryTags(selectedTags: Tag[], els: ElementModel[]): Tag[] {
+function filterSecondaryTags(selectedTags: Tag[], els: Element[]): Tag[] {
   return els.reduce(
     (prev, curr) => [...prev, ...(curr.tags.find(el => !!selectedTags.find(tag => tag.id === el.id)) ? curr.tags : [])], [])
     .filter(el => !el.primary);

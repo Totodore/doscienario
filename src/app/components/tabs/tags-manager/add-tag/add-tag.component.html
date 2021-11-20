@@ -11,7 +11,7 @@
     <mat-label>Couleur du tag</mat-label>
     <input matInput [ngxMatColorPicker]="picker" [(ngModel)]="color">
     <ngx-mat-color-toggle matSuffix [for]="picker"></ngx-mat-color-toggle>
-    <ngx-mat-color-picker #picker [touchUi]="false" [color]="color"></ngx-mat-color-picker>
+    <ngx-mat-color-picker #picker [touchUi]="false" [color]="$any(color)"></ngx-mat-color-picker>
   </mat-form-field>
   <button *ngIf="modify" mat-stroked-button style="border: red solid 2px" (click)="removeTag()">Supprimer le tag</button>
 </div>

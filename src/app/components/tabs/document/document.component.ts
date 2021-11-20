@@ -171,7 +171,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     } else if (tag.startsWith("#")) {
 
     } else if (tag.startsWith("/")) {
-      const sheet = this.doc.sheets.find(el => el.title.toLowerCase() === tag.substr(1).toLowerCase());
+      const sheet = this.sheets.find(el => el.title.toLowerCase() === tag.substr(1).toLowerCase());
       if (sheet)
         this.openSheet(sheet.id);
     }
@@ -225,7 +225,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       range: this.editorInstance.model.document.selection.getFirstRange(),
     });
     this.hasEdited = true;
-    this.openSheet(this.project.docs.find(el => el.id === this.id).sheets.find(el => el.title.toLowerCase() == title.toLowerCase())?.id || title);
+    this.openSheet(this.sheets.find(el => el.title.toLowerCase() == title.toLowerCase())?.id || title);
     this.textSelectionPos = null;
     selection.collapseToEnd();
     this.editorInstance.editing.view.focus();
@@ -285,6 +285,10 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
 
   get doc(): DocumentSock {
     return this.project.openDocs[this.tabId!]!;
+  }
+
+  get sheets(): Sheet[] {
+    return this.project.docs.find(el => el.id == this.id).sheets || [];
   }
 
   get title(): string {

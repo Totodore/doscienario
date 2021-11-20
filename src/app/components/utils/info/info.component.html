@@ -1,0 +1,9 @@
+<h1 mat-dialog-title>
+  {{ text }}
+</h1>
+<p mat-dialog-title *ngIf="content">
+	{{ content }}
+</p>
+<div mat-dialog-actions align="end" *ngIf="closable">
+  <button mat-stroked-button color="accent" mat-dialog-close>Confirmer</button>
+</div>

@@ -1,2 +1,2 @@
 <mat-progress-bar [mode]="progress.mode" [value]="progress.value" [style.opacity]="progress.showing ? 1 : 0"></mat-progress-bar>
-<router-outlet></router-outlet>
+<router-outlet *ngIf="isCompatible"></router-outlet>

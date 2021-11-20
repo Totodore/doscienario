@@ -4,8 +4,9 @@ import { Socket } from 'socket.io-client';
 import { Project } from './../models/api/project.model';
 import { HttpClient, HttpEvent, HttpEventType, HttpHeaders, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { version } from '../../../package.json';
 import { ApiUtil } from '../utils/api.util';
+import { VersionCheckRes } from '../models/api/system.model';
 
 @Injectable({
   providedIn: 'root'
@@ -46,6 +47,11 @@ export class ApiService extends ApiUtil {
     const res = await this.get<Project>(`project/${projectId}`);
     localStorage.setItem("project", projectId.toString());
     this.project.loadData(res);
+  }
+
+  public async checkApiVersion() {
+    const res = await this.get<VersionCheckRes>(`system/check-version?version=${version}`);
+    return res.allowed ? true : res.versions;
   }
 
   public get inProject(): boolean {

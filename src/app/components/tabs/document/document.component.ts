@@ -213,7 +213,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
 
   public async onAddSheet() {
     const selection = window.getSelection();
-    let title = selection.toString();
+    let title = selection.toString().trim();
     if (title.startsWith("/")) title = title.substr(1);
     this.editorInstance.execute("mention", {
       marker: "/",

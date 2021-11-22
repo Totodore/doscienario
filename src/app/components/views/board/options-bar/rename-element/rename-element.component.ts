@@ -6,7 +6,9 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
   templateUrl: './rename-element.component.html',
   styleUrls: ['./rename-element.component.scss']
 })
-export class RenameElementComponent implements OnInit {
+export class RenameElementComponent {
+
+  public colorObject: Color;
 
   @Input()
   public title: string;
@@ -14,27 +16,30 @@ export class RenameElementComponent implements OnInit {
   @Output()
   public readonly titleChange = new EventEmitter<string>();
 
-  @Input()
-  public color?: string;
-
-  public colorObject: Color;
 
   @Output()
   public readonly colorChange = new EventEmitter<string>();
 
-  constructor() { }
+  private _color: string;
 
-  public ngOnInit(): void {
-    if (this.color) {
-      const hex = this.color;
+  public onColorObjectChange(obj: Color) {
+    this.color = obj?.toHexString(false)?.substring(1);
+    this.colorChange.emit(this.color);
+  }
+
+  
+  @Input()
+  public set color(val: string | undefined) {
+    this._color = val || "FFFFFF";
+    if (val) {
+      const hex = val;
       const [r, g, b] = [hex.slice(0, 2), hex.slice(2, 4), hex.slice(4, 6)].map(el => parseInt(el, 16));
       this.colorObject = new Color(r, g, b);
     } else this.colorObject = new Color(245, 245, 245);
   }
 
-  public onColorObjectChange(obj: Color) {
-    this.color = obj?.toHexString(false)?.substring(1);
-    this.colorChange.emit(this.color);
+  public get color(): string | undefined {
+    return this._color;
   }
 
 }

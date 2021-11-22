@@ -34,7 +34,7 @@
     "@ckeditor/ckeditor5-build-classic": "^25.0.0",
     "@ckeditor/ckeditor5-mention": "^26.0.0",
     "ckeditor5-image-remove-event-callback-plugin": "^1.1.2",
-    "custom-electron-titlebar": "^3.2.6",
+    "custom-electron-titlebar": "^3.2.7",
     "diff": "^5.0.0",
     "electron-updater": "^4.3.9",
     "fast_array_intersect": "^1.1.0",

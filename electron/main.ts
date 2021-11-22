@@ -1,6 +1,7 @@
 import { app as electron, BrowserWindow, shell } from "electron";
 import { globalShortcut } from "electron/main";
 import { checkAndUpdate } from "./updater";
+import * as path from "path";
 
 class App {
   private readonly url = `dist/app/index.html`;
@@ -13,7 +14,12 @@ class App {
     this.window = new BrowserWindow({
       maximizable: true,
       icon: "../icons/icon.ico",
-      titleBarStyle: 'hidden'
+      titleBarStyle: 'hidden',
+      frame: false,
+      webPreferences: {
+        preload: path.join(__dirname, './preload.js'),
+        enableRemoteModule: true,
+      }
     });
     this.config();
     // await this.window.loadURL("http://localhost:4200/");
@@ -27,6 +33,7 @@ class App {
     });
     this.window.setMenu(null);
     this.window.menuBarVisible = false;
+    this.window.removeMenu();
     this.window.on('closed', () => {
       this.window = null;
     });

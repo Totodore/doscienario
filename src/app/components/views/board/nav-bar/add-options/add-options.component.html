@@ -9,8 +9,8 @@
         <mat-icon class="main-icon" color="accent" matSuffix>account_tree</mat-icon>
         <mat-icon color="accent" matSuffix>add</mat-icon>
       </button>
-      <button mat-stroked-button>
-        <mat-icon class="main-icon" color="accent" matSuffix>folder</mat-icon>
+      <button mat-stroked-button (click)="refresh()">
+        <mat-icon class="main-icon" color="accent" matSuffix>refresh</mat-icon>
       </button>
       <button mat-stroked-button (click)="openMenu()">
         <mat-icon class="main-icon" color="accent" matSuffix>menu</mat-icon>

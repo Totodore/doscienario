@@ -22,14 +22,14 @@
 }
 .nav-bar {
   display: flex;
-  min-height: 100vh;
+  min-height: calc(100vh - 30px);
 	position: relative;
 
   mat-divider.separator {
-    height: 100vh;
+    height: calc(100vh - 30px);
   }
   .wrapper {
-    height: 100vh;
+    height: calc(100vh - 30px);
     display: flex;
     flex-direction: column;
     padding: 8px;

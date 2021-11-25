@@ -43,7 +43,7 @@ body {
 
 app-menu {
 	overflow: auto;
-	height: 100vh;
+	height: calc(100vh - 30px);
 	display: block;
 }
 
@@ -78,7 +78,7 @@ app-menu {
 }
 ckeditor {
 	.ck.ck-editor__main {
-    max-height: calc(100vh - 50px) !important;
+    max-height: calc(100vh -  30px - 50px) !important;
     flex-direction: column !important;
     display: flex !important;
 	}

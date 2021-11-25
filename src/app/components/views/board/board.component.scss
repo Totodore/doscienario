@@ -1,7 +1,7 @@
 .wrapper {
   display: flex;
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh - 30px);
   .body {
     display: flex;
     flex-direction: column;

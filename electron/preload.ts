@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     icon: __dirname.replace(/\\/g, "/") + "/" + "../icons/icon.png",
     titleHorizontalAlignment: "left",
     shadow: true,
-    menu: null
+    menu: null,
+    overflow: "hidden",
   });
 });

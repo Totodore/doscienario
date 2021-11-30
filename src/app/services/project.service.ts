@@ -299,8 +299,8 @@ export class ProjectService {
     console.log("Add Send sheet");
     this.openSheets[packet.reqId] = sheet;
     const parentDoc = this.data.documents.find(el => el.id === sheet.documentId);
-    if (!parentDoc!.sheets.find(el => el.id === sheet.id)) {
-      parentDoc!.sheets.push(sheet);
+    if (!parentDoc.sheets?.find(el => el.id === sheet.id)) {
+      (parentDoc.sheets ??= []).push(sheet);
     }
     // const doc = this.getDoc(sheet.documentId);
     // if (doc) {

@@ -40,7 +40,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       items: [
         "heading", "|", "bold", "italic", "Underline", "BlockQuote", "HorizontalLine", "FontColor", "|",
         "numberedList", "bulletedList", "|",
-        "indent", "outdent", "|", "link", "imageUpload",
+        "alignment", "indent", "outdent", "|", "link", "imageUpload",
         "insertTable", "mediaEmbed", "|",
         "undo", "redo"
       ],

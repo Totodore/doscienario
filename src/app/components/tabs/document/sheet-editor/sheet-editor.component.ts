@@ -26,7 +26,7 @@ export class SheetEditorComponent implements OnInit {
       items: [
         "heading", "|", "bold", "italic", "Underline", "BlockQuote", "HorizontalLine", "FontColor", "|",
         "numberedList", "bulletedList", "|",
-        "indent", "outdent", "|", "link",
+        "alignment", "indent", "outdent", "|", "link",
         "undo", "redo"
       ],
       shouldNotGroupWhenFull: true

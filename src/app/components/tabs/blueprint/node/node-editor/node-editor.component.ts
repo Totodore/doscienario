@@ -5,6 +5,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CKEditor5, CKEditorComponent, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 import * as CKEditor from "../../../../../../lib/ckeditor.js";
 import { DocumentComponent } from '../../../document/document.component';
+import { applyTabPlugin } from 'src/app/utils/doc.utils';
 
 @Component({
   templateUrl: './node-editor.component.html',
@@ -66,6 +67,7 @@ export class NodeEditorComponent implements OnInit {
       editor.ui.view.toolbar.element,
       editor.ui.getEditableElement()
     );
+    applyTabPlugin(editor);
     this.addTagsListener();
     window.setInterval(() => this.hasEdited && this.addTagsListener(), 1000);
   }

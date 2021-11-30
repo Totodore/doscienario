@@ -13,6 +13,7 @@ import { Change } from 'src/app/models/sockets/in/element.in';
 import { ProgressService } from 'src/app/services/progress.service';
 import { OpenSheetOut } from 'src/app/models/sockets/out/sheet.out';
 import { ConfirmComponent } from 'src/app/components/utils/confirm/confirm.component';
+import { applyTabPlugin } from 'src/app/utils/doc.utils';
 
 @Component({
   templateUrl: './sheet-editor.component.html',
@@ -99,6 +100,7 @@ export class SheetEditorComponent implements OnInit {
       editor.ui.view.toolbar.element,
       editor.ui.getEditableElement()
     );
+    applyTabPlugin(editor);
     this.addTagsListener();
     window.setInterval(() => this.hasEdited && this.addTagsListener(), 1000);
   }

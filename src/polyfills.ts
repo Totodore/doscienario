@@ -54,6 +54,9 @@ String.prototype.insert = function(index: number, what: string) {
 String.prototype.delete = function(from: number, length: number = 1) {
   return this.substring(0, from) + this.substring(from + length, this.length);
 }
+String.prototype.capitalize = function () {
+  return this.charAt(0).toUpperCase() + this.slice(1);
+}
 Array.prototype.equals = function<T = any>(this: Array<T>, array: Array<T>) {
   // if the other array is a falsy value, return
   if (!array)

@@ -1,3 +1,9 @@
+:host {
+	height: calc(100vh - 30px);
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
 header {
 	mat-toolbar {
 		display: flex;
@@ -19,11 +25,11 @@ footer {
 	mat-toolbar {
 		display: flex;
 		align-items: center;
-		justify-content: right;
+		justify-content: flex-end;
 		padding: 0;
 		border-top: 1px solid rgba(255, 255, 255, 0.12);
 		button {
-			margin-right: 15px;
+			margin-right: 16px;
 			&.import {
 				position: relative;
 				input {
@@ -47,9 +53,11 @@ $icon-size: 80px;
 .wrapper {
 	display: flex;
 	justify-content: space-evenly;
+	align-content: baseline;
 	flex-wrap: wrap;
 	width: 100%;
-	margin: auto;
+	overflow: auto;
+	flex: 1 1 auto;
 	button {
 		display: block;
 		width: 275px;
@@ -89,6 +97,7 @@ $icon-size: 80px;
 				width: 100%;
 			}
 			p {
+				color: white;
 				margin-top: 10px;
 				text-align: center;
 				width: 100%;

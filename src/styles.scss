@@ -44,7 +44,9 @@ body {
 app-menu {
 	overflow: auto;
 	height: calc(100vh - 30px);
-	display: block;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
 }
 
 //Ck Styling

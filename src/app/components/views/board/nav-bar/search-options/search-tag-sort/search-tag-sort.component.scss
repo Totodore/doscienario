@@ -7,8 +7,14 @@ mat-divider {
 	margin: 5px 0;
 }
 .add-icon {
+	padding: 4px;
 	mat-icon {
+		font-size: 22px;
 		margin: 0;
+		transition: transform 0.2s ease-in-out;
+		&.remove-tags {
+			transform: rotate(45deg);
+		}
 	}
 	cursor: pointer;
 }

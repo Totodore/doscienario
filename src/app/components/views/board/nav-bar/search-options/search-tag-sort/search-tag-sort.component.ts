@@ -51,4 +51,13 @@ export class SearchTagSortComponent {
   public onTagAdd() {
     this.dialog.open(CreateMainTagComponent);
   }
+
+  public onUnselectAllTags() {
+    this.selectedTags = [];
+    this.selectedTagsChange.emit(this.selectedTags);
+  }
+
+  public get hasSelectedTags() {
+    return this.selectedTags.length > 0;
+  }
 }

@@ -36,6 +36,7 @@ export class EditMainTagComponent {
   public removeTag() {
     const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer le tag ?" });
     dialog.componentInstance.confirm.subscribe(() => {
+      this.project.searchComponent.tagSortComponent.unSelectTag(this.tag);
       this.socket.socket.emit(Flags.REMOVE_TAG, this.tag.title);
       this.project.removeProjectTag(this.tag.title);
       dialog.close();

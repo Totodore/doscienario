@@ -14,10 +14,7 @@ export class SearchTagSortComponent {
 
   constructor(
     private readonly dialog: MatDialog,
-    private readonly project: ProjectService,
-  ) {
-    this.project.toggleTag = tag => this.toggleTag(tag);
-  }
+  ) { }
 
   @Input()
   public tags!: Tag[];
@@ -36,6 +33,14 @@ export class SearchTagSortComponent {
       this.selectedTags.splice(index, 1);
     }
     this.selectedTagsChange.emit(this.selectedTags);
+  }
+
+  public unSelectTag(tag: Tag) {
+    const index = this.selectedTags.indexOf(tag);
+    if (index !== -1) {
+      this.selectedTags.splice(index, 1);
+      this.selectedTagsChange.emit(this.selectedTags);
+    }
   }
 
   public onTagRightClick(e: Event, tag: Tag) {

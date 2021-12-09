@@ -26,7 +26,7 @@ export class ElementTagsComponent {
   ) { }
 
   public onTagClick(tag: Tag) {
-    this.project.toggleTag?.(tag);
+    this.project.searchComponent.tagSortComponent.toggleTag?.(tag);
   }
   public onTagRightClick(e: Event, tag: Tag) {
     e.preventDefault();

@@ -20,8 +20,11 @@ import { TabTypes } from 'src/app/models/tab-element.model';
 export class BoardComponent implements OnInit {
 
 
-  public openOptions = true;
-  public openNav = true;
+
+  public get openOptions() { return localStorage.getItem("openOptions") !== "false"; }
+  public set openOptions(value: boolean) { localStorage.setItem("openOptions", value.toString()); }
+  public get openNav() { return localStorage.getItem("openNav") !== "false"; }
+  public set openNav(value: boolean) { localStorage.setItem("openNav", value.toString()); }
   constructor(
     private readonly socket: SocketService,
     private readonly snackbar: MatSnackBar,

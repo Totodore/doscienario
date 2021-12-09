@@ -5,8 +5,6 @@ import { ProgressService } from 'src/app/services/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { Component, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core';
-//@ts-ignore
-import * as CKEditor from "../../../../lib/ckeditor.js";
 import { CKEditor5, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { ElementComponent } from '../element.component';
@@ -16,6 +14,9 @@ import { DocumentSock } from 'src/app/models/api/document.model';
 import { MatDialog } from '@angular/material/dialog';
 import { SheetEditorComponent } from './sheet-editor/sheet-editor.component';
 import { Sheet } from 'src/app/models/api/sheet.model';
+import { applyTabPlugin } from 'src/app/utils/doc.utils';
+import * as CKEditor from "../../../../lib/ckeditor";
+
 @Component({
   selector: 'app-document',
   templateUrl: './document.component.html',
@@ -34,12 +35,12 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
 
   public readonly type = TabTypes.DOCUMENT;
   public readonly editor: CKEditor5.EditorConstructor = CKEditor;
-  public readonly editorCongig: CKEditor5.Config = {
+  public readonly editorConfig: CKEditor5.Config = {
     toolbar: {
       items: [
         "heading", "|", "bold", "italic", "Underline", "BlockQuote", "HorizontalLine", "FontColor", "|",
         "numberedList", "bulletedList", "|",
-        "indent", "outdent", "|", "link", "imageUpload",
+        "alignment", "indent", "outdent", "|", "link", "imageUpload",
         "insertTable", "mediaEmbed", "|",
         "undo", "redo"
       ],
@@ -111,6 +112,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       editor.ui.getEditableElement()
     );
     editor.model.document.on("change", (e: any) => !e.name.endsWith(":data") && this.onTextSelection());
+    applyTabPlugin(editor);
     this.editorInstance = editor;
     this.contentElement = this.editorView?.nativeElement.querySelector(".ck-content") as HTMLElement;
     this.contentElement.scrollTo({ left: this.scroll?.[0], top: this.scroll?.[1], behavior: "auto" });

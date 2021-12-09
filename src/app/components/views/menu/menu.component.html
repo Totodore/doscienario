@@ -1,21 +1,41 @@
 <header>
-  <h1>Mes projets</h1>
-  <button mat-icon-button  color="accent" (click)="logout()" class="logout-btn">
-      <mat-icon class="mat-18">logout</mat-icon>
-  </button>
+	<mat-toolbar>
+		<div>
+			<span>Mes espaces de travail</span>
+		</div>
+		<div>
+			<span>{{ data?.name?.capitalize() }}</span>
+			<button mat-icon-button  color="accent" (click)="logout()" class="logout-btn">
+				<mat-icon matSuffix class="mat-18">logout</mat-icon>
+			</button>
+		</div>
+	</mat-toolbar>
 </header>
 <div class="wrapper" *ngIf="data?.projects?.length != null">
-  <button mat-stroked-button class="project" *ngFor="let project of data.projects" (click)="openProject(project)">
-    {{ project.name }}
-  </button>
-  <button mat-stroked-button color="accent" class="project" (click)="createProject()">
-    <mat-icon color="accent">add</mat-icon>
-    Créer un nouveau projet
-  </button>
-  <button mat-stroked-button color="accent" class="project import">
-    <mat-icon color="accent">upload</mat-icon>
-    Importer un projet
-    <label for="file-import"></label>
-    <input type="file" id="file-import" #file (change)="importProject(file)">
-  </button>
+  <div *ngFor="let project of data.projects">
+		<button class="project" (click)="openProject(project)">
+			<div>
+				<p>{{ project.name.capitalize() }}</p>
+				<mat-divider></mat-divider>
+			</div>
+			<div>
+				<span *ngFor="let user of project.users" ><mat-icon class="mat-18">person</mat-icon>{{ user.name.capitalize() }}</span>
+				<span><mat-icon class="mat-18">schedule</mat-icon>{{ project.createdDate | date }}</span>
+			</div>
+		</button>
+	</div>
 </div>
+<footer>
+	<mat-toolbar>
+		<button mat-stroked-button color="accent" class="project import">
+			<mat-icon color="accent">upload</mat-icon>
+			Importer un projet
+			<label for="file-import"></label>
+			<input type="file" id="file-import" #file (change)="importProject(file)">
+		</button>
+		<button mat-stroked-button color="accent" class="project" (click)="createProject()">
+			<mat-icon color="accent">add</mat-icon>
+			Créer un nouveau projet
+		</button>
+	</mat-toolbar>
+</footer>

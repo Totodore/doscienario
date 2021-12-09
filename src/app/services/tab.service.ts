@@ -148,8 +148,18 @@ export class TabService {
     tabs.splice(tabs.findIndex(el => (id ? el.id === id : el.tab === index) && el.projectId === this.projectId), 1);
     localStorage.setItem("tabs", JSON.stringify(tabs));
   }
+
+  /**
+   * We remove all doublons if some exists and we returns tabs only for this project
+   */
   private get savedTabs(): TabSaveModel[] {
-    return (JSON.parse(localStorage.getItem("tabs")) as TabSaveModel[])?.filter(el => el.projectId === this.projectId) || [];
+    const data = (JSON.parse(localStorage.getItem("tabs")) as TabSaveModel[]) || [];
+    let returnedData = [];
+    for (const el of data) {
+      if (el.projectId === this.projectId && !returnedData.find(el2 => (!el2.id && el2.tab === el.tab) || el2.id === el.id))
+        returnedData.push(el);
+    }
+    return returnedData;
   }
   private addSavedTab(tab: TabSaveModel) {
     const tabs: TabSaveModel[] = JSON.parse(localStorage.getItem("tabs")) || [];

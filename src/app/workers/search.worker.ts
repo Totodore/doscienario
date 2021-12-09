@@ -19,7 +19,7 @@ function searchFromTags(tags: Tag[], needle: string | undefined, els: Element[])
   return tags.length > 0 ? els.filter(el =>
     tags.reduce((prev, curr) => prev && !!el.tags.find(tag => tag.id === curr.id), true)
     && (el.title?.toLowerCase()?.includes(needle?.toLowerCase() || ''))
-  ).sort((a, b) => sortByRelevance(a, b, needle || '', el => el.title)) : els;
+  ).sort((a, b) => a.title?.toLowerCase() < b.title?.toLowerCase() ? -1 : 1) : els;
 }
 
 /**

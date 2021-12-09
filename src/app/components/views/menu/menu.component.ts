@@ -28,6 +28,7 @@ export class MenuComponent implements OnInit {
     this.progress.show();
     try {
       this.data = await this.api.get<User>("user/me");
+      console.log(this.data);
       localStorage.setItem("me", JSON.stringify(this.data));
       this.progress.hide();
     } catch (e) {

@@ -1,5 +1,5 @@
 .wrapper {
-  height: 100vh;
+  height: calc(100vh - 30px);
   width: 80%;
   margin: auto;
   display: flex;
@@ -16,6 +16,9 @@ h1 {
 button {
   margin-top: 20px;
   width: 250px;
+}
+.version {
+	margin: 15px 0 0 0;
 }
 mat-divider {
   width: 100%;

@@ -43,8 +43,10 @@ body {
 
 app-menu {
 	overflow: auto;
-	height: 100vh;
-	display: block;
+	height: calc(100vh - 30px);
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
 }
 
 //Ck Styling
@@ -78,7 +80,7 @@ app-menu {
 }
 ckeditor {
 	.ck.ck-editor__main {
-    max-height: calc(100vh - 50px) !important;
+    max-height: calc(100vh -  30px - 50px) !important;
     flex-direction: column !important;
     display: flex !important;
 	}
@@ -165,7 +167,9 @@ ckeditor {
 			height: 1px !important;
 		}
 		p {
-			margin: 0 !important;
+			margin-top: 0 !important;
+			margin-right: 0 !important;
+			margin-bottom: 0 !important;
 		}
 		a {
 			color: #b0bec5 !important;

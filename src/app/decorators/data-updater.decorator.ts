@@ -7,11 +7,11 @@ export function DataUpdater() {
       if (result instanceof Promise) {
         result.then(() => {
           this.saveData();
-          this.updateSearch();
+          this.searchComponent.search();
         });
       } else {
         this.saveData();
-        this.updateSearch();
+        this.searchComponent.search();
       }
     };
     return descriptor;

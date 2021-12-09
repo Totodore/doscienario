@@ -16,6 +16,7 @@ import { CreateNodeIn, CreateRelationIn, EditSummaryIn, PlaceNodeIn, RemoveNodeI
 import { Element } from '../models/default.model';
 import { DataUpdater } from '../decorators/data-updater.decorator';
 import { applyTextChanges } from '../utils/element.utils';
+import { SearchOptionsComponent } from '../components/views/board/nav-bar/search-options/search-options.component';
 
 @Injectable({
   providedIn: 'root'
@@ -26,8 +27,7 @@ export class ProjectService {
   public openBlueprints: { [k: string]: Blueprint } = {};
   public openSheets: { [k: string]: SheetSock } = {};
 
-  public updateSearch!: (val?: string) => void;
-  public toggleTag!: (tag: Tag) => void;
+  public searchComponent!: SearchOptionsComponent;
 
   private searchWorker: WorkerManager;
   constructor(
@@ -299,8 +299,8 @@ export class ProjectService {
     console.log("Add Send sheet");
     this.openSheets[packet.reqId] = sheet;
     const parentDoc = this.data.documents.find(el => el.id === sheet.documentId);
-    if (!parentDoc!.sheets.find(el => el.id === sheet.id)) {
-      parentDoc!.sheets.push(sheet);
+    if (!parentDoc.sheets?.find(el => el.id === sheet.id)) {
+      (parentDoc.sheets ??= []).push(sheet);
     }
     // const doc = this.getDoc(sheet.documentId);
     // if (doc) {

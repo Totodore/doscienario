@@ -8,7 +8,7 @@ import { TabService } from '../../../services/tab.service';
 import { ITabElement } from '../../../models/tab-element.model';
 import { ProjectService } from '../../../services/project.service';
 import { ChangeDetectionStrategy, Component, Input, OnInit, Provider, Type, ViewEncapsulation } from '@angular/core';
-
+import { version } from "../../../../../package.json";
 @Component({
   selector: 'app-welcome-tab',
   templateUrl: './welcome-tab.component.html',
@@ -50,5 +50,9 @@ export class WelcomeTabComponent implements ITabElement {
   public async exit() {
     this.tabService.closeAllTab();
     this.project.exit();
+  }
+
+  public get version() {
+    return version;
   }
 }

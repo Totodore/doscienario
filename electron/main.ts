@@ -1,7 +1,7 @@
 import { app as electron, BrowserWindow, shell } from "electron";
 import { globalShortcut } from "electron/main";
-import { checkAndUpdate } from "./updater";
 import * as path from "path";
+import { checkUpdate, downloadAndInstall } from "./updater";
 
 class App {
   private readonly url = `dist/app/index.html`;
@@ -9,8 +9,7 @@ class App {
   private window: BrowserWindow;
 
   public async init(): Promise<void> {
-    checkAndUpdate();
-    await new Promise<void>(resolve => electron.on("ready", () => resolve()));
+    await new Promise(resolve => electron.on("ready", resolve));
     this.window = new BrowserWindow({
       maximizable: true,
       icon: "../icons/icon.ico",
@@ -23,7 +22,14 @@ class App {
     });
     this.config();
     // await this.window.loadURL("http://localhost:4200/");
-    await this.window.loadFile(this.url);
+    try {
+      await Promise.all([
+        this.window.loadFile(this.url),
+        this.updateIfNeeded()
+      ]);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   public config() {
@@ -37,12 +43,22 @@ class App {
     this.window.on('closed', () => {
       this.window = null;
     });
-    globalShortcut.register("CmdOrCtrl+I", () => this.window.webContents.openDevTools());
+    globalShortcut.register("CmdOrCtrl+Shift+I", () => this.window.webContents.openDevTools());
     electron.on('window-all-closed', () => {
       // On macOS it is common for applications to stay open
       // until the user explicitly quits
       if (process.platform !== 'darwin') electron.quit()
     });
+  }
+
+  private async updateIfNeeded() {
+    const res = await checkUpdate();
+    console.log("checkUpdate", res);
+    if (res.isUpdateAvailable && res.mandatory) {
+      await downloadAndInstall(res.url, (prog) => {
+        this.window.setProgressBar(prog >= 1 ? 2 : prog);
+      });
+    }
   }
 }
 

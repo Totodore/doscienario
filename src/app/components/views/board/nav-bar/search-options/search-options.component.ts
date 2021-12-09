@@ -44,7 +44,8 @@ export class SearchOptionsComponent implements OnInit {
     this.results = this.selectedTags.length > 0 ?
       await this.project.searchFromTags(this.selectedTags, this.needle)
       : [...this.project.blueprints, ...this.project.docs]
-        .filter(el => el.title?.toLowerCase()?.includes(this.needle?.toLowerCase() || ""));
+        .filter(el => el.title?.toLowerCase()?.includes(this.needle?.toLowerCase() || ""))
+        .sort((a, b) => a.title?.toLowerCase() < b.title?.toLowerCase() ? -1 : 1);
     this.progress.hide();
   }
 

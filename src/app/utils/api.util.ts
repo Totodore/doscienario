@@ -48,7 +48,7 @@ export class ApiUtil {
   public post<Q, R>(path: string, payload?: Q): Promise<R> {
     return this.http.post<R>(`${this.root}/${path}`, payload, {
       headers: {
-        "Authorization": this.jwt,
+        "Authorization": this.jwt ?? "",
       }
     }).toPromise();
   }
@@ -56,7 +56,7 @@ export class ApiUtil {
   public get<R>(path: string): Promise<R> {
     return this.http.get<R>(`${this.root}/${path}`, {
       headers: {
-        "Authorization": this.jwt,
+        "Authorization": this.jwt ?? "",
       },
       reportProgress: true,
       observe: "body"
@@ -66,7 +66,7 @@ export class ApiUtil {
   public put<R>(path: string): Promise<R> {
     return this.http.put<R>(`${this.root}/${path}`, {}, {
       headers: {
-        "Authorization": this.jwt,
+        "Authorization": this.jwt ?? "",
       },
       reportProgress: true,
       observe: "body"
@@ -76,7 +76,7 @@ export class ApiUtil {
   public delete(path: string): Promise<void> {
     return this.http.delete<void>(`${this.root}/${path}`, {
       headers: {
-        "Authorization": this.jwt,
+        "Authorization": this.jwt ?? "",
       }
     }).toPromise();
   }
@@ -84,7 +84,7 @@ export class ApiUtil {
   public patch<Q, R>(path: string, payload?: Q): Promise<R> {
     return this.http.patch<R>(`${this.root}/${path}`, payload, {
       headers: {
-        "Authorization": this.jwt,
+        "Authorization": this.jwt ?? "",
       }
     }).toPromise();
   }

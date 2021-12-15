@@ -13,7 +13,7 @@ export async function checkUpdate(): Promise<CheckUpdateResult> {
   };
   let allowedVersions = [];
   try {
-    allowedVersions = (await axios.get(`http://localhost:3000/system/check-version?version=${currentVersion}`)).data.versions;
+    allowedVersions = (await axios.get(`https://doscenario.scriptis.fr/system/check-version?version=${currentVersion}`)).data.versions;
   } catch (e) {
     console.error(e);
     return { isUpdateAvailable: false, lastVersion: currentVersion, mandatory: false };

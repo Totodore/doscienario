@@ -1,7 +1,7 @@
 import { BlueprintComponent } from './../../../../tabs/blueprint/blueprint.component';
 import { DocumentComponent } from './../../../../tabs/document/document.component';
 import { TabService } from './../../../../../services/tab.service';
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { WelcomeTabComponent } from 'src/app/components/tabs/welcome-tab/welcome-tab.component';
 import { ProjectService } from 'src/app/services/project.service';
 import { ApiService } from 'src/app/services/api.service';

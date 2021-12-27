@@ -7,7 +7,7 @@ import { ProjectOptionsComponent } from '../project-options/project-options.comp
 import { TabService } from '../../../services/tab.service';
 import { ITabElement } from '../../../models/tab-element.model';
 import { ProjectService } from '../../../services/project.service';
-import { ChangeDetectionStrategy, Component, Input, OnInit, Provider, Type, ViewEncapsulation } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { version } from "../../../../../package.json";
 @Component({
   selector: 'app-welcome-tab',

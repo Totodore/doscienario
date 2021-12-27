@@ -4,7 +4,7 @@ import { TabService } from './../../../services/tab.service';
 import { ProgressService } from 'src/app/services/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
-import { Component, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core';
+import { Component, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CKEditor5, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { ElementComponent } from '../element.component';

@@ -1,6 +1,6 @@
 import { Sheet } from './../../../../../models/api/sheet.model';
-import { Component, OnInit } from '@angular/core';
-import { Document, DocumentSock } from 'src/app/models/api/document.model';
+import { Component } from '@angular/core';
+import { Document } from 'src/app/models/api/document.model';
 import { ProjectService } from 'src/app/services/project.service';
 import { TabService } from 'src/app/services/tab.service';
 import { DocumentComponent } from 'src/app/components/tabs/document/document.component';

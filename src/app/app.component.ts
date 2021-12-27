@@ -1,7 +1,5 @@
-import { DocumentComponent } from './components/tabs/document/document.component';
-import { TabService } from './services/tab.service';
-import { N, T, W } from '@angular/cdk/keycodes';
-import { ChangeDetectorRef, Component, HostListener, OnInit } from '@angular/core';
+
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ProgressService } from './services/progress.service';
 import { ApiService } from './services/api.service';
 import { MatDialog } from '@angular/material/dialog';

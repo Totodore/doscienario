@@ -1,4 +1,4 @@
-import { Vector } from './../../types/global.d';
+
 import { TabSaveModel } from './../models/tab-element.model';
 import { BlueprintComponent } from './../components/tabs/blueprint/blueprint.component';
 import { WelcomeTabComponent } from './../components/tabs/welcome-tab/welcome-tab.component';

@@ -1,4 +1,4 @@
-import { Vector } from './../../types/global.d';
+
 import { Component } from "@angular/core";
 
 export interface ITabElement extends Component {

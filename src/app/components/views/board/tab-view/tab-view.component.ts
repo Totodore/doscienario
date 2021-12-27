@@ -1,7 +1,6 @@
-import { DocumentComponent } from './../../../tabs/document/document.component';
-import { WelcomeTabComponent } from '../../../tabs/welcome-tab/welcome-tab.component';
+
 import { TabService } from '../../../../services/tab.service';
-import { AfterViewInit, Component, Inject, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Component, ViewChild, ViewContainerRef } from '@angular/core';
 
 @Component({
   selector: 'app-tab-view',

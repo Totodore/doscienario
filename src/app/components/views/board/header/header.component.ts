@@ -1,7 +1,5 @@
 import { TabService } from '../../../../services/tab.service';
-import { ApiService } from '../../../../services/api.service';
-import { ProgressService } from '../../../../services/progress.service';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-header',

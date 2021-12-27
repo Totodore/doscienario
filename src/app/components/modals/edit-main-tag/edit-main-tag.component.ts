@@ -1,6 +1,6 @@
 import { ColorTagOut } from './../../../models/sockets/out/tag.out';
 import { Color } from '@angular-material-components/color-picker';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Tag } from 'src/app/models/api/tag.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';

@@ -2,7 +2,7 @@ import { TabService } from './../../../../../services/tab.service';
 import { ProjectService } from './../../../../../services/project.service';
 import { Component, OnInit, EventEmitter, Inject, ViewChild, ElementRef } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { CKEditor5, CKEditorComponent, ChangeEvent } from '@ckeditor/ckeditor5-angular';
+import { CKEditor5, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 import * as CKEditor from "../../../../../../lib/ckeditor.js";
 import { DocumentComponent } from '../../../document/document.component';
 import { applyTabPlugin } from 'src/app/utils/doc.utils';

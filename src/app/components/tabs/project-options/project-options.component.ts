@@ -7,8 +7,7 @@ import { ApiService } from 'src/app/services/api.service';
 import { SocketService } from '../../../services/sockets/socket.service';
 import { ProjectService } from '../../../services/project.service';
 import { ITabElement } from '../../../models/tab-element.model';
-import { ChangeDetectionStrategy, Component, OnInit, Provider, Type, ViewEncapsulation } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-project-options',

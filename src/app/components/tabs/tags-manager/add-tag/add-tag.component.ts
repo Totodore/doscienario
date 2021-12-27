@@ -5,7 +5,7 @@ import { Flags } from './../../../../models/sockets/flags.enum';
 import { SocketService } from '../../../../services/sockets/socket.service';
 import { SnackbarService } from './../../../../services/snackbar.service';
 import { ProjectService } from './../../../../services/project.service';
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Color } from '@angular-material-components/color-picker';
 import { Tag } from 'src/app/models/api/tag.model';

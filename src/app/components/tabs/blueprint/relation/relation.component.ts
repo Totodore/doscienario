@@ -1,4 +1,4 @@
-import { AfterViewChecked, Component, ElementRef, Input, OnInit } from '@angular/core';
+import { AfterViewChecked, Component, Input } from '@angular/core';
 import { Relationship } from 'src/app/models/api/blueprint.model';
 import { TemporaryNode } from '../blueprint.component';
 

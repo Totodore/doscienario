@@ -65,6 +65,7 @@ import { AddSheetComponent } from './components/tabs/document/add-sheet/add-shee
 import { SheetEditorComponent } from './components/tabs/document/sheet-editor/sheet-editor.component';
 import { DocumentSheetListComponent } from './components/views/board/options-bar/document-sheet-list/document-sheet-list.component';
 import { InfoComponent } from './components/utils/info/info.component';
+import { LoggerModule, NgxLoggerLevel } from "ngx-logger";
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -109,6 +110,9 @@ import { InfoComponent } from './components/utils/info/info.component';
     InfoComponent,
   ],
   imports: [
+    LoggerModule.forRoot({
+      level: NgxLoggerLevel.INFO,
+    }),
     ReactiveFormsModule,
     BrowserModule,
     AppRoutingModule,
@@ -132,7 +136,7 @@ import { InfoComponent } from './components/utils/info/info.component';
     NgxMatColorPickerModule,
     MatRippleModule,
     DragDropModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: appearance },

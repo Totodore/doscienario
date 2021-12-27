@@ -49,6 +49,7 @@ export const downloadAndInstall = async (url: string, handler: (prog: number) =>
     responseType: 'stream'
   });
   console.log("Downloading update...", downloadPath);
+  /* tslint:disable-next-line */
   let chunkSize = 0;
   res.data.pipe(createWriteStream(downloadPath));
   res.data.on('data', (chunk: Buffer) => {

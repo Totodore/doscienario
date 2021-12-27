@@ -1,5 +1,4 @@
 import { WelcomeTabComponent } from './../../tabs/welcome-tab/welcome-tab.component';
-import { MenuComponent } from './../menu/menu.component';
 import { BlueprintComponent } from './../../tabs/blueprint/blueprint.component';
 import { TabService } from './../../../services/tab.service';
 import { ProjectService } from 'src/app/services/project.service';

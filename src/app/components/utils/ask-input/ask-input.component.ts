@@ -1,5 +1,5 @@
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Component, EventEmitter, Input, Output, Inject } from '@angular/core';
+import { Component, EventEmitter, Output, Inject } from '@angular/core';
 
 @Component({
   selector: 'app-ask-input',

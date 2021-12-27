@@ -1,8 +1,7 @@
 import { CreateMainTagComponent } from './../../../../../modals/create-main-tag/create-main-tag.component';
 import { MatDialog } from '@angular/material/dialog';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { EditMainTagComponent } from 'src/app/components/modals/edit-main-tag/edit-main-tag.component';
-import { ProjectService } from 'src/app/services/project.service';
 import { Tag } from 'src/app/models/api/tag.model';
 
 @Component({

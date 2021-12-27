@@ -1,5 +1,5 @@
 import { TabService } from './../../../../services/tab.service';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { TabTypes } from 'src/app/models/tab-element.model';
 
 @Component({

@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { Vector } from './../../../../../types/global.d';
 import { TabService } from './../../../../services/tab.service';
-import { Component, Input, OnInit, Output, EventEmitter, HostListener, ViewChild, ElementRef, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, HostListener, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { ProjectService } from 'src/app/services/project.service';
 import { EditorWorkerService } from 'src/app/services/document-worker.service';

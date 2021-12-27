@@ -1,4 +1,4 @@
-import { sortByRelevance } from '../utils/helpers';
+
 import { Element } from '../models/default.model';
 import { Tag } from '../models/api/tag.model';
 

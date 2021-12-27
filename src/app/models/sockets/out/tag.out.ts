@@ -1,14 +1,14 @@
 export class RenameTagOut {
   constructor(
+    public oldTitle: string,
     public title: string,
-    public oldTitle: string
   ) {}
 }
 
 export class ColorTagOut {
   constructor(
+    public title: string,
     public color: string,
-    public title: string
   ) {}
 }
 

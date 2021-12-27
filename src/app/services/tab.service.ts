@@ -120,6 +120,10 @@ export class TabService {
     if (save)
       this.focusedTabIndex = index;
   }
+  public showNextTab() {
+    const index = this.focusedTabIndex >= this.tabs.length ? 0 : this.focusedTabIndex + 1;
+    this.showTab(index);
+  }
   public closeAllTab() {
     const tabLength = this._tabs.length;
     for (let i = 0; i < tabLength; i++)

@@ -9,7 +9,7 @@ import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material
 import { SocketService } from '../../../services/sockets/socket.service';
 import { Component, HostListener, OnInit } from '@angular/core';
 import { DocumentComponent } from '../../tabs/document/document.component';
-import { B, M, N, W } from '@angular/cdk/keycodes';
+import { B, M, N, TAB, W } from '@angular/cdk/keycodes';
 import { TabTypes } from 'src/app/models/tab-element.model';
 
 @Component({
@@ -76,6 +76,13 @@ export class BoardComponent implements OnInit {
         e.preventDefault();
         e.stopImmediatePropagation();
         this.tabs.pushTab(WelcomeTabComponent);
+        break;
+      case TAB:
+        if (e.ctrlKey) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          this.tabs.showNextTab();
+        }
         break;
       default:
         break;

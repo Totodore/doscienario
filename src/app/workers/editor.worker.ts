@@ -11,7 +11,7 @@ addEventListener('message', (e: MessageEvent<[string, any] | string>) => {
 function computeDiff([oldContent, newContent]: [string, string]): Change[] {
   let changes: Change[] = [];
   let i = 0;
-  // console.log("Computing diff from thread...");
+  // this.logger.log("Computing diff from thread...");
   for (const change of diff.diffChars(oldContent, newContent)) {
     if (change.added)
       changes.push([1, i, change.value]);

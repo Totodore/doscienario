@@ -7,6 +7,7 @@ import { DocumentComponent } from './../components/tabs/document/document.compon
 import { ProjectOptionsComponent } from '../components/tabs/project-options/project-options.component';
 import { ComponentFactoryResolver, Inject, Injectable, Type, ViewContainerRef } from '@angular/core';
 import { ITabElement, TabTypes } from '../models/tab-element.model';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,8 @@ export class TabService {
 
   constructor(
     @Inject(ComponentFactoryResolver)
-    private readonly factoryResolver: ComponentFactoryResolver
+    private readonly factoryResolver: ComponentFactoryResolver,
+    private readonly logger: NGXLogger,
   ) { }
 
   public setRootViewContainerRef(viewContainerRef: ViewContainerRef) {
@@ -46,7 +48,7 @@ export class TabService {
     this.projectId = projectId;
     for (const tab of this.savedTabs) {
       this.pushTab(this.availableTabs[tab.tab], false, tab.id);
-      console.log("Loading saved tab :", this.availableTabs[tab.tab].name);
+      this.logger.log("Loading saved tab :", this.availableTabs[tab.tab].name);
     }
     this.showTab(this.focusedTabIndex);
   }
@@ -64,7 +66,7 @@ export class TabService {
       displayedIndex = componentIndex;
     else if (this._tabs.find(el => el[0] === tab && el[1].type === TabTypes.STANDALONE))
       displayedIndex = this._tabs.findIndex(el => el[0].name === tab.name);
-    console.log(displayedIndex >= 0 ? `Tab already exists : ${displayedIndex}` : `Creating new tab for ${tab.name}`);
+    this.logger.log(displayedIndex >= 0 ? `Tab already exists : ${displayedIndex}` : `Creating new tab for ${tab.name}`);
     if (displayedIndex >= 0)
       this.showTab(displayedIndex);
     else {

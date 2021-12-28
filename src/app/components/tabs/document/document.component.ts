@@ -41,7 +41,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
         "heading", "|", "bold", "italic", "Underline", "BlockQuote", "HorizontalLine", "FontColor", "|",
         "numberedList", "bulletedList", "|",
         "alignment", "indent", "outdent", "|", "link", "imageUpload",
-        "insertTable", "mediaEmbed", "|",
+        "insertTable", "|",
         "undo", "redo"
       ],
       shouldNotGroupWhenFull: true

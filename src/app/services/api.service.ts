@@ -7,6 +7,7 @@ import { Injectable } from '@angular/core';
 import { version } from '../../../package.json';
 import { ApiUtil } from '../utils/api.util';
 import { VersionCheckRes } from '../models/api/system.model';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable({
   providedIn: 'root'
@@ -16,10 +17,11 @@ export class ApiService extends ApiUtil {
   public socket: typeof Socket;
   constructor(
     http: HttpClient,
+    logger: NGXLogger,
     private readonly project: ProjectService,
-    private readonly progress: ProgressService
+    private readonly progress: ProgressService,
   ) {
-    super(http);
+    super(http, logger);
   }
 
 

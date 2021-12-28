@@ -10,6 +10,7 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { DocumentComponent } from '../../tabs/document/document.component';
 import { B, M, N, TAB, W } from '@angular/cdk/keycodes';
 import { TabTypes } from 'src/app/models/tab-element.model';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-board',
@@ -30,7 +31,8 @@ export class BoardComponent implements OnInit {
     private readonly api: ApiService,
     private readonly progress: ProgressService,
     private readonly project: ProjectService,
-    private readonly tabs: TabService
+    private readonly tabs: TabService,
+    private readonly logger: NGXLogger,
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -43,7 +45,7 @@ export class BoardComponent implements OnInit {
       this.tabs.loadSavedTabs(this.project.id);
       this.snackbar.open("Project synchronisé avec succès !", null, { duration: 3000 });
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
       this.snackbar.open("Impossible de synchroniser le projet...", null, { duration: 3000 });
     } finally {
       this.progress.hide();

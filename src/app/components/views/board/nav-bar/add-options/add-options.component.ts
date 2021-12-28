@@ -7,6 +7,7 @@ import { ProjectService } from 'src/app/services/project.service';
 import { ApiService } from 'src/app/services/api.service';
 import { ProgressService } from 'src/app/services/progress.service';
 import { SnackbarService } from 'src/app/services/snackbar.service';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-add-options',
@@ -20,6 +21,7 @@ export class AddOptionsComponent {
     private readonly progress: ProgressService,
     private readonly project: ProjectService,
     private readonly snackbar: SnackbarService,
+    private readonly logger: NGXLogger,
   ) { }
 
   createDoc() {
@@ -34,7 +36,7 @@ export class AddOptionsComponent {
   }
   public async refresh() {
     this.tabs.closeAllTab();
-    console.log(this.project.id);
+    this.logger.log(this.project.id);
     try {
       this.progress.show();
       await this.api.openProject(this.project.id);

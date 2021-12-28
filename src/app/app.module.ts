@@ -65,7 +65,9 @@ import { AddSheetComponent } from './components/tabs/document/add-sheet/add-shee
 import { SheetEditorComponent } from './components/tabs/document/sheet-editor/sheet-editor.component';
 import { DocumentSheetListComponent } from './components/views/board/options-bar/document-sheet-list/document-sheet-list.component';
 import { InfoComponent } from './components/utils/info/info.component';
-import { LoggerModule, NgxLoggerLevel } from "ngx-logger";
+import { LoggerModule, NgxLoggerLevel, TOKEN_LOGGER_MAPPER_SERVICE, TOKEN_LOGGER_WRITER_SERVICE } from "ngx-logger";
+import { MapperLoggerService } from './services/logger/mapper-logger.service';
+import { WriterLoggerService } from './services/logger/writer-logger.service';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -112,6 +114,17 @@ import { LoggerModule, NgxLoggerLevel } from "ngx-logger";
   imports: [
     LoggerModule.forRoot({
       level: NgxLoggerLevel.INFO,
+      disableFileDetails: false,
+      timestampFormat: 'dd/MM/YYYY - HH:mm:ss',
+    }, {
+      mapperProvider: {
+        provide: TOKEN_LOGGER_MAPPER_SERVICE,
+        useClass: MapperLoggerService
+      },
+      writerProvider: {
+        provide: TOKEN_LOGGER_WRITER_SERVICE,
+        useClass: WriterLoggerService
+      }
     }),
     ReactiveFormsModule,
     BrowserModule,

@@ -7,6 +7,7 @@ import { ProjectService } from '../project.service';
 import { TabService } from '../tab.service';
 import { WriteElementOut } from 'src/app/models/sockets/out/element.out';
 import { AddTagElementIn, RemoveTagElementIn } from 'src/app/models/sockets/in/tag.in';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,8 @@ export class DocsSocketService {
   constructor(
     private readonly api: ApiService,
     private readonly project: ProjectService,
-    private readonly tabs: TabService
+    private readonly tabs: TabService,
+    private readonly logger: NGXLogger,
   ) { }
 
 
@@ -38,7 +40,7 @@ export class DocsSocketService {
 
   updateDocument(docId: number, tabId: string, changes: Change[], lastChangeId: number, clientUpdateId: number) {
     const doc = this.project.openDocs[tabId];
-    console.log("Updating doc", docId, "tab", tabId);
+    this.logger.log("Updating doc", docId, "tab", tabId);
     doc.changes.set(clientUpdateId, changes);
     this.socket.emit(Flags.WRITE_DOC, new WriteElementOut(docId, lastChangeId, changes, this.api.user.id, clientUpdateId));
   }

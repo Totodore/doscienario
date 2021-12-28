@@ -15,6 +15,7 @@ import { environment } from 'src/environments/environment';
 import { ElementComponent } from '../element.component';
 import { CreateNodeOut, PlaceNodeOut, RemoveNodeOut } from 'src/app/models/sockets/out/blueprint.out';
 import { Blueprint, Node, Relationship } from 'src/app/models/api/blueprint.model';
+import { NGXLogger } from 'ngx-logger';
 
 
 @Component({
@@ -59,9 +60,10 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     progress: ProgressService,
     private readonly snack: SnackbarService,
     private readonly changeDetector: ChangeDetectorRef,
+    private readonly logger: NGXLogger,
   ) {
     super(progress);
-    this.blueprintWorker = new WorkerManager(WorkerType.Blueprint);
+    this.blueprintWorker = new WorkerManager(WorkerType.Blueprint, this.logger);
   }
 
   /**

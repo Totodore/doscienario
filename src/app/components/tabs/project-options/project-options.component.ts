@@ -8,6 +8,7 @@ import { SocketService } from '../../../services/sockets/socket.service';
 import { ProjectService } from '../../../services/project.service';
 import { ITabElement } from '../../../models/tab-element.model';
 import { Component } from '@angular/core';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-project-options',
@@ -18,6 +19,7 @@ export class ProjectOptionsComponent implements ITabElement {
 
   constructor(
     private readonly tabs: TabService,
+    private readonly logger: NGXLogger,
     public readonly project: ProjectService,
     public readonly socket: SocketService,
     public readonly api: ApiService,
@@ -54,7 +56,7 @@ export class ProjectOptionsComponent implements ITabElement {
         localStorage.removeItem("tabs");
         this.project.exit();
       } catch (e) {
-        console.error(e);
+        this.logger.error(e);
         this.snackbar.snack("Erreur lors de la suppression du projet");
       }
     });

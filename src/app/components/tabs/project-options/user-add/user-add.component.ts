@@ -6,6 +6,7 @@ import { ProgressService } from 'src/app/services/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { SnackbarService } from 'src/app/services/snackbar.service';
 import { setImmediate } from 'src/app/utils/helpers';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-user-add',
@@ -19,7 +20,8 @@ export class UserAddComponent implements OnInit {
     public readonly api: ApiService,
     public readonly progress: ProgressService,
     public readonly socket: SocketService,
-    public readonly snackbar: SnackbarService
+    public readonly snackbar: SnackbarService,
+    private readonly logger: NGXLogger,
   ) { }
 
   public title: string = "Options";
@@ -35,7 +37,7 @@ export class UserAddComponent implements OnInit {
       this.allUsers = await this.api.get<User[]>("user/all");
       setImmediate(() => this.progress.hide());
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
       this.snackbar.snack("Impossible de récupérer certaines données");
       this.progress.hide();
     }
@@ -49,7 +51,7 @@ export class UserAddComponent implements OnInit {
     newUsers.push(this.me);
     if (this.me.id != this.project.owner.id)
       newUsers.push(this.project.owner);
-    console.log("Set user", newUsers);
+    this.logger.log("Set user", newUsers);
     this.socket.updateUserProject(newUsers);
   }
 

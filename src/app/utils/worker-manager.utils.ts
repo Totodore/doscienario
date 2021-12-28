@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { NGXLogger } from 'ngx-logger';
 import { v4 as uuid } from "uuid";
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,10 @@ export class WorkerManager {
   private worker: Worker;
   private readonly eventListeners: Map<string, WorkerListener<any>[]> = new Map();
 
-  constructor(workerType: WorkerType) {
+  constructor(
+    workerType: WorkerType,
+    private readonly logger: NGXLogger,
+  ) {
     if (typeof Worker === 'undefined')
       alert("Worker not supported, cannot start Doscenario");
     else {
@@ -24,7 +28,7 @@ export class WorkerManager {
           break;
       }
     }
-    console.log("Creating worker for", workerType, this.worker);
+    this.logger.log("Creating worker for", workerType, this.worker);
     this.worker.onmessage = e => this.onMessage(e);
    }
 

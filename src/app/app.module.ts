@@ -1,3 +1,4 @@
+import { dbConfig, loggerConfig } from './configs';
 import { NodeComponent } from './components/tabs/blueprint/node/node.component';
 import { BlueprintComponent } from './components/tabs/blueprint/blueprint.component';
 import { AddOptionsComponent } from './components/views/board/nav-bar/add-options/add-options.component';
@@ -65,9 +66,10 @@ import { AddSheetComponent } from './components/tabs/document/add-sheet/add-shee
 import { SheetEditorComponent } from './components/tabs/document/sheet-editor/sheet-editor.component';
 import { DocumentSheetListComponent } from './components/views/board/options-bar/document-sheet-list/document-sheet-list.component';
 import { InfoComponent } from './components/utils/info/info.component';
-import { LoggerModule, NgxLoggerLevel, TOKEN_LOGGER_MAPPER_SERVICE, TOKEN_LOGGER_WRITER_SERVICE } from "ngx-logger";
+import { LoggerModule, TOKEN_LOGGER_MAPPER_SERVICE, TOKEN_LOGGER_WRITER_SERVICE } from "ngx-logger";
 import { MapperLoggerService } from './services/logger/mapper-logger.service';
 import { WriterLoggerService } from './services/logger/writer-logger.service';
+import { NgxIndexedDBModule } from 'ngx-indexed-db';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -112,20 +114,8 @@ import { WriterLoggerService } from './services/logger/writer-logger.service';
     InfoComponent,
   ],
   imports: [
-    LoggerModule.forRoot({
-      level: NgxLoggerLevel.INFO,
-      disableFileDetails: false,
-      timestampFormat: 'dd/MM/YYYY - HH:mm:ss',
-    }, {
-      mapperProvider: {
-        provide: TOKEN_LOGGER_MAPPER_SERVICE,
-        useClass: MapperLoggerService
-      },
-      writerProvider: {
-        provide: TOKEN_LOGGER_WRITER_SERVICE,
-        useClass: WriterLoggerService
-      }
-    }),
+    LoggerModule.forRoot(loggerConfig),
+    NgxIndexedDBModule.forRoot(dbConfig),
     ReactiveFormsModule,
     BrowserModule,
     AppRoutingModule,
@@ -155,6 +145,8 @@ import { WriterLoggerService } from './services/logger/writer-logger.service';
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: appearance },
     { provide: MAT_COLOR_FORMATS, useValue: NGX_MAT_COLOR_FORMATS },
     { provide: HTTP_INTERCEPTORS, useClass: DateHttpInterceptor, multi: true },
+    { provide: TOKEN_LOGGER_MAPPER_SERVICE, useClass: MapperLoggerService },
+    { provide: TOKEN_LOGGER_WRITER_SERVICE, useClass: WriterLoggerService },
   ],
   bootstrap: [AppComponent]
 })

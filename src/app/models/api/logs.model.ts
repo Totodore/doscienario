@@ -1,17 +1,15 @@
-import { DbColumn, DbPrimaryColumn, DbTable } from "src/app/decorators/database-column.decorator";
+import { DbColumn, DbPrimaryColumn, DbPrimaryGeneratedColumn, DbTable } from "src/app/decorators/database-column.decorator";
 
 @DbTable()
 export class Logs {
 
-  @DbPrimaryColumn()
+  @DbPrimaryGeneratedColumn()
   public id: number;
 
   @DbColumn()
   public message: string;
 
-  // @DbColumn()
+  @DbColumn()
   public level: string;
 
-  @DbColumn()
-  public createdDate: Date;
 }

@@ -4,9 +4,10 @@ import 'reflect-metadata';
 export function DbTable() {
   return function (constructor: Function): void {
     constructor.prototype.__tableName = constructor.name.toLowerCase();
+    const keyColumn = constructor.prototype.__columns.find(c => c.primary);
     constructor.prototype.__dbDefinition = {
       store: constructor.prototype.__tableName,
-      storeConfig: { keyPath: constructor.prototype.__columns.find(c => c.primary).key, autoIncrement: false },
+      storeConfig: { keyPath: keyColumn.key, autoIncrement: keyColumn.generated },
       storeSchema: constructor.prototype.__columns.map(c => ({ name: c.key, keypath: c.key, options: { unique: c.unique } }))
     };
   }
@@ -20,7 +21,21 @@ export function DbColumn() {
       key: key,
       type: Reflect.getMetadata("design:type", target, key),
       unique: false,
-      primary: false
+      primary: false,
+      generated: false,
+    });
+  }
+}
+
+
+export function DbPrimaryGeneratedColumn() {
+  return function (target: any, key: any): void {
+    (target.constructor.prototype.__columns ??= []).push({
+      key: key,
+      type: Reflect.getMetadata("design:type", target, key),
+      primary: true,
+      unique: true,
+      generated: true,
     });
   }
 }
@@ -31,7 +46,8 @@ export function DbPrimaryColumn() {
       key: key,
       type: Reflect.getMetadata("design:type", target, key),
       primary: true,
-      unique: true
+      unique: true,
+      generated: false,
     });
   }
 }
@@ -42,7 +58,8 @@ export function DbUniqueColumn() {
       key: key,
       type: Reflect.getMetadata("design:type", target, key),
       unique: true,
-      primary: false
+      primary: false,
+      generated: false,
     });
   }
 }
@@ -52,4 +69,5 @@ export type ColumnMetadata = {
   type: string;
   unique: boolean;
   primary: boolean;
+  generated: boolean;
 }

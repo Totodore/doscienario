@@ -361,6 +361,7 @@ export class ProjectService {
     setTimeout(() => localStorage.setItem("project-data", JSON.stringify(this.data)), 0);
   }
   public exit() {
+    this.logger.log("Exiting current project:", this.id, this.name);
     localStorage.removeItem("project-data");
     localStorage.removeItem("project");
     localStorage.removeItem("tab-index");

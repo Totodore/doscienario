@@ -41,11 +41,13 @@ export class BoardComponent implements OnInit {
     try {
       this.progress.show();
       snack = this.snackbar.open("Synchronisation du projet...", null, { duration: null });
+      this.logger.log("Opening project:", this.project.id);
       await this.api.openProject(this.project.id);
       this.tabs.loadSavedTabs(this.project.id);
+      this.logger.log("Project opened:", this.project.id, this.project.name);
       this.snackbar.open("Project synchronisé avec succès !", null, { duration: 3000 });
     } catch (e) {
-      this.logger.error(e);
+      this.logger.error("Impossible to open project:", this.project.id, e);
       this.snackbar.open("Impossible de synchroniser le projet...", null, { duration: 3000 });
     } finally {
       this.progress.hide();

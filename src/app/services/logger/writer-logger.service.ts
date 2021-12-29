@@ -1,3 +1,4 @@
+import { ProjectService } from './../project.service';
 import { DbService } from './../database/db.service';
 import { Inject, Injectable, PLATFORM_ID } from "@angular/core";
 import { INGXLoggerConfig, INGXLoggerMetadata, INGXLoggerWriterService, NgxLoggerLevel, NGXLoggerWriterService } from "ngx-logger";
@@ -20,9 +21,13 @@ export class WriterLoggerService extends NGXLoggerWriterService {
 
   protected logModern(metadata: INGXLoggerMetadata, config: INGXLoggerConfig, metaString: string): void {
     super.logModern(metadata, config, metaString);
-    this.db.add(Logs, {
-      message: `${metaString} ${metadata.message} ${metadata.additional?.join(' ')}`,
-      level: NgxLoggerLevel[metadata.level],
-    });
+    try {
+      this.db.add(Logs, {
+        message: `${metaString} ${metadata.message} ${metadata.additional?.join(' ')}`,
+        level: NgxLoggerLevel[metadata.level],
+      });
+    } catch (e) {
+      console.error("No saved logs", e);
+    }
   }
 }

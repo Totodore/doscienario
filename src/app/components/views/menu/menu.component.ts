@@ -28,14 +28,14 @@ export class MenuComponent implements OnInit {
 
   public async ngOnInit(): Promise<void> {
     this.progress.show();
+    this.logger.log("Loading user data and projects");
     try {
       this.data = await this.api.get<User>("user/me");
-      this.logger.log(this.data);
       localStorage.setItem("me", JSON.stringify(this.data));
       this.progress.hide();
     } catch (e) {
       this.snackbar.snack("Impossible de charger les projets !");
-      this.logger.error(e);
+      this.logger.error("Impossible to load user data and projects", e);
       this.progress.hide();
     }
   }

@@ -28,7 +28,7 @@ export class WorkerManager {
           break;
       }
     }
-    this.logger.log("Creating worker for", workerType, this.worker);
+    this.logger.log("Creating worker for", WorkerType[workerType], "worker");
     this.worker.onmessage = e => this.onMessage(e);
    }
 

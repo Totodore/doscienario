@@ -12,7 +12,6 @@ export const loggerConfig: INGXLoggerConfig = {
 const dbTables: Type<any>[] = [
   Logs
 ];
-console.log(dbTables[0].prototype.__dbDefinition);
 
 export const dbConfig: DBConfig = {
   name: "doscienario",

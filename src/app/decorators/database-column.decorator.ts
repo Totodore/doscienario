@@ -1,11 +1,22 @@
 import 'reflect-metadata';
 
+
+export function DbTable() {
+  return function (constructor: Function): void {
+    constructor.prototype.__tableName = constructor.name.toLowerCase();
+    constructor.prototype.__dbDefinition = {
+      store: constructor.prototype.__tableName,
+      storeConfig: { keyPath: constructor.prototype.__columns.find(c => c.primary).key, autoIncrement: false },
+      storeSchema: constructor.prototype.__columns.map(c => ({ name: c.key, keypath: c.key, options: { unique: c.unique } }))
+    };
+  }
+}
 /**
  * Set column metadata in the instance
  */
 export function DbColumn() {
   return function (target: any, key: any): void {
-    (target.__columns ??= []).push({
+    (target.constructor.prototype.__columns ??= []).push({
       key: key,
       type: Reflect.getMetadata("design:type", target, key),
       unique: false,
@@ -16,7 +27,7 @@ export function DbColumn() {
 
 export function DbPrimaryColumn() {
   return function (target: any, key: any): void {
-    (target.__columns ??= []).push({
+    (target.constructor.prototype.__columns ??= []).push({
       key: key,
       type: Reflect.getMetadata("design:type", target, key),
       primary: true,
@@ -27,7 +38,7 @@ export function DbPrimaryColumn() {
 
 export function DbUniqueColumn() {
   return function (target: any, key: any): void {
-    (target.__columns ??= []).push({
+    (target.constructor.prototype.__columns ??= []).push({
       key: key,
       type: Reflect.getMetadata("design:type", target, key),
       unique: true,

@@ -1,8 +1,7 @@
-import { Logs } from './models/database/logs.db';
-import { Type } from '@angular/core';
+import { Logs } from './models/api/logs.model';
 import { DBConfig } from 'ngx-indexed-db';
 import { INGXLoggerConfig, NgxLoggerLevel } from 'ngx-logger';
-import { IStorableModelType, StorableModel } from './models/database/base.db';
+import { Type } from '@angular/core';
 
 export const loggerConfig: INGXLoggerConfig = {
   level: NgxLoggerLevel.INFO,
@@ -10,12 +9,12 @@ export const loggerConfig: INGXLoggerConfig = {
   timestampFormat: 'dd/MM/YYYY - HH:mm:ss',
 };
 
-const dbTables: IStorableModelType[] = [
+const dbTables: Type<any>[] = [
   Logs
 ];
 
 export const dbConfig: DBConfig = {
   name: "doscienario",
-  version: 1,
-  objectStoresMeta: dbTables.map(table => table.getModelDBConfig()),
+  version: 2,
+  objectStoresMeta: dbTables.map(table => table.prototype.__dbDefinition),
 }

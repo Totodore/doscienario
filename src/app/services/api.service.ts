@@ -1,3 +1,5 @@
+import { Logs } from 'src/app/models/api/logs.model';
+import { DbService } from './database/db.service';
 import { ProgressService } from './progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { Socket } from 'socket.io-client';
@@ -20,6 +22,7 @@ export class ApiService extends ApiUtil {
     logger: NGXLogger,
     private readonly project: ProjectService,
     private readonly progress: ProgressService,
+    private readonly db: DbService,
   ) {
     super(http, logger);
   }
@@ -49,6 +52,16 @@ export class ApiService extends ApiUtil {
     const res = await this.get<Project>(`project/${projectId}`);
     localStorage.setItem("project", projectId.toString());
     this.project.loadData(res);
+  }
+
+  public async bugReport(message: string) {
+    this.progress.show();
+    try {
+      const data = (await this.db.getAll(Logs, ["message", "level"])).map(l => l.level + " - " + l.message).join("\n");
+      await this.post("system/bug-report", { data, message });
+    } finally {
+      this.progress.hide();
+    }
   }
 
   public async checkApiVersion() {

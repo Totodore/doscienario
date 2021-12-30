@@ -23,7 +23,7 @@ export class WriterLoggerService extends NGXLoggerWriterService {
     super.logModern(metadata, config, metaString);
     try {
       this.db.add(Logs, {
-        message: `${metaString} ${metadata.message} ${metadata.additional?.join(' ')}`,
+        message: `${metaString} ${metadata.message} ${metadata.additional?.map(s => typeof s === "object" ? JSON.stringify(s) : s)?.join(' ')}`,
         level: NgxLoggerLevel[metadata.level],
       });
     } catch (e) {

@@ -1,0 +1,14 @@
+<h1 mat-dialog-title>
+  {{ data.title }}
+</h1>
+
+<div mat-dialog-content style="text-align: center;">
+  <mat-form-field color="accent" style="width: 300px;">
+		<mat-label *ngIf="data.label">{{ data.label }}</mat-label>
+    <textarea matInput #input cols="40"></textarea>
+  </mat-form-field>
+</div>
+
+<div mat-dialog-actions align="end">
+  <button mat-stroked-button color="accent" (click)="onConfirm.emit(input.value)">Confirmer</button>
+</div>

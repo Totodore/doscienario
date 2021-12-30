@@ -1,3 +1,5 @@
+import { Logs } from 'src/app/models/api/logs.model';
+import { DbService } from './services/database/db.service';
 import { dbConfig, loggerConfig } from './configs';
 import { NodeComponent } from './components/tabs/blueprint/node/node.component';
 import { BlueprintComponent } from './components/tabs/blueprint/blueprint.component';
@@ -7,7 +9,7 @@ import { OptionsSeparatorComponent } from './components/views/board/nav-bar/opti
 import { SearchBarComponent } from './components/views/board/nav-bar/search-options/search-bar/search-bar.component';
 import { DocumentOptionsComponent } from './components/views/board/options-bar/document-options/document-options.component';
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, OnInit } from '@angular/core';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -70,6 +72,7 @@ import { LoggerModule, TOKEN_LOGGER_MAPPER_SERVICE, TOKEN_LOGGER_WRITER_SERVICE 
 import { MapperLoggerService } from './services/logger/mapper-logger.service';
 import { WriterLoggerService } from './services/logger/writer-logger.service';
 import { NgxIndexedDBModule } from 'ngx-indexed-db';
+import { AskTextareaComponent } from './components/utils/ask-textarea/ask-textarea.component';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -112,6 +115,7 @@ import { NgxIndexedDBModule } from 'ngx-indexed-db';
     SheetEditorComponent,
     DocumentSheetListComponent,
     InfoComponent,
+    AskTextareaComponent,
   ],
   imports: [
     LoggerModule.forRoot(loggerConfig),
@@ -150,5 +154,17 @@ import { NgxIndexedDBModule } from 'ngx-indexed-db';
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  
+  constructor(private readonly db: DbService) { 
+    this.clearLogs();
+  }
+
+  /**
+   * Clear logs on startup
+   */
+  public clearLogs() {
+    this.db.clear(Logs);
+  }
+}
 

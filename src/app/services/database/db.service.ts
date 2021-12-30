@@ -16,6 +16,14 @@ export class DbService {
     return this.db.clear(table.prototype.__tableName).toPromise();
   }
 
+  public async getAll<T>(table: Type<T>, select?: (keyof T)[]) {
+    const res = await this.db.getAll<T>(table.prototype.__tableName).toPromise();
+    if (select)
+      return res.map(x => select.reduce<Partial<T>>((acc, key) => ({ ...acc, [key]: x[key] }), {}));
+    else
+      return res;
+  }
+
   public get db(): NgxIndexedDBService {
     return this.dbcore;
   }

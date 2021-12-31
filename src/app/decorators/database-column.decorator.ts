@@ -1,6 +1,9 @@
 import 'reflect-metadata';
 
 
+/**
+ * Create a ngx-indexed-db definition for the given entity table 
+ */
 export function DbTable() {
   return function (constructor: Function): void {
     constructor.prototype.__tableName = constructor.name.toLowerCase();
@@ -13,7 +16,8 @@ export function DbTable() {
   }
 }
 /**
- * Set column metadata in the instance
+ * Decorator for database columns
+ * Set column metadata in the prototype
  */
 export function DbColumn() {
   return function (target: any, key: any): void {
@@ -27,7 +31,10 @@ export function DbColumn() {
   }
 }
 
-
+/**
+ * Decorator for database columns
+ * Set column metadata in the prototype
+ */
 export function DbPrimaryGeneratedColumn() {
   return function (target: any, key: any): void {
     (target.constructor.prototype.__columns ??= []).push({
@@ -40,6 +47,10 @@ export function DbPrimaryGeneratedColumn() {
   }
 }
 
+/**
+ * Decorator for database columns
+ * Set column metadata in the prototype
+ */
 export function DbPrimaryColumn() {
   return function (target: any, key: any): void {
     (target.constructor.prototype.__columns ??= []).push({
@@ -52,6 +63,10 @@ export function DbPrimaryColumn() {
   }
 }
 
+/**
+ * Decorator for database columns
+ * 
+ */
 export function DbUniqueColumn() {
   return function (target: any, key: any): void {
     (target.constructor.prototype.__columns ??= []).push({

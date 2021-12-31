@@ -4,6 +4,10 @@ import { Inject, Injectable, PLATFORM_ID } from "@angular/core";
 import { INGXLoggerConfig, INGXLoggerMetadata, INGXLoggerWriterService, NgxLoggerLevel, NGXLoggerWriterService } from "ngx-logger";
 import { Logs } from "src/app/models/api/logs.model";
 
+/**
+ * Change the default logger metadata string
+ * Log to the database with also console
+ */
 @Injectable()
 export class WriterLoggerService extends NGXLoggerWriterService {
   
@@ -19,6 +23,9 @@ export class WriterLoggerService extends NGXLoggerWriterService {
   }
 
 
+  /**
+   * Add Log entry to local db after logging in normal console
+   */
   protected logModern(metadata: INGXLoggerMetadata, config: INGXLoggerConfig, metaString: string): void {
     super.logModern(metadata, config, metaString);
     try {

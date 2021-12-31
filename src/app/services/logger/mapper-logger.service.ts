@@ -2,6 +2,10 @@ import { Injectable } from "@angular/core";
 import { INGXLoggerConfig, INGXLoggerLogPosition, INGXLoggerMapperService, INGXLoggerMetadata } from "ngx-logger";
 import { Observable, of } from "rxjs";
 
+/**
+ * Logger customization
+ * Change the default logger metadata (file execution) to class and function call
+ */
 @Injectable()
 export class MapperLoggerService implements INGXLoggerMapperService {
   

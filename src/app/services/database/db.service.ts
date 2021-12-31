@@ -1,6 +1,11 @@
 import { Injectable, Type } from '@angular/core';
 import { NgxIndexedDBService } from 'ngx-indexed-db';
 
+
+/**
+ * @class Wrapper service for ngx-indexed-db
+ * Provide orm functions
+ */
 @Injectable({ providedIn: 'root' })
 export class DbService {
   

@@ -24,7 +24,7 @@ export class AddOptionsComponent {
     private readonly logger: NGXLogger,
   ) { }
 
-  createDoc() {
+  public createDoc() {
     this.tabs.pushTab(DocumentComponent, false);
   }
 
@@ -36,7 +36,7 @@ export class AddOptionsComponent {
   }
   public async refresh() {
     this.tabs.closeAllTab();
-    this.logger.log(this.project.id);
+    this.logger.log("Trying to refresh project", this.project.id);
     try {
       this.progress.show();
       await this.api.openProject(this.project.id);

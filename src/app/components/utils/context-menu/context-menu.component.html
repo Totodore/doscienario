@@ -1,0 +1,8 @@
+<div class="wrapper" [style.top.px]="pos[0]" [style.left.px]="pos[1]">
+	<div *ngFor="let item of menuItems">
+		<button mat-button (click)="onItemClick(item)">
+			<mat-icon *ngIf="item.icon">{{ item.icon }}</mat-icon>
+			{{ item.label }}
+		</button>
+	</div>
+</div>

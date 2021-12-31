@@ -5,6 +5,7 @@ import { ApiService } from './services/api.service';
 import { MatDialog } from '@angular/material/dialog';
 import { InfoComponent } from './components/utils/info/info.component';
 import { version } from '../../package.json';
+import { ContextMenuService } from './services/ui/context-menu.service';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -16,6 +17,7 @@ export class AppComponent implements OnInit {
 
   constructor(
     public readonly progress: ProgressService,
+    public readonly contextMenu: ContextMenuService,
     private readonly api: ApiService,
     private readonly dialog: MatDialog,
     private readonly changeDetector: ChangeDetectorRef

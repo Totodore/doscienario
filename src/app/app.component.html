@@ -1,2 +1,3 @@
 <mat-progress-bar [mode]="progress.mode" [value]="progress.value" [style.opacity]="progress.showing ? 1 : 0"></mat-progress-bar>
 <router-outlet *ngIf="isCompatible"></router-outlet>
+<app-context-menu [pos]="contextMenu.pos" [menuItems]="contextMenu.items" (onClose)="contextMenu.hide()" *ngIf="contextMenu.showing"></app-context-menu>

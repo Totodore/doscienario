@@ -2,7 +2,7 @@ import { TabService } from './../../../services/tab.service';
 import { TabTypes } from './../../../models/tab-element.model';
 import { ConfirmComponent } from './../../utils/confirm/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
-import { SnackbarService } from './../../../services/snackbar.service';
+import { SnackbarService } from '../../../services/ui/snackbar.service';
 import { ApiService } from 'src/app/services/api.service';
 import { SocketService } from '../../../services/sockets/socket.service';
 import { ProjectService } from '../../../services/project.service';

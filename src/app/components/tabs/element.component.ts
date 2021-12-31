@@ -1,5 +1,5 @@
 import { ITabElement, TabTypes } from 'src/app/models/tab-element.model';
-import { ProgressService } from 'src/app/services/progress.service';
+import { ProgressService } from 'src/app/services/ui/progress.service';
 import { Vector } from 'src/types/global';
 import { v4 as uuid4 } from "uuid";
 

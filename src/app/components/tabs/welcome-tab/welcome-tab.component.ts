@@ -1,9 +1,9 @@
 import { AskTextareaComponent } from './../../utils/ask-textarea/ask-textarea.component';
 import { MatDialog } from '@angular/material/dialog';
 import { TabTypes } from './../../../models/tab-element.model';
-import { SnackbarService } from './../../../services/snackbar.service';
+import { SnackbarService } from '../../../services/ui/snackbar.service';
 import { ApiService } from './../../../services/api.service';
-import { ProgressService } from './../../../services/progress.service';
+import { ProgressService } from '../../../services/ui/progress.service';
 import { TagsManagerComponent } from './../tags-manager/tags-manager.component';
 import { ProjectOptionsComponent } from '../project-options/project-options.component';
 import { TabService } from '../../../services/tab.service';

@@ -1,6 +1,6 @@
-import { ProgressService } from '../../../services/progress.service';
+import { ProgressService } from '../../../services/ui/progress.service';
 import { ConfirmPasswordComponent } from '../../utils/confirm-password/confirm-password.component';
-import { SnackbarService } from '../../../services/snackbar.service';
+import { SnackbarService } from '../../../services/ui/snackbar.service';
 import { Router } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { Component, OnInit } from '@angular/core';

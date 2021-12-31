@@ -1,7 +1,7 @@
 import { Vector, Vector3 } from './../../../../types/global.d';
 import { ConfirmComponent } from './../../utils/confirm/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
-import { ProgressService } from './../../../services/progress.service';
+import { ProgressService } from '../../../services/ui/progress.service';
 import { SocketService } from '../../../services/sockets/socket.service';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { ProjectService } from './../../../services/project.service';
@@ -10,7 +10,7 @@ import { Flags } from 'src/app/models/sockets/flags.enum';
 import { Poles, NodeComponent } from './node/node.component';
 import { findChildRels, findLevelByNode, findParentRels, removeNodeFromTree } from 'src/app/utils/tree.utils';
 import { WorkerManager, WorkerType } from 'src/app/utils/worker-manager.utils';
-import { SnackbarService } from 'src/app/services/snackbar.service';
+import { SnackbarService } from 'src/app/services/ui/snackbar.service';
 import { environment } from 'src/environments/environment';
 import { ElementComponent } from '../element.component';
 import { CreateNodeOut, PlaceNodeOut, RemoveNodeOut } from 'src/app/models/sockets/out/blueprint.out';

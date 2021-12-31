@@ -1,6 +1,6 @@
 import { Logs } from 'src/app/models/api/logs.model';
 import { DbService } from './database/db.service';
-import { ProgressService } from './progress.service';
+import { ProgressService } from './ui/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { Socket } from 'socket.io-client';
 import { Project } from './../models/api/project.model';

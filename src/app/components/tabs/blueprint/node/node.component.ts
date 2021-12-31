@@ -1,5 +1,5 @@
 import { DrawStates } from './../blueprint.component';
-import { ProgressService } from './../../../../services/progress.service';
+import { ProgressService } from '../../../../services/ui/progress.service';
 import { NodeEditorComponent } from './node-editor/node-editor.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Flags } from 'src/app/models/sockets/flags.enum';

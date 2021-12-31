@@ -8,7 +8,7 @@ import { Injectable } from '@angular/core';
 import { User } from '../../models/api/project.model';
 import { DocsSocketService } from './docs-socket.service';
 import { TreeSocketService } from './tree-socket.service';
-import { SnackbarService } from '../snackbar.service';
+import { SnackbarService } from '../ui/snackbar.service';
 import { SheetSocketService } from './sheet-socket.service';
 import { NGXLogger } from 'ngx-logger';
 @Injectable({

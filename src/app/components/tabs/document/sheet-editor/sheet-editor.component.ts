@@ -10,7 +10,7 @@ import { v4 as uuid } from 'uuid';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { EditorWorkerService } from 'src/app/services/document-worker.service';
 import { Change } from 'src/app/models/sockets/in/element.in';
-import { ProgressService } from 'src/app/services/progress.service';
+import { ProgressService } from 'src/app/services/ui/progress.service';
 import { OpenSheetOut } from 'src/app/models/sockets/out/sheet.out';
 import { ConfirmComponent } from 'src/app/components/utils/confirm/confirm.component';
 import { applyTabPlugin } from 'src/app/utils/doc.utils';

@@ -1,6 +1,6 @@
 
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { ProgressService } from './services/progress.service';
+import { ProgressService } from './services/ui/progress.service';
 import { ApiService } from './services/api.service';
 import { MatDialog } from '@angular/material/dialog';
 import { InfoComponent } from './components/utils/info/info.component';

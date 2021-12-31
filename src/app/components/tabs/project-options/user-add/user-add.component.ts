@@ -2,9 +2,9 @@ import { SocketService } from '../../../../services/sockets/socket.service';
 import { Component, OnInit } from '@angular/core';
 import { User } from 'src/app/models/api/project.model';
 import { ApiService } from 'src/app/services/api.service';
-import { ProgressService } from 'src/app/services/progress.service';
+import { ProgressService } from 'src/app/services/ui/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
-import { SnackbarService } from 'src/app/services/snackbar.service';
+import { SnackbarService } from 'src/app/services/ui/snackbar.service';
 import { setImmediate } from 'src/app/utils/helpers';
 import { NGXLogger } from 'ngx-logger';
 

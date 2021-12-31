@@ -1,7 +1,7 @@
 
 import { ProjectService } from '../../../../../services/project.service';
 import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
-import { ProgressService } from 'src/app/services/progress.service';
+import { ProgressService } from 'src/app/services/ui/progress.service';
 import { Element } from 'src/app/models/default.model';
 import { Tag } from 'src/app/models/api/tag.model';
 import { SearchTagSortComponent } from './search-tag-sort/search-tag-sort.component';

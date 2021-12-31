@@ -64,7 +64,6 @@ import { EditMainTagComponent } from './components/modals/edit-main-tag/edit-mai
 import { CreateMainTagComponent } from './components/modals/create-main-tag/create-main-tag.component';
 import { ElementTagsComponent } from './components/views/board/options-bar/element-tags/element-tags.component';
 import { RenameElementComponent } from './components/views/board/options-bar/rename-element/rename-element.component';
-import { AddSheetComponent } from './components/tabs/document/add-sheet/add-sheet.component';
 import { SheetEditorComponent } from './components/tabs/document/sheet-editor/sheet-editor.component';
 import { DocumentSheetListComponent } from './components/views/board/options-bar/document-sheet-list/document-sheet-list.component';
 import { InfoComponent } from './components/utils/info/info.component';
@@ -73,6 +72,7 @@ import { MapperLoggerService } from './services/logger/mapper-logger.service';
 import { WriterLoggerService } from './services/logger/writer-logger.service';
 import { NgxIndexedDBModule } from 'ngx-indexed-db';
 import { AskTextareaComponent } from './components/utils/ask-textarea/ask-textarea.component';
+import { ContextMenuComponent } from './components/utils/context-menu/context-menu.component';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -111,11 +111,11 @@ import { AskTextareaComponent } from './components/utils/ask-textarea/ask-textar
     CreateMainTagComponent,
     ElementTagsComponent,
     RenameElementComponent,
-    AddSheetComponent,
     SheetEditorComponent,
     DocumentSheetListComponent,
     InfoComponent,
     AskTextareaComponent,
+    ContextMenuComponent,
   ],
   imports: [
     LoggerModule.forRoot(loggerConfig),

@@ -1,7 +1,7 @@
 import { EditorWorkerService } from './../../../services/document-worker.service';
 import { ApiService } from 'src/app/services/api.service';
 import { TabService } from './../../../services/tab.service';
-import { ProgressService } from 'src/app/services/progress.service';
+import { ProgressService } from 'src/app/services/ui/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { Component, OnDestroy, ViewChild, ElementRef } from '@angular/core';

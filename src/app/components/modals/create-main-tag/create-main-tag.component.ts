@@ -4,7 +4,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { Tag } from 'src/app/models/api/tag.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { ProjectService } from 'src/app/services/project.service';
-import { SnackbarService } from 'src/app/services/snackbar.service';
+import { SnackbarService } from 'src/app/services/ui/snackbar.service';
 import { SocketService } from 'src/app/services/sockets/socket.service';
 
 @Component({

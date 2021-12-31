@@ -5,8 +5,8 @@ import { Component } from '@angular/core';
 import { WelcomeTabComponent } from 'src/app/components/tabs/welcome-tab/welcome-tab.component';
 import { ProjectService } from 'src/app/services/project.service';
 import { ApiService } from 'src/app/services/api.service';
-import { ProgressService } from 'src/app/services/progress.service';
-import { SnackbarService } from 'src/app/services/snackbar.service';
+import { ProgressService } from 'src/app/services/ui/progress.service';
+import { SnackbarService } from 'src/app/services/ui/snackbar.service';
 import { NGXLogger } from 'ngx-logger';
 
 @Component({

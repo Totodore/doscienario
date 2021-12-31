@@ -2,7 +2,7 @@ import { WelcomeTabComponent } from './../../tabs/welcome-tab/welcome-tab.compon
 import { BlueprintComponent } from './../../tabs/blueprint/blueprint.component';
 import { TabService } from './../../../services/tab.service';
 import { ProjectService } from 'src/app/services/project.service';
-import { ProgressService } from './../../../services/progress.service';
+import { ProgressService } from '../../../services/ui/progress.service';
 import { ApiService } from './../../../services/api.service';
 import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
 import { SocketService } from '../../../services/sockets/socket.service';

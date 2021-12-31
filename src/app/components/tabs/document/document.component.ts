@@ -15,7 +15,7 @@ import { DocumentSock } from 'src/app/models/api/document.model';
 import { MatDialog } from '@angular/material/dialog';
 import { SheetEditorComponent } from './sheet-editor/sheet-editor.component';
 import { Sheet } from 'src/app/models/api/sheet.model';
-import { applyTabPlugin } from 'src/app/utils/doc.utils';
+import { applyTabPlugin, findStrFromSelection } from 'src/app/utils/doc.utils';
 import * as CKEditor from "../../../../lib/ckeditor";
 import { ConfirmComponent } from '../../utils/confirm/confirm.component';
 
@@ -231,8 +231,8 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
 
   private onContextMenu(e: MouseEvent) {
     const selection = window.getSelection();
-    const sheetTitle = selection.toString().trim();
-    
+    const sheetTitle = selection.toString().trim() || findStrFromSelection(selection);
+    console.log(sheetTitle);
     const mentions = Array.from(this.editorView.nativeElement.querySelectorAll(".mention"));
     const includedMention = mentions && mentions.reduce((prev, curr) => prev || selection.containsNode(curr, true) ? curr : null, null);
     if (sheetTitle?.length > 0 && !sheetTitle.includes('\n') && !includedMention) {
@@ -255,7 +255,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   private removeSheet(sheet: Sheet) {
     const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer cette note ?" });
     dialog.componentInstance.confirm.subscribe(() => {
-      this.socket.socket.emit(Flags.REMOVE_SHEET, [this.id, this.id]);
+      this.socket.socket.emit(Flags.REMOVE_SHEET, [sheet.id, this.id]);
       this.project.removeSheet(sheet.id, this.id);
       this.onRemoveSheet(sheet);
       dialog.close();

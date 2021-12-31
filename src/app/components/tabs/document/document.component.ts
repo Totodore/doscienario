@@ -229,22 +229,50 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     }
   }
 
+  /**
+   * Get sheetTitle from the selection and open it in the current document view
+   * @param e 
+   * @returns 
+   */
   private onContextMenu(e: MouseEvent) {
     const selection = window.getSelection();
-    const sheetTitle = selection.toString().trim() || findStrFromSelection(selection);
-    console.log(sheetTitle);
+    const hasSelection = selection.type === "Range";
+    //We get range selection and otherwise we find the word under the cursor
+    const strSelectionData = findStrFromSelection(selection);
+    const sheetTitle = selection.toString().trim() || strSelectionData.str;
     const mentions = Array.from(this.editorView.nativeElement.querySelectorAll(".mention"));
+    
+    //We get the included mention in the selection
     const includedMention = mentions && mentions.reduce((prev, curr) => prev || selection.containsNode(curr, true) ? curr : null, null);
+    
+    const selectWord = () => {
+      if (selection.type != 'Range') {
+        const range = selection.getRangeAt(0);
+        range.setStart(strSelectionData.node, strSelectionData.offset[0]);
+        range.setEnd(strSelectionData.node, strSelectionData.offset[1]);
+      }
+    }
+
     if (sheetTitle?.length > 0 && !sheetTitle.includes('\n') && !includedMention) {
+      
       this.contextMenu.show(e, [{
-        label: "Ajouter une note", action: () => this.onAddSheet(selection), "icon": "add"
+        label: "Ajouter une note", action: () => {
+          selectWord();
+          setTimeout(() => this.onAddSheet(sheetTitle), 0);
+        }, icon: "add"
       }]);
+
     } else if (includedMention) {
-      const sheet = this.sheets.find(el => el.title == includedMention.getAttribute("data-mention").substring(1));
+
+      const sheet = this.sheets.find(el => el.title == (!hasSelection ? strSelectionData.str : includedMention.getAttribute("data-mention")).substring(1));
       if (!sheet) return;
       this.contextMenu.show(e, [{
-        label: "Supprimer la note", action: () => this.removeSheet(sheet), icon: "delete"
+        label: "Supprimer la note", action: () => {
+          selectWord();
+          setTimeout(() => this.removeSheet(sheet), 0);
+        }, icon: "delete"
       }]);
+      
     }
   }
 
@@ -288,9 +316,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   }
 
 
-  public async onAddSheet(selection?: Selection) {
-    selection ??= window.getSelection();
-    let title = selection.toString().trim();
+  public async onAddSheet(title: string) {
     if (title.startsWith("/")) title = title.substring(1);
     this.editorInstance.execute("mention", {
       marker: "/",
@@ -303,7 +329,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     });
     this.hasEdited = true;
     this.openSheet(this.sheets.find(el => el.title.toLowerCase() == title.toLowerCase())?.id || title);
-    selection.collapseToEnd();
+    window.getSelection().collapseToEnd();
     this.editorInstance.editing.view.focus();
   }
 
@@ -315,7 +341,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       const mentions = this.findMentionsFromModel(sheet.title);
       for (const mention of mentions) {
         const text = writer.createText(sheet.title);
-        const pos = writer.createPositionAt(mention.parent, mention.index);
+        const pos = writer.createPositionAt(mention.parent, mention.startOffset);
         writer.insert(text, pos);
         writer.remove(mention);
       }

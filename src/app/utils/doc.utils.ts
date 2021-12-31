@@ -52,5 +52,9 @@ export function findStrFromSelection(s: Selection) {
     endOffset++;
   } while (content[endOffset] != " " && content[endOffset] != '\n' && endOffset < content.length);
   
-  return content.substring(startOffset, endOffset);
+  return {
+    str: content.substring(startOffset, endOffset),
+    offset: [startOffset, endOffset],
+    node
+  };
 }

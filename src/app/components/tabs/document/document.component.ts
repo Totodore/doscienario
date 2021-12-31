@@ -1,3 +1,4 @@
+import { ContextMenuService } from './../../../services/ui/context-menu.service';
 import { EditorWorkerService } from './../../../services/document-worker.service';
 import { ApiService } from 'src/app/services/api.service';
 import { TabService } from './../../../services/tab.service';
@@ -16,6 +17,7 @@ import { SheetEditorComponent } from './sheet-editor/sheet-editor.component';
 import { Sheet } from 'src/app/models/api/sheet.model';
 import { applyTabPlugin } from 'src/app/utils/doc.utils';
 import * as CKEditor from "../../../../lib/ckeditor";
+import { ConfirmComponent } from '../../utils/confirm/confirm.component';
 
 @Component({
   selector: 'app-document',
@@ -30,8 +32,6 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   private editorView?: ElementRef<HTMLElement>;
   private editorInstance?: CKEditor5.Editor;
   public openedSheet?: SheetEditorComponent;
-
-  public textSelectionPos?: DOMRect;
 
   public readonly type = TabTypes.DOCUMENT;
 
@@ -87,6 +87,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     private readonly docWorker: EditorWorkerService,
     private readonly api: ApiService,
     private readonly dialog: MatDialog,
+    private readonly contextMenu: ContextMenuService,
     progress: ProgressService,
   ) {
     super(progress);
@@ -129,11 +130,12 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       editor.ui.view.toolbar.element,
       editor.ui.getEditableElement()
     );
-    editor.model.document.on("change", (e: any) => !e.name.endsWith(":data") && this.onTextSelection());
     applyTabPlugin(editor);
+    
     this.editorInstance = editor;
-    this.contentElement = this.editorView?.nativeElement.querySelector(".ck-content") as HTMLElement;
+    this.contentElement = editor.ui.view.editable.element as HTMLElement;
     this.contentElement.scrollTo({ left: this.scroll?.[0], top: this.scroll?.[1], behavior: "auto" });
+    this.contentElement.addEventListener("contextmenu", e => this.onContextMenu(e));
     window.setInterval(() => this.hasEdited && this.addTagsListener(), 1000);
     this.addTagsListener();
   }
@@ -227,8 +229,42 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     }
   }
 
+  private onContextMenu(e: MouseEvent) {
+    const selection = window.getSelection();
+    const sheetTitle = selection.toString().trim();
+    
+    const mentions = Array.from(this.editorView.nativeElement.querySelectorAll(".mention"));
+    const includedMention = mentions && mentions.reduce((prev, curr) => prev || selection.containsNode(curr, true) ? curr : null, null);
+    if (sheetTitle?.length > 0 && !sheetTitle.includes('\n') && !includedMention) {
+      this.contextMenu.show(e, [{
+        label: "Ajouter une note", action: () => this.onAddSheet(selection), "icon": "add"
+      }]);
+    } else if (includedMention) {
+      const sheet = this.sheets.find(el => el.title == includedMention.getAttribute("data-mention").substring(1));
+      if (!sheet) return;
+      this.contextMenu.show(e, [{
+        label: "Supprimer la note", action: () => this.removeSheet(sheet), icon: "delete"
+      }]);
+    }
+  }
+
+  /**
+   * Remove a given sheet from the document and from the editor
+   * @param sheet The sheet to remove
+   */
+  private removeSheet(sheet: Sheet) {
+    const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer cette note ?" });
+    dialog.componentInstance.confirm.subscribe(() => {
+      this.socket.socket.emit(Flags.REMOVE_SHEET, [this.id, this.id]);
+      this.project.removeSheet(sheet.id, this.id);
+      this.onRemoveSheet(sheet);
+      dialog.close();
+    });
+  }
+
   /**
    * Find a mention inside the ckeditor model from a mention title with recursion
+   * Used to edit mention when removing a sheet
    * @param mention The title of the mention
    * @returns A Mention object
    */
@@ -251,18 +287,9 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     return childIterate(this.editorInstance.model.document.getRoot());
   }
 
-  public onTextSelection() {
-    const selection = window.getSelection();
-    const mentions = Array.from(this.editorView.nativeElement.querySelectorAll(".mention"));
-    const containsNode = mentions && mentions.reduce((prev, curr) => prev || selection.containsNode(curr, true), false);
-    if (selection.type === "Range" && selection.toString().trim().length > 0 && !containsNode)
-      this.textSelectionPos = selection.getRangeAt(0).getBoundingClientRect()
-    else 
-      this.textSelectionPos = null;
-  }
 
-  public async onAddSheet() {
-    const selection = window.getSelection();
+  public async onAddSheet(selection?: Selection) {
+    selection ??= window.getSelection();
     let title = selection.toString().trim();
     if (title.startsWith("/")) title = title.substring(1);
     this.editorInstance.execute("mention", {
@@ -276,7 +303,6 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     });
     this.hasEdited = true;
     this.openSheet(this.sheets.find(el => el.title.toLowerCase() == title.toLowerCase())?.id || title);
-    this.textSelectionPos = null;
     selection.collapseToEnd();
     this.editorInstance.editing.view.focus();
   }
@@ -284,7 +310,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   /**
    * This will transform the sheet tag to a normal text
    */
-  public async onRemoveSheet(sheet: Sheet) {
+  public onRemoveSheet(sheet: Sheet) {
     this.editorInstance.model.change(writer => {
       const mentions = this.findMentionsFromModel(sheet.title);
       for (const mention of mentions) {
@@ -297,6 +323,9 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     this.editorInstance.editing.view.focus();
   }
 
+  /**
+   * Scroll the editor viewport to a given sheet
+   */
   public scrollToSheet(sheet: Sheet) {
     const element = this.contentElement.querySelector(`[data-mention="/${sheet.title}"]`);
     if (element) {
@@ -305,6 +334,11 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     }
   }
 
+  /**
+   * Open a sheet in the current document view
+   * @param idOrTitle The id or title of the sheet to open
+   * If it is a title the sheet will be created
+   */
   public openSheet(idOrTitle: number | string) {
     const dial = this.dialog.open(SheetEditorComponent, {
       data: [this.id, idOrTitle],
@@ -315,7 +349,6 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       id: "editor-dialog",
     });
     this.openedSheet = dial.componentInstance;
-    // dial.afterClosed().subscribe(() => this.openedSheet = undefined);
   }
   
   /**

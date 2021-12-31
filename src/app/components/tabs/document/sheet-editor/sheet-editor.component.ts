@@ -140,7 +140,7 @@ export class SheetEditorComponent implements OnInit {
 
   private onTagClick(tag: string) {
     if (tag.startsWith("@")) {
-      const docId = this.project.docs.find(el => el.title.toLowerCase() === tag.substr(1).toLowerCase())?.id;
+      const docId = this.project.docs.find(el => el.title.toLowerCase() === tag.substring(1).toLowerCase())?.id;
       if (docId)
         this.tabs.pushTab(DocumentComponent, true, docId);
     } else if (tag.startsWith("#")) {

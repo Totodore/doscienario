@@ -28,7 +28,7 @@ export class CreateMainTagComponent implements OnInit {
     this.tag.title = val.replace(" ", "-").toLowerCase();
   }
   public onColorChange(color: Color) {
-    this.tag.color = color?.toHexString(false)?.substr(1);
+    this.tag.color = color?.toHexString(false)?.substring(1);
   }
 
   public addTag() {

@@ -34,6 +34,10 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   public textSelectionPos?: DOMRect;
 
   public readonly type = TabTypes.DOCUMENT;
+
+  /**
+   * Editor configuration
+   */
   public readonly editor: CKEditor5.EditorConstructor = CKEditor;
   public readonly editorConfig: CKEditor5.Config = {
     toolbar: {
@@ -93,6 +97,12 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     super.onClose();
   }
 
+  /**
+   * Triggered when we create a new tab
+   * @description Send document request and then add event listener for changes computation in worker
+   * @param id can be a tab id (string) or a document id
+   * @returns the tab id
+   */
   public openTab(id: string | number): string {
     super.openTab(id);
     this.socket.socket.emit(Flags.OPEN_DOC, [this.tabId, id]);
@@ -106,6 +116,14 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     this.docWorker.worker.removeEventListener(`diff-${this.tabId}`);
   }
 
+  /**
+   * Triggered when the editor is loaded
+   * Add the toolbar to view
+   * Add tab plugin to avoid tab navigation
+   * scroll to content position from the previous registered scroll position
+   * Add tag listener on document to react when clicking on tag
+   * @param editor the Ckeditor instance
+   */
   public editorLoaded(editor: CKEditor5.Editor): void {
     editor.ui.getEditableElement().parentElement.insertBefore(
       editor.ui.view.toolbar.element,
@@ -120,11 +138,19 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     this.addTagsListener();
   }
 
+  /**
+   * Triggerred when the tab is loaded (document received)
+   */
   public loadedTab() {
     super.loadedTab();
     this.project.openDocs[this.tabId!].content = this.doc.content;
   }
 
+  /**
+   * Triggerred for each text edition
+   * If the change is above 500 char (e.g copy/paste) we send the entire content
+   * Else we compute diff in worker 
+   */
   public onChange(e: ChangeEvent) {
     const data = e.editor.getData();
     this.hasEdited = true;
@@ -138,6 +164,11 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     this.project.openDocs[this.tabId!].content = data;
   }
 
+  /**
+   * Triggerred when the worker has finished the diff computation
+   * The changes are then sent to the server trough socket
+   * @param changes the changes computed by the worker
+   */
   private onDocParsed(changes: Change[]) {
     this.displayProgress = false;
     this.progress.hide();
@@ -146,41 +177,58 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     } catch (error) {   }
   }
 
-
+  /**
+   * Method that display progress if the worker is computing diff for more than 1 second
+   */
   private progressWatcher() {
     this.displayProgress = true;
     setTimeout(() => this.displayProgress && this.progress.show(), 1000);
   }
+
+  /**
+   * Doc names tag filtering from user input 
+   */
   private atDocNames(query: string): string[] {
     return this.project.docs.filter(el => el.title.toLowerCase().startsWith(query.toLowerCase())).map(el => "@" + el.title);
   }
 
+  /**
+   * Tag name filtering from user input
+   */
   private atTagNames(query: string): string[] {
     return this.project.tags.filter(el => el.title.toLowerCase().startsWith(query.toLowerCase())).map(el => "#" + el.title);
   }
 
+  /**
+   * Get all tag in the editor and add onclick listener if not already done
+   */
   private addTagsListener() {
     this.contentElement.querySelectorAll(".mention")
       .forEach((el: HTMLSpanElement) => el.onclick ??= () => this.onTagClick(el.getAttribute("data-mention")));
     this.hasEdited = false;
   }
 
+  /**
+   * Triggerred when the user click on a tag
+   * If it is a document we open it in a new tab
+   * If it is a sheet we open it in the current document view
+   */
   private onTagClick(tag: string) {
     if (tag.startsWith("@")) {
-      const docId = this.project.docs.find(el => el.title.toLowerCase() === tag.substr(1).toLowerCase())?.id;
+      const docId = this.project.docs.find(el => el.title.toLowerCase() === tag.substring(1).toLowerCase())?.id;
       if (docId)
         this.tabs.pushTab(DocumentComponent, true, docId);
     } else if (tag.startsWith("#")) {
 
     } else if (tag.startsWith("/")) {
-      const sheet = this.sheets.find(el => el.title.toLowerCase() === tag.substr(1).toLowerCase());
+      const sheet = this.sheets.find(el => el.title.toLowerCase() === tag.substring(1).toLowerCase());
       if (sheet)
         this.openSheet(sheet.id);
     }
   }
 
   /**
-   * Find a mention inside the ckeditor model from a mention title
+   * Find a mention inside the ckeditor model from a mention title with recursion
    * @param mention The title of the mention
    * @returns A Mention object
    */
@@ -216,7 +264,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   public async onAddSheet() {
     const selection = window.getSelection();
     let title = selection.toString().trim();
-    if (title.startsWith("/")) title = title.substr(1);
+    if (title.startsWith("/")) title = title.substring(1);
     this.editorInstance.execute("mention", {
       marker: "/",
       mention: {
@@ -270,13 +318,18 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     // dial.afterClosed().subscribe(() => this.openedSheet = undefined);
   }
   
+  /**
+   * Get a list of all the sheets in the document
+   * The first list is the sheets detected in the text
+   * The second list is the sheets that aren't
+   */
   public getSortedSheets(): [Sheet[], Sheet[]] {
     const mentions = this.contentElement?.querySelectorAll("span.mention[data-mention^='/']") || [];
     const sheets = new Set<Sheet>();
     for (let i = 0; i < mentions.length; i++) {
       const title = mentions[i].getAttribute("data-mention");
       if (title?.startsWith("/")) {
-        const sheet = this.sheets.find(el => el.title?.toLowerCase() === title.substr(1).toLowerCase());
+        const sheet = this.sheets.find(el => el.title?.toLowerCase() === title.substring(1).toLowerCase());
         if (sheet)
           sheets.add(sheet);
       }

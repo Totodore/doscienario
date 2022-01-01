@@ -42,10 +42,11 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   public readonly editorConfig: CKEditor5.Config = {
     toolbar: {
       items: [
-        "heading", "|", "bold", "italic", "Underline", "BlockQuote", "HorizontalLine", "FontColor", "|",
-        "numberedList", "bulletedList", "|",
-        "alignment", "indent", "outdent", "|", "link", "imageUpload",
-        "insertTable", "|",
+        "heading", "|",
+        "bold", "italic", "Underline", "BlockQuote", "HorizontalLine", "FontColor", "|",
+        "numberedList", "bulletedList", "TodoList", "|",
+        "alignment", "indent", "outdent", "|",
+        "imageInsert", "insertTable", "FindAndReplace", "|",
         "undo", "redo"
       ],
       shouldNotGroupWhenFull: true

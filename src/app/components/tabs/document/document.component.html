@@ -3,11 +3,10 @@
   [editor]="editor"
   [config]="editorConfig"
   [data]="doc.content"
-  (change)="onChange($event)"
+  (change)="onChange()"
   name="edit"
   ngDefaultControl
   (ready)="editorLoaded($event)"
   ></ckeditor>
-	<!-- <app-add-sheet *ngIf="textSelectionPos" [position]="textSelectionPos" (click)="onAddSheet()"></app-add-sheet> -->
   <h1 *ngIf="doc == null">Chargement du document...</h1>
 </div>

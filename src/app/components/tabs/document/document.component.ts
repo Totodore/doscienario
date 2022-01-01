@@ -6,7 +6,7 @@ import { ProgressService } from 'src/app/services/ui/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { Component, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { CKEditor5, ChangeEvent } from '@ckeditor/ckeditor5-angular';
+import { CKEditor5 } from '@ckeditor/ckeditor5-angular';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { ElementComponent } from '../element.component';
 import { DocsSocketService } from 'src/app/services/sockets/docs-socket.service';
@@ -56,7 +56,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       feeds: [
         {
           marker: "/",
-          feed: (query: string) => [],
+          feed: () => [],
         },
         {
           marker: '@',
@@ -154,8 +154,8 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
    * If the change is above 500 char (e.g copy/paste) we send the entire content
    * Else we compute diff in worker 
    */
-  public onChange(e: ChangeEvent) {
-    const data = e.editor.getData();
+  public onChange() {
+    const data = this.editorInstance.getData();
     this.hasEdited = true;
     if (Math.abs(data.length - this.doc.content.length) > 500) {
       const change: Change = [2, null, data];

@@ -122,7 +122,7 @@ export class TabService {
     }
     if (save)
       this.focusedTabIndex = index;
-    return this.displayedTab[1]?.tabId;
+    return this.displayedTab?.[1]?.tabId;
   }
   public showNextTab() {
     const index = this.focusedTabIndex >= this.tabs.length ? 0 : this.focusedTabIndex + 1;

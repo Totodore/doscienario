@@ -143,6 +143,18 @@ ckeditor {
 			}
 		}
 	}
+	.ck-reset.ck-list {
+		border-radius: 0 !important;
+	}
+	.ck-input-text:focus {
+		box-shadow: 0 0 0px 2px #818181 !important;
+	}
+	label.ck-label, .ck-splitbutton, .ck-file-dialog-button {
+		background-color: $grey-dark-color !important;
+	}
+	.ck-button__label {
+		color: #b0bec5 !important;
+	}
 	.ck-content {
 		overflow-y: auto !important;
 		.mention {

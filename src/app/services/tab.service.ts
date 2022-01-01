@@ -35,7 +35,7 @@ export class TabService {
   public setRootViewContainerRef(viewContainerRef: ViewContainerRef) {
     this.rootViewContainer = viewContainerRef
   }
-  private addDynamicComponent(el: Type<ITabElement>, id?: number): string | void {
+  private addDynamicComponent(el: Type<ITabElement>, id?: number): string {
     const factory = this.factoryResolver.resolveComponentFactory(el)
     const component = factory.create(this.rootViewContainer.injector);
     this._tabs.push([el, component.instance]);
@@ -57,7 +57,7 @@ export class TabService {
    * Take an id, it can be a document id (number)
    * or a tab id
    */
-  public pushTab(tab: Type<ITabElement>, save = true, id?: number) {
+  public pushTab(tab: Type<ITabElement>, save = true, id?: number): string {
     if (this.displayedTab?.[1])
       this.displayedTab[1].show = false;
     let displayedIndex: number;
@@ -68,11 +68,12 @@ export class TabService {
       displayedIndex = this._tabs.findIndex(el => el[0].name === tab.name);
     this.logger.log(displayedIndex >= 0 ? `Tab already exists : ${displayedIndex}` : `Creating new tab for ${tab.name}`);
     if (displayedIndex >= 0)
-      this.showTab(displayedIndex);
+      return this.showTab(displayedIndex);
     else {
-      this.addDynamicComponent(tab, id);
+      const tabId = this.addDynamicComponent(tab, id);
       if (save)
         this.addTabToStorage(tab, id);
+      return tabId;
     }
   }
 
@@ -91,7 +92,7 @@ export class TabService {
     this._tabs.splice(index, 1);
   }
   public updateDocTab(tabId: string, docId: number) {
-    this.tabs.find(el => el.tabId === tabId).loadedTab?.();
+    this.getTabFromId<DocumentComponent>(tabId).loadedTab?.();
     if (!this.savedTabs.find(el => el?.id === docId && this.availableTabs.indexOf(DocumentComponent) === el.tab))
       this.addTabToStorage(DocumentComponent, docId);
   }
@@ -101,7 +102,7 @@ export class TabService {
       this.removeTab(index);
   }
   public updateBlueprintTab(tabId: string, blueprintId: number) {
-    this.tabs.find(el => el.tabId === tabId).loadedTab?.();
+    this.getTabFromId<BlueprintComponent>(tabId).loadedTab?.();
     if (!this.savedTabs.find(el => el.id === blueprintId && this.availableTabs.indexOf(BlueprintComponent) === el.tab))
       this.addTabToStorage(BlueprintComponent, blueprintId);
   }
@@ -121,6 +122,7 @@ export class TabService {
     }
     if (save)
       this.focusedTabIndex = index;
+    return this.displayedTab[1]?.tabId;
   }
   public showNextTab() {
     const index = this.focusedTabIndex >= this.tabs.length ? 0 : this.focusedTabIndex + 1;
@@ -134,6 +136,9 @@ export class TabService {
   }
   public getTab<T extends ITabElement>(tabType: TabTypes, id: number): T {
     return this.tabs.find(el => el.type == tabType && el.id === id) as T;
+  }
+  public getTabFromId<T extends ITabElement>(tabId: string): T {
+    return this.tabs.find(el => el.tabId === tabId) as T;
   }
 
   private addTabToStorage(tab: Type<ITabElement>, id?: number | string) {

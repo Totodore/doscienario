@@ -1,3 +1,4 @@
+import { SocketService } from 'src/app/services/sockets/socket.service';
 import { ContextMenuService } from './../../../services/ui/context-menu.service';
 import { EditorWorkerService } from './../../../services/document-worker.service';
 import { ApiService } from 'src/app/services/api.service';
@@ -18,6 +19,8 @@ import { Sheet } from 'src/app/models/api/sheet.model';
 import { applyTabPlugin, findStrFromSelection } from 'src/app/utils/doc.utils';
 import * as CKEditor from "../../../../lib/ckeditor";
 import { ConfirmComponent } from '../../utils/confirm/confirm.component';
+import { AddTagElementOut } from 'src/app/models/sockets/out/tag.out';
+import { Tag } from 'src/app/models/api/tag.model';
 
 @Component({
   selector: 'app-document',
@@ -395,6 +398,18 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       }
     }
     return [Array.from(sheets), this.sheets.filter(el => !sheets.has(el))];
+  }
+
+  
+  /**
+   * Add element tag and wait that doc is loaded before adding element tag if needed
+   */
+   public async addTags(tags: Tag[]) {
+    if (!this.loaded)
+      await new Promise<void>(resolve => setInterval(() => this.loaded && resolve(), 100));
+    this.project.updateDocTags(this.tabId, tags);
+    for (const tag of tags)
+      this.socket.socket.emit(Flags.TAG_ADD_DOC, new AddTagElementOut(this.id, tag.title));
   }
 
   get doc(): DocumentSock {

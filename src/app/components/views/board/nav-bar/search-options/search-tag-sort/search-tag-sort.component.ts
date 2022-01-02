@@ -24,6 +24,12 @@ export class SearchTagSortComponent {
   @Output()
   public readonly selectedTagsChange = new EventEmitter<Tag[]>();
 
+  @Output()
+  public readonly selectedNoTagChange = new EventEmitter<boolean>();
+
+  @Input()
+  public selectedNoTag = false;
+
   public toggleTag(tag: Tag) {
     const index = this.selectedTags.indexOf(tag);
     if (index === -1) {
@@ -53,10 +59,17 @@ export class SearchTagSortComponent {
 
   public onUnselectAllTags() {
     this.selectedTags = [];
+    this.selectedNoTag = false;
     this.selectedTagsChange.emit(this.selectedTags);
+    this.selectedNoTagChange.emit(false);
+  }
+
+  public onToggleNoTags() {
+    this.selectedNoTag = !this.selectedNoTag;
+    this.selectedNoTagChange.emit(this.selectedNoTag);
   }
 
   public get hasSelectedTags() {
-    return this.selectedTags.length > 0;
+    return this.selectedTags.length > 0 || this.selectedNoTag;
   }
 }

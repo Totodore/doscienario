@@ -350,8 +350,8 @@ export class ProjectService {
      }
    }
 
-  public async searchFromTags(tags: Tag[], needle?: string) {
-    return await this.searchWorker.postAsyncMessage<Element[]>('searchFromTags', [tags, needle, [...this.docs, ...this.blueprints]]);
+  public async searchFromTags(tags: Tag[], needle?: string, selectNoTags = false) {
+    return await this.searchWorker.postAsyncMessage<Element[]>('searchFromTags', [tags, needle, [...this.docs, ...this.blueprints], selectNoTags]);
   }
   public async filterSecondaryTags(tags: Tag[]) {
     return await this.searchWorker.postAsyncMessage<Tag[]>('filterSecondaryTags', [tags, [...this.docs, ...this.blueprints]]);

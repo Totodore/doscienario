@@ -24,6 +24,8 @@ export class SearchOptionsComponent implements OnInit {
 
   public results: Element[] = [];
 
+  public selectedNoTag = false;
+
   @ViewChild(SearchTagSortComponent)
   public tagSortComponent!: SearchTagSortComponent;
 
@@ -38,11 +40,11 @@ export class SearchOptionsComponent implements OnInit {
     this.search();
   }
 
-  public async search(query?: string) {
+  public async search(query?: string, selectNoTag = this.selectedNoTag) {
     this.progress.show();
     this.needle = query;
-    this.results = this.selectedTags.length > 0 ?
-      await this.project.searchFromTags(this.selectedTags, this.needle)
+    this.results = this.selectedTags.length > 0 || selectNoTag ?
+      await this.project.searchFromTags(this.selectedTags, this.needle, selectNoTag)
       : [...this.project.blueprints, ...this.project.docs]
         .filter(el => el.title?.toLowerCase()?.includes(this.needle?.toLowerCase() || ""))
         .sort((a, b) => a.title?.toLowerCase() < b.title?.toLowerCase() ? -1 : 1);

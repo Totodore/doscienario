@@ -1,7 +1,7 @@
 {
   "name": "doscienario",
-  "version": "2.0.45",
-  "description": "Application de gestion de projets de jeux vidéos",
+  "version": "2.0.47",
+  "description": "Application de gestion de projets créatifs",
   "main": "dist/main.js",
   "author": {
     "name": "Théodore Prévot",

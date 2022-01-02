@@ -9,8 +9,8 @@ import { SocketService } from '../../../services/sockets/socket.service';
 import { Component, HostListener, OnInit } from '@angular/core';
 import { DocumentComponent } from '../../tabs/document/document.component';
 import { B, M, N, TAB, W } from '@angular/cdk/keycodes';
-import { TabTypes } from 'src/app/models/tab-element.model';
 import { NGXLogger } from 'ngx-logger';
+import { TabTypes } from 'src/app/models/sys/tab.model';
 
 @Component({
   selector: 'app-board',

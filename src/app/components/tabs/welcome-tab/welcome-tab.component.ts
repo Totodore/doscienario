@@ -1,17 +1,16 @@
 import { AskTextareaComponent } from './../../utils/ask-textarea/ask-textarea.component';
 import { MatDialog } from '@angular/material/dialog';
-import { TabTypes } from './../../../models/tab-element.model';
 import { SnackbarService } from '../../../services/ui/snackbar.service';
 import { ApiService } from './../../../services/api.service';
 import { ProgressService } from '../../../services/ui/progress.service';
 import { TagsManagerComponent } from './../tags-manager/tags-manager.component';
 import { ProjectOptionsComponent } from '../project-options/project-options.component';
 import { TabService } from '../../../services/tab.service';
-import { ITabElement } from '../../../models/tab-element.model';
 import { ProjectService } from '../../../services/project.service';
 import { Component, Input } from '@angular/core';
 import { version } from "../../../../../package.json";
 import { NGXLogger } from 'ngx-logger';
+import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
 @Component({
   selector: 'app-welcome-tab',
   templateUrl: './welcome-tab.component.html',

@@ -1,7 +1,7 @@
 
 import { TabService } from './../../../../services/tab.service';
 import { Component } from '@angular/core';
-import { TabTypes } from 'src/app/models/tab-element.model';
+import { TabTypes } from 'src/app/models/sys/tab.model';
 
 @Component({
   selector: 'app-nav-bar',

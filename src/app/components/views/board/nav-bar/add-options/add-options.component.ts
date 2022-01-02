@@ -10,11 +10,7 @@ import { ApiService } from 'src/app/services/api.service';
 import { ProgressService } from 'src/app/services/ui/progress.service';
 import { SnackbarService } from 'src/app/services/ui/snackbar.service';
 import { NGXLogger } from 'ngx-logger';
-import { Flags } from 'src/app/models/sockets/flags.enum';
-import { AddTagElementOut } from 'src/app/models/sockets/out/tag.out';
 import { ElementComponent } from 'src/app/components/tabs/element.component';
-import { TabTypes } from 'src/app/models/tab-element.model';
-import { Tag } from 'src/app/models/api/tag.model';
 
 @Component({
   selector: 'app-add-options',
@@ -33,19 +29,18 @@ export class AddOptionsComponent {
     private readonly project: ProjectService,
     private readonly snackbar: SnackbarService,
     private readonly logger: NGXLogger,
-    private readonly socket: SocketService
   ) { }
 
-  public createDoc() {
-    const tabId = this.tabs.pushTab(DocumentComponent, false);
+  public async createDoc() {
+    const tabId = await this.tabs.pushTab(DocumentComponent, false);
     this.addElementTag(tabId);
   }
 
   public openMenu() {
     this.tabs.pushTab(WelcomeTabComponent);
   }
-  public openBlueprint() {
-    const tabId = this.tabs.pushTab(BlueprintComponent, false);
+  public async openBlueprint() {
+    const tabId = await this.tabs.pushTab(BlueprintComponent, false);
     this.addElementTag(tabId);
   }
 

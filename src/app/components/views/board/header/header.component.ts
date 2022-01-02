@@ -40,7 +40,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   public tabRightClick(e: MouseEvent) {
-    this.context.show(e, [{ label: "Fermer tous les onglets", action: () => this.tabService.closeAllTab() }]);
+    this.context.show(e, [{ label: "Fermer tous les onglets", action: () => this.tabService.closeAllTab(true) }]);
   }
 
 }

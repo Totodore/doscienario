@@ -1,3 +1,4 @@
+import { Tab } from './models/sys/tab.model';
 import { Logs } from './models/api/logs.model';
 import { DBConfig } from 'ngx-indexed-db';
 import { INGXLoggerConfig, NgxLoggerLevel } from 'ngx-logger';
@@ -10,11 +11,12 @@ export const loggerConfig: INGXLoggerConfig = {
 };
 
 const dbTables: Type<any>[] = [
-  Logs
+  Logs,
+  Tab
 ];
 
 export const dbConfig: DBConfig = {
   name: "doscienario",
-  version: 2,
+  version: 3,
   objectStoresMeta: dbTables.map(table => table.prototype.__dbDefinition),
 }

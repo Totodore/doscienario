@@ -4,7 +4,7 @@ import { EditMainTagComponent } from 'src/app/components/modals/edit-main-tag/ed
 import { EditTagsComponent } from 'src/app/components/modals/edit-tags/edit-tags.component';
 import { Tag } from 'src/app/models/api/tag.model';
 import { Element } from 'src/app/models/default.model';
-import { TabTypes } from 'src/app/models/tab-element.model';
+import { TabTypes } from 'src/app/models/sys/tab.model';
 import { ProjectService } from 'src/app/services/project.service';
 
 @Component({

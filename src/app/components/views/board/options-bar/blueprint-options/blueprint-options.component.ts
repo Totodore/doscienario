@@ -1,4 +1,3 @@
-import { TabTypes } from '../../../../../models/tab-element.model';
 import { ConfirmComponent } from '../../../../utils/confirm/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SocketService } from '../../../../../services/sockets/socket.service';
@@ -12,6 +11,7 @@ import { BlueprintComponent } from 'src/app/components/tabs/blueprint/blueprint.
 import { ColorElementOut, RenameElementOut } from 'src/app/models/sockets/out/element.out';
 import { Tag } from 'src/app/models/api/tag.model';
 import { Blueprint } from 'src/app/models/api/blueprint.model';
+import { TabTypes } from 'src/app/models/sys/tab.model';
 
 @Component({
   selector: 'app-blueprint-options',

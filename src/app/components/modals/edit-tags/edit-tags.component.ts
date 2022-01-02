@@ -5,11 +5,11 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { diff as arrayDiff } from "fast-array-diff";
 import { Flags } from 'src/app/models/sockets/flags.enum';
-import { TabTypes } from 'src/app/models/tab-element.model';
 import { DocumentSock } from 'src/app/models/api/document.model';
 import { Blueprint } from 'src/app/models/api/blueprint.model';
 import { Tag } from 'src/app/models/api/tag.model';
 import { NGXLogger } from 'ngx-logger';
+import { TabTypes } from 'src/app/models/sys/tab.model';
 
 @Component({
   selector: 'app-edit-tags',

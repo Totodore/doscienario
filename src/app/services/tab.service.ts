@@ -1,13 +1,14 @@
+import { Tab } from './../models/sys/tab.model';
+import { DbService } from './database/db.service';
 
-import { TabSaveModel } from './../models/tab-element.model';
 import { BlueprintComponent } from './../components/tabs/blueprint/blueprint.component';
 import { WelcomeTabComponent } from './../components/tabs/welcome-tab/welcome-tab.component';
 import { TagsManagerComponent } from './../components/tabs/tags-manager/tags-manager.component';
 import { DocumentComponent } from './../components/tabs/document/document.component';
 import { ProjectOptionsComponent } from '../components/tabs/project-options/project-options.component';
 import { ComponentFactoryResolver, Inject, Injectable, Type, ViewContainerRef } from '@angular/core';
-import { ITabElement, TabTypes } from '../models/tab-element.model';
 import { NGXLogger } from 'ngx-logger';
+import { ITabElement, TabTypes } from '../models/sys/tab.model';
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +31,7 @@ export class TabService {
     @Inject(ComponentFactoryResolver)
     private readonly factoryResolver: ComponentFactoryResolver,
     private readonly logger: NGXLogger,
+    private readonly db: DbService
   ) { }
 
   public setRootViewContainerRef(viewContainerRef: ViewContainerRef) {
@@ -44,11 +46,11 @@ export class TabService {
     return component.instance.openTab?.(id);
   }
 
-  public loadSavedTabs(projectId: number) {
+  public async loadSavedTabs(projectId: number) {
     this.projectId = projectId;
-    for (const tab of this.savedTabs) {
-      this.pushTab(this.availableTabs[tab.tab], false, tab.id);
-      this.logger.log("Loading saved tab :", this.availableTabs[tab.tab].name);
+    for (const tab of (await this.getSavedTabs())) {
+      this.pushTab(this.availableTabs[tab.tabType], false, tab.elId as number);
+      this.logger.log("Loading saved tab :", this.availableTabs[tab.tabType].name);
     }
     this.showTab(this.focusedTabIndex);
   }
@@ -57,7 +59,7 @@ export class TabService {
    * Take an id, it can be a document id (number)
    * or a tab id
    */
-  public pushTab(tab: Type<ITabElement>, save = true, id?: number): string {
+  public async pushTab(tab: Type<ITabElement>, save = true, id?: number): Promise<string> {
     if (this.displayedTab?.[1])
       this.displayedTab[1].show = false;
     let displayedIndex: number;
@@ -72,7 +74,7 @@ export class TabService {
     else {
       const tabId = this.addDynamicComponent(tab, id);
       if (save)
-        this.addTabToStorage(tab, id);
+        await this.addTabToStorage(tab, id);
       return tabId;
     }
   }
@@ -91,20 +93,22 @@ export class TabService {
     this.rootViewContainer.remove(index);
     this._tabs.splice(index, 1);
   }
-  public updateDocTab(tabId: string, docId: number) {
+  public async updateDocTab(tabId: string, docId: number) {
     this.getTabFromId<DocumentComponent>(tabId).loadedTab?.();
-    if (!this.savedTabs.find(el => el?.id === docId && this.availableTabs.indexOf(DocumentComponent) === el.tab))
-      this.addTabToStorage(DocumentComponent, docId);
+    const savedTabs = await this.getSavedTabs();
+    if (!savedTabs.find(el => el.tabType === this.availableTabs.indexOf(DocumentComponent) && el?.elId === docId))
+      await this.addTabToStorage(DocumentComponent, docId);
   }
   public removeDocTab(docId: number) {
     const index = this.tabs.findIndex(el => el.id === docId && el.type === TabTypes.DOCUMENT);
     if (index >= 0)
       this.removeTab(index);
   }
-  public updateBlueprintTab(tabId: string, blueprintId: number) {
+  public async updateBlueprintTab(tabId: string, blueprintId: number) {
     this.getTabFromId<BlueprintComponent>(tabId).loadedTab?.();
-    if (!this.savedTabs.find(el => el.id === blueprintId && this.availableTabs.indexOf(BlueprintComponent) === el.tab))
-      this.addTabToStorage(BlueprintComponent, blueprintId);
+    const savedTabs = await this.getSavedTabs();
+    if (!savedTabs.find(el => el.tabType === this.availableTabs.indexOf(DocumentComponent) && el?.elId === blueprintId))
+      await this.addTabToStorage(BlueprintComponent, blueprintId);
   }
   public removeBlueprintTab(docId: number) {
     const index = this.tabs.findIndex(el => el.id === docId && el.type === TabTypes.BLUEPRINT);
@@ -128,10 +132,13 @@ export class TabService {
     const index = this.focusedTabIndex >= this.tabs.length ? 0 : this.focusedTabIndex + 1;
     this.showTab(index);
   }
-  public closeAllTab() {
+  public async closeAllTab(removeFromStorage = false) {
     const tabLength = this._tabs.length;
     for (let i = 0; i < tabLength; i++)
-      this.removeTab(0, false);
+      this.removeTab(0);
+    if (removeFromStorage) {
+      await this.db.removeMany(Tab, await this.getSavedTabs());
+    }
     localStorage.removeItem("tab-index");
   }
   public getTab<T extends ITabElement>(tabType: TabTypes, id: number): T {
@@ -141,41 +148,29 @@ export class TabService {
     return this.tabs.find(el => el.tabId === tabId) as T;
   }
 
-  private addTabToStorage(tab: Type<ITabElement>, id?: number | string) {
-    const index = this.availableTabs.indexOf(tab);
-    if (id && index >= 0) {
-      if (typeof id === "number")
-        this.addSavedTab({ tab: index, id, projectId: this.projectId });
-      else
-        this.addSavedTab({ tab: index, projectId: this.projectId, tabId: id });
+  private async addTabToStorage(type: Type<ITabElement>, id?: number | string) {
+    const index = this.availableTabs.indexOf(type);
+    const tab = new Tab(this.projectId, index, id);
+    try {
+      await this.db.add(Tab, tab);
+    } catch (e) {
+      this.logger.error("Could not add tab to storage", e);
     }
-    else if (index >= 0)
-      this.addSavedTab({ tab: index, projectId: this.projectId });
   }
 
-  private removeTabToStorage(tab: Type<ITabElement>, id?: number) {
-    const index = this.availableTabs.indexOf(tab);
-    const tabs: TabSaveModel[] = JSON.parse(localStorage.getItem("tabs"));
-    tabs.splice(tabs.findIndex(el => (id ? el.id === id : el.tab === index) && el.projectId === this.projectId), 1);
-    localStorage.setItem("tabs", JSON.stringify(tabs));
+  private async removeTabToStorage(tabType: Type<ITabElement>, id?: number) {
+    const index = this.availableTabs.indexOf(tabType);
+    const tab = (await this.getSavedTabs()).find(el => (id && el.elId === id && el.tabType == index) || el.tabType === index);
+    if (tab)
+      await this.db.remove(Tab, tab);
+    else this.logger.warn("Could not find tab to remove with", tabType, id);
   }
 
   /**
    * We remove all doublons if some exists and we returns tabs only for this project
    */
-  private get savedTabs(): TabSaveModel[] {
-    const data = (JSON.parse(localStorage.getItem("tabs")) as TabSaveModel[]) || [];
-    let returnedData = [];
-    for (const el of data) {
-      if (el.projectId === this.projectId && !returnedData.find(el2 => (!el2.id && el2.tab === el.tab) || el2.id === el.id))
-        returnedData.push(el);
-    }
-    return returnedData;
-  }
-  private addSavedTab(tab: TabSaveModel) {
-    const tabs: TabSaveModel[] = JSON.parse(localStorage.getItem("tabs")) || [];
-    tabs.push(tab);
-    localStorage.setItem("tabs", JSON.stringify(tabs));
+  private async getSavedTabs() {
+    return await this.db.getManyWhere(Tab, 'projectId', this.projectId);
   }
 
   public get tabs(): ITabElement[] {

@@ -1,9 +1,5 @@
 import { Tag } from 'src/app/models/api/tag.model';
-import { Flags } from 'src/app/models/sockets/flags.enum';
-import { AddTagElementOut } from 'src/app/models/sockets/out/tag.out';
-import { ITabElement, TabTypes } from 'src/app/models/tab-element.model';
-import { ProjectService } from 'src/app/services/project.service';
-import { SocketService } from 'src/app/services/sockets/socket.service';
+import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
 import { ProgressService } from 'src/app/services/ui/progress.service';
 import { Vector } from 'src/types/global';
 import { v4 as uuid4 } from "uuid";

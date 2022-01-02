@@ -1,11 +1,9 @@
-import { SocketService } from 'src/app/services/sockets/socket.service';
 import { ContextMenuService } from './../../../services/ui/context-menu.service';
 import { EditorWorkerService } from './../../../services/document-worker.service';
 import { ApiService } from 'src/app/services/api.service';
 import { TabService } from './../../../services/tab.service';
 import { ProgressService } from 'src/app/services/ui/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
-import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { Component, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CKEditor5 } from '@ckeditor/ckeditor5-angular';
 import { Flags } from 'src/app/models/sockets/flags.enum';
@@ -21,6 +19,7 @@ import * as CKEditor from "../../../../lib/ckeditor";
 import { ConfirmComponent } from '../../utils/confirm/confirm.component';
 import { AddTagElementOut } from 'src/app/models/sockets/out/tag.out';
 import { Tag } from 'src/app/models/api/tag.model';
+import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
 
 @Component({
   selector: 'app-document',

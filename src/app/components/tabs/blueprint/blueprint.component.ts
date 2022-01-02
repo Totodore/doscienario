@@ -3,7 +3,6 @@ import { ConfirmComponent } from './../../utils/confirm/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ProgressService } from '../../../services/ui/progress.service';
 import { SocketService } from '../../../services/sockets/socket.service';
-import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { ProjectService } from './../../../services/project.service';
 import { Component, ViewChild, ElementRef, ViewChildren, QueryList, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Flags } from 'src/app/models/sockets/flags.enum';
@@ -18,6 +17,7 @@ import { Blueprint, Node, Relationship } from 'src/app/models/api/blueprint.mode
 import { NGXLogger } from 'ngx-logger';
 import { AddTagElementOut } from 'src/app/models/sockets/out/tag.out';
 import { Tag } from 'src/app/models/api/tag.model';
+import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
 
 
 @Component({

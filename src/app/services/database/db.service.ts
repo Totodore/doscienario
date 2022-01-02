@@ -21,6 +21,20 @@ export class DbService {
     return this.db.clear(table.prototype.__tableName).toPromise();
   }
 
+  public remove<T>(table: Type<T>, key: string | T) {
+    return this.db.delete(table.prototype.__tableName, typeof key === "string" ? key : key[table.prototype.__dbDefinition.storeConfig.keyPath]).toPromise();
+  }
+  public removeMany<T>(table: Type<T>, obj: T[]) {
+    return this.db.bulkDelete(table.prototype.__tableName, obj.map(el => el[table.prototype.__dbDefinition.storeConfig.keyPath])).toPromise();
+  }
+  public async getManyWhere<T>(table: Type<T>, key: keyof T, val: IDBKeyRange | string | number, select?: (keyof T)[]): Promise<T[]> {
+    const res = await this.db.getAllByIndex<T>(table.prototype.__tableName, key as string, typeof val != "object" ? IDBKeyRange.only(val) : val).toPromise();
+    if (select)
+      return res.map(x => select.reduce<Partial<T>>((acc, key) => ({ ...acc, [key]: x[key] }), {})) as T[];
+    else
+      return res;
+  }
+
   public async getAll<T>(table: Type<T>, select?: (keyof T)[]) {
     const res = await this.db.getAll<T>(table.prototype.__tableName).toPromise();
     if (select)

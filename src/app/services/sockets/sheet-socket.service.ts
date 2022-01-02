@@ -8,9 +8,9 @@ import { Change, OpenElementIn, SendElementIn } from 'src/app/models/sockets/in/
 import { ApiService } from '../api.service';
 import { ProjectService } from '../project.service';
 import { TabService } from '../tab.service';
-import { TabTypes } from 'src/app/models/tab-element.model';
 import { DocumentComponent } from 'src/app/components/tabs/document/document.component';
 import { NGXLogger } from 'ngx-logger';
+import { TabTypes } from 'src/app/models/sys/tab.model';
 
 @Injectable({
   providedIn: 'root'

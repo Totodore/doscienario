@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { Project, User } from './../models/api/project.model';
 import { Injectable } from '@angular/core';
 import { removeNodeFromTree } from '../utils/tree.utils';
-import { TabTypes } from '../models/tab-element.model';
 import { BlueprintComponent } from '../components/tabs/blueprint/blueprint.component';
 import { WorkerManager, WorkerType } from '../utils/worker-manager.utils';
 import { Document, DocumentSock } from '../models/api/document.model';
@@ -18,6 +17,7 @@ import { DataUpdater } from '../decorators/data-updater.decorator';
 import { applyTextChanges } from '../utils/element.utils';
 import { SearchOptionsComponent } from '../components/views/board/nav-bar/search-options/search-options.component';
 import { NGXLogger } from 'ngx-logger';
+import { TabTypes } from '../models/sys/tab.model';
 
 @Injectable({
   providedIn: 'root'

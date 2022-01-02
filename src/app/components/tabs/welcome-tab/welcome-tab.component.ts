@@ -22,7 +22,7 @@ export class WelcomeTabComponent implements ITabElement, OnInit {
   public readonly title = "Menu";
   public readonly type = TabTypes.STANDALONE;
 
-  public hasUpdate = false;
+  public hasUpdate?: string;
 
   @Input() public show: boolean = false;
 
@@ -39,7 +39,7 @@ export class WelcomeTabComponent implements ITabElement, OnInit {
 
   public async ngOnInit() {
     const res = await this.api.checkApiVersion();
-    this.hasUpdate = res.versions[res.versions.length - 1] !== version && this.electron.isElectronApp;
+    this.hasUpdate = res.versions[res.versions.length - 1] !== version && this.electron.isElectronApp ? res.versions[res.versions.length - 1] : undefined;
   }
   public openSettings() {
     this.tabService.pushTab(ProjectOptionsComponent);
@@ -78,9 +78,8 @@ export class WelcomeTabComponent implements ITabElement, OnInit {
 
   public update() {
     if (this.electron.isElectronApp) {
-      this.progress.show();
       this.tabService.closeAllTab();
-      this.electron.ipcRenderer.send("update");
+      this.electron.ipcRenderer.send("update", this.hasUpdate);
     }
   }
   public async exit() {

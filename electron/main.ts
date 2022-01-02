@@ -1,4 +1,4 @@
-import { app as electron, BrowserWindow, shell } from "electron";
+import { app as electron, BrowserWindow, ipcMain, shell } from "electron";
 import { globalShortcut } from "electron/main";
 import * as path from "path";
 import { checkUpdate, downloadAndInstall } from "./updater";
@@ -27,6 +27,7 @@ class App {
         this.window.loadFile(this.url),
         this.updateIfNeeded()
       ]);
+      this.addUpdateHandler();
     } catch (e) {
       console.error(e);
     }
@@ -59,6 +60,16 @@ class App {
         this.window.setProgressBar(prog >= 1 ? 2 : prog);
       });
     }
+  }
+
+  private async addUpdateHandler() {
+    ipcMain.on("update", async () => {
+      const res = await checkUpdate();
+      if (res.isUpdateAvailable)
+        await downloadAndInstall(res.url, (prog) => {
+          this.window.setProgressBar(prog >= 1 ? 2 : prog);
+        });
+    });
   }
 }
 

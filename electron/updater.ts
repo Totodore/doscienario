@@ -38,7 +38,7 @@ export async function checkUpdate(): Promise<CheckUpdateResult> {
 
 export const downloadAndInstall = async (url: string, handler: (prog: number) => void) => {
   if (!await isInstalled())
-    return;
+    return false;
   const downloadPath = join(dirname(app.getPath('exe')), './update.exe');
   const res = await axios.get(url, {
     headers: {
@@ -62,6 +62,7 @@ export const downloadAndInstall = async (url: string, handler: (prog: number) =>
   await fs.chmod(downloadPath, '755');
   spawn(downloadPath, [], { detached: true, stdio: ['ignore', 'ignore', 'ignore'] }).unref();
   app.quit();
+  return true;
 }
 
 const isInstalled = async () => {

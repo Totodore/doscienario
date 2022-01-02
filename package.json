@@ -1,6 +1,6 @@
 {
   "name": "doscienario",
-  "version": "2.0.47",
+  "version": "2.0.46",
   "description": "Application de gestion de projets créatifs",
   "main": "dist/main.js",
   "author": {
@@ -39,6 +39,7 @@
     "fast_array_intersect": "^1.1.0",
     "fast-array-diff": "^1.0.0",
     "fs-extra": "^9.1.0",
+    "ngx-electron": "^2.2.0",
     "ngx-indexed-db": "^9.4.2",
     "ngx-logger": "^5.0.3",
     "ngx-socket-io": "^2.1.1",

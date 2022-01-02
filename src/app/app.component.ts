@@ -26,12 +26,12 @@ export class AppComponent implements OnInit {
   public async ngOnInit() {
     this.progress.changeDetector = this.changeDetector;
     const res = await this.api.checkApiVersion();
-    this.isCompatible = res === true;
-    if (res !== true) {
+    this.isCompatible = res.allowed;
+    if (!res.allowed) {
       this.dialog.open(InfoComponent, {
         data: {
           text: `Une mise à jour est requise pour continuer à utiliser Doscienario`,
-          content: `Vous devez posséder une des versions suivantes : ${res.join(", ")}. Version actuelle : ${version}`,
+          content: `Vous devez posséder une des versions suivantes : ${res.versions.join(", ")}. Version actuelle : ${version}`,
           closable: false
         },
         closeOnNavigation: false,

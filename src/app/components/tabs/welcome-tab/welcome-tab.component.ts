@@ -7,19 +7,23 @@ import { TagsManagerComponent } from './../tags-manager/tags-manager.component';
 import { ProjectOptionsComponent } from '../project-options/project-options.component';
 import { TabService } from '../../../services/tab.service';
 import { ProjectService } from '../../../services/project.service';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { version } from "../../../../../package.json";
 import { NGXLogger } from 'ngx-logger';
 import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
+import { ElectronService } from "ngx-electron";
 @Component({
   selector: 'app-welcome-tab',
   templateUrl: './welcome-tab.component.html',
   styleUrls: ['./welcome-tab.component.scss']
 })
-export class WelcomeTabComponent implements ITabElement {
+export class WelcomeTabComponent implements ITabElement, OnInit {
 
   public readonly title = "Menu";
   public readonly type = TabTypes.STANDALONE;
+
+  public hasUpdate = false;
+
   @Input() public show: boolean = false;
 
   constructor(
@@ -30,8 +34,13 @@ export class WelcomeTabComponent implements ITabElement {
     private readonly snackbar: SnackbarService,
     private readonly dialog: MatDialog,
     private readonly logger: NGXLogger,
+    private readonly electron: ElectronService
   ) { }
 
+  public async ngOnInit() {
+    const res = await this.api.checkApiVersion();
+    this.hasUpdate = res.versions[res.versions.length - 1] !== version && this.electron.isElectronApp;
+  }
   public openSettings() {
     this.tabService.pushTab(ProjectOptionsComponent);
   }
@@ -65,6 +74,14 @@ export class WelcomeTabComponent implements ITabElement {
         this.logger.error("Impossible to send bug report", e);
       }
     });
+  }
+
+  public update() {
+    if (this.electron.isElectronApp) {
+      this.progress.show();
+      this.tabService.closeAllTab();
+      this.electron.ipcRenderer.send("update");
+    }
   }
   public async exit() {
     this.tabService.closeAllTab();

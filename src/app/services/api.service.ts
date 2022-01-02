@@ -65,8 +65,7 @@ export class ApiService extends ApiUtil {
   }
 
   public async checkApiVersion() {
-    const res = await this.get<VersionCheckRes>(`system/check-version?version=${version}`);
-    return res.allowed ? true : res.versions;
+    return await this.get<VersionCheckRes>(`system/check-version?version=${version}`);
   }
 
   public get inProject(): boolean {

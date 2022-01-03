@@ -20,6 +20,8 @@ class App {
       webPreferences: {
         preload: join(__dirname, 'preload.js'),
         nodeIntegration: true,
+        //@ts-ignore
+        enableRemoteModule: true,
       },
     });
     this.config();
@@ -55,7 +57,6 @@ class App {
   }
 
   private async updateIfNeeded() {
-    return;
     const res = await checkUpdate();
     console.log("checkUpdate", res);
     if (res.isUpdateAvailable && res.mandatory) {

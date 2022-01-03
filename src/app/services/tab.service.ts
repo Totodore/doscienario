@@ -99,22 +99,43 @@ export class TabService {
     if (!savedTabs.find(el => el.tabType === this.availableTabs.indexOf(DocumentComponent) && el?.elId === docId))
       await this.addTabToStorage(DocumentComponent, docId);
   }
+
+  /**
+   * Remove a document tab from its id
+   */
   public removeDocTab(docId: number) {
     const index = this.tabs.findIndex(el => el.id === docId && el.type === TabTypes.DOCUMENT);
     if (index >= 0)
       this.removeTab(index);
   }
+
+  /**
+   * Add a tab to the storage if it's not already there
+   * @param tabId the uuid of the tab
+   * @param blueprintId the element id we need to save the current tab
+   */
   public async updateBlueprintTab(tabId: string, blueprintId: number) {
     this.getTabFromId<BlueprintComponent>(tabId).loadedTab?.();
     const savedTabs = await this.getSavedTabs();
     if (!savedTabs.find(el => el.tabType === this.availableTabs.indexOf(DocumentComponent) && el?.elId === blueprintId))
       await this.addTabToStorage(BlueprintComponent, blueprintId);
   }
+
+  /**
+   * Remove a blueprint tab from its id
+   */
   public removeBlueprintTab(docId: number) {
     const index = this.tabs.findIndex(el => el.id === docId && el.type === TabTypes.BLUEPRINT);
     if (index >= 0)
       this.removeTab(index);
   }
+
+  /**
+   * Show a tab by its index
+   * @param index the index of the tab to show
+   * @param save if set tu true the tab index is saved
+   * @returns return the new tab uuid
+   */
   public showTab(index: number, save = true) {
     if (this.displayedTab?.[1]) {
       this.displayedTab[1].onUnFocus?.();
@@ -128,10 +149,19 @@ export class TabService {
       this.focusedTabIndex = index;
     return this.displayedTab?.[1]?.tabId;
   }
+
+  /**
+   * Show the next tab after the current one
+   */
   public showNextTab() {
     const index = this.focusedTabIndex >= this.tabs.length ? 0 : this.focusedTabIndex + 1;
-    this.showTab(index);
+    return this.showTab(index);
   }
+
+  /**
+   * Close all tabs and remove them from storage if needed
+   * @param removeFromStorage Specify if the tabs should be removed from storage
+   */
   public async closeAllTab(removeFromStorage = false) {
     const tabLength = this._tabs.length;
     for (let i = 0; i < tabLength; i++)
@@ -141,16 +171,38 @@ export class TabService {
     }
     localStorage.removeItem("tab-index");
   }
+
+  /**
+   * Get a tab component from its element id and type
+   * @param tabType The type of the tab
+   * @param id the element id of the tab
+   */
   public getTab<T extends ITabElement>(tabType: TabTypes, id: number): T {
     return this.tabs.find(el => el.type == tabType && el.id === id) as T;
   }
+
+  /**
+   * Get a tab component from its tabId uuid
+   * @param tabId the tab uuid to get
+   */
   public getTabFromId<T extends ITabElement>(tabId: string): T {
     return this.tabs.find(el => el.tabId === tabId) as T;
   }
 
+  /**
+   * Add a tab to the storage
+   * If the tab already exists in storage it will not be added
+   * @param type the type of the tab
+   * @param id the optional element id of the tab
+   */
   private async addTabToStorage(type: Type<ITabElement>, id?: number | string) {
     const index = this.availableTabs.indexOf(type);
     const tab = new Tab(this.projectId, index, id);
+    const savedTabs = await this.getSavedTabs();
+    if (savedTabs.find(el => el.tabType === index && (el?.elId || id) === id)) {
+      this.logger.warn("Tab already exists");
+      return;
+    }
     try {
       await this.db.add(Tab, tab);
     } catch (e) {
@@ -158,17 +210,19 @@ export class TabService {
     }
   }
 
+  /**
+   * Remove a tab from the storage
+   * @param tabType the type of the tab
+   * @param id the optional element id of the tab
+   */
   private async removeTabToStorage(tabType: Type<ITabElement>, id?: number) {
     const index = this.availableTabs.indexOf(tabType);
     const tab = (await this.getSavedTabs()).find(el => (id && el.elId === id && el.tabType == index) || el.tabType === index);
     if (tab)
       await this.db.remove(Tab, tab);
-    else this.logger.warn("Could not find tab to remove with", tabType, id);
+    else this.logger.warn("Could not find tab to remove with", tabType.name, id);
   }
 
-  /**
-   * We remove all doublons if some exists and we returns tabs only for this project
-   */
   private async getSavedTabs() {
     return await this.db.getManyWhere(Tab, 'projectId', this.projectId);
   }

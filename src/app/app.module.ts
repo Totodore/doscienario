@@ -73,7 +73,6 @@ import { WriterLoggerService } from './services/logger/writer-logger.service';
 import { NgxIndexedDBModule } from 'ngx-indexed-db';
 import { AskTextareaComponent } from './components/utils/ask-textarea/ask-textarea.component';
 import { ContextMenuComponent } from './components/utils/context-menu/context-menu.component';
-import { NgxElectronModule } from 'ngx-electron';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -145,7 +144,6 @@ import { NgxElectronModule } from 'ngx-electron';
     MatRippleModule,
     DragDropModule,
     MatSlideToggleModule,
-    NgxElectronModule
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: appearance },

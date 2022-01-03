@@ -11,7 +11,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { version } from "../../../../../package.json";
 import { NGXLogger } from 'ngx-logger';
 import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
-import { ElectronService } from "ngx-electron";
+import { ElectronService } from 'src/app/services/electron.service';
 @Component({
   selector: 'app-welcome-tab',
   templateUrl: './welcome-tab.component.html',
@@ -34,7 +34,7 @@ export class WelcomeTabComponent implements ITabElement, OnInit {
     private readonly snackbar: SnackbarService,
     private readonly dialog: MatDialog,
     private readonly logger: NGXLogger,
-    private readonly electron: ElectronService
+    private readonly electron: ElectronService,
   ) { }
 
   public async ngOnInit() {
@@ -79,7 +79,7 @@ export class WelcomeTabComponent implements ITabElement, OnInit {
   public update() {
     if (this.electron.isElectronApp) {
       this.tabService.closeAllTab();
-      this.electron.ipcRenderer.send("update", this.hasUpdate);
+      this.electron.send("update", this.hasUpdate);
     }
   }
   public async exit() {

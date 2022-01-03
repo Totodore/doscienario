@@ -1,3 +1,4 @@
+import { DbService } from './../../../services/database/db.service';
 import { TabService } from './../../../services/tab.service';
 import { ConfirmComponent } from './../../utils/confirm/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -7,7 +8,7 @@ import { SocketService } from '../../../services/sockets/socket.service';
 import { ProjectService } from '../../../services/project.service';
 import { Component } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
-import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
+import { ITabElement, Tab, TabTypes } from 'src/app/models/sys/tab.model';
 
 @Component({
   selector: 'app-project-options',
@@ -19,6 +20,7 @@ export class ProjectOptionsComponent implements ITabElement {
   constructor(
     private readonly tabs: TabService,
     private readonly logger: NGXLogger,
+    private readonly db: DbService,
     public readonly project: ProjectService,
     public readonly socket: SocketService,
     public readonly api: ApiService,
@@ -43,6 +45,21 @@ export class ProjectOptionsComponent implements ITabElement {
       location.href = `${this.api.root}/res/exported-data/${id}`;
     else
       this.snackbar.snack("Erreur lors de l'export du projet");
+  }
+
+  public async clearTabs() {
+    const dialog = this.dialog.open(ConfirmComponent, { data: "Vider les onglets de tous les projets ?" });
+    dialog.componentInstance.confirm.subscribe(async () => {
+      dialog.close();
+      try {
+        await this.db.clear(Tab);
+        this.tabs.closeAllTab();
+        localStorage.removeItem("tabs");
+      } catch (e) {
+        this.logger.error(e);
+        this.snackbar.snack("Erreur lors de la suppression des onglets");
+      }
+    });
   }
 
   public deleteProject() {

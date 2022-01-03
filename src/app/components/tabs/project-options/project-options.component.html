@@ -6,6 +6,7 @@
       <mat-label>Nom du projet</mat-label>
       <input type="text" [(ngModel)]="name" (input)="updateName()" matInput>
     </mat-form-field>
+		<button mat-stroked-button color="accent" (click)="clearTabs()" style="margin-bottom: 10px">Supprimer les onglets de tous les projets</button>
   </section>
 	<section class="blueprint-options">
 		<h4>Paramètres des arbres :</h4>

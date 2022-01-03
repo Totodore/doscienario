@@ -43,7 +43,7 @@ export class BoardComponent implements OnInit {
       snack = this.snackbar.open("Synchronisation du projet...", null, { duration: null });
       this.logger.log("Opening project:", this.project.id);
       await this.api.openProject(this.project.id);
-      this.tabs.loadSavedTabs(this.project.id);
+      await this.tabs.loadSavedTabs(this.project.id);
       this.logger.log("Project opened:", this.project.id, this.project.name);
       this.snackbar.open("Project synchronisé avec succès !", null, { duration: 3000 });
     } catch (e) {

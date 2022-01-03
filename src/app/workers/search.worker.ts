@@ -16,7 +16,6 @@ addEventListener('message', (e: MessageEvent<[string, any] | string>) => {
  * We get all the elements if they have the selected @param tags and the @param needle as title
  */
 function searchFromTags(tags: Tag[], needle: string | undefined, els: Element[], addNoTags = false) {
-  console.log(addNoTags);
   return els.filter(el => {
     return ((addNoTags && el.tags.length == 0) || (tags.length > 0 && tags.reduce((prev, curr) => prev && !!el.tags.find(tag => tag.id === curr.id), true)))
       && el.title?.toLowerCase()?.includes(needle?.toLowerCase() || '');

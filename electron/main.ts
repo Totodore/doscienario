@@ -1,11 +1,13 @@
 import { app as electron, BrowserWindow, ipcMain, shell } from "electron";
 import { globalShortcut } from "electron/main";
-import * as path from "path";
 import { checkUpdate, downloadAndInstall } from "./updater";
+import { join } from "path";
+
+//Initializing remote module for electron-remote
+require("@electron/remote/main").initialize();
 
 class App {
-  private readonly url = `dist/app/index.html`;
-  // private readonly url = `./app/index.html`;
+  private readonly url = `./app/index.html`;
   private window: BrowserWindow;
 
   public async init(): Promise<void> {
@@ -16,15 +18,15 @@ class App {
       titleBarStyle: 'hidden',
       frame: false,
       webPreferences: {
-        preload: path.join(__dirname, './preload.js'),
-        enableRemoteModule: true,
-      }
+        preload: join(__dirname, 'preload.js'),
+        nodeIntegration: true,
+      },
     });
     this.config();
     // await this.window.loadURL("http://localhost:4200/");
     try {
       await Promise.all([
-        this.window.loadFile(this.url),
+        this.window.loadFile(join(__dirname, this.url)),
         this.updateIfNeeded()
       ]);
       this.addUpdateHandler();
@@ -53,6 +55,7 @@ class App {
   }
 
   private async updateIfNeeded() {
+    return;
     const res = await checkUpdate();
     console.log("checkUpdate", res);
     if (res.isUpdateAvailable && res.mandatory) {

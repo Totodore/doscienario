@@ -1,6 +1,6 @@
 {
   "name": "doscienario",
-  "version": "2.0.45",
+  "version": "2.0.47",
   "description": "Application de gestion de projets créatifs",
   "main": "dist/main.js",
   "author": {

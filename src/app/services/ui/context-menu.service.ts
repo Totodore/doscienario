@@ -1,3 +1,4 @@
+import { ElectronService } from 'src/app/services/electron.service';
 import { NGXLogger } from 'ngx-logger';
 import { ContextMenuItem } from './../../components/utils/context-menu/context-menu.component';
 import { Injectable } from '@angular/core';
@@ -10,6 +11,7 @@ export class ContextMenuService {
 
   constructor(
     private readonly logger: NGXLogger,
+    private readonly electron: ElectronService,
   ) { }
 
   private _showing = false;
@@ -63,7 +65,7 @@ export class ContextMenuService {
   private getCoordsFromEvent(e?: MouseEvent): Vector {
     if (!e)
       return [0, 0];
-    return [e.clientY, e.clientX];
+    return [e.clientY + (this.electron.isElectronApp ? -30 : 0), e.clientX];
   }
 
 }

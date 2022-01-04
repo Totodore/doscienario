@@ -1,24 +1,33 @@
 import { Injectable } from '@angular/core';
 import Electron from "electron";
+import isElectron from 'is-electron';
+import { NGXLogger } from 'ngx-logger';
 @Injectable({
   providedIn: 'root'
 })
 export class ElectronService {
 
-  private lib: typeof Electron;
+  private readonly remote: typeof Electron;
 
-  constructor() { 
+  constructor(
+    private readonly logger: NGXLogger,
+  ) {
     try {
-      this.lib = window.require('@electron/remote');
-    } catch(e) {}
+      if (this.isElectronApp) {
+        this.remote = window.require("@electron/remote/renderer");
+        console.log(this.remote);
+      }
+    } catch (e) {
+      this.logger.error("Could not load electron remote lib", e);
+    }
   }
 
   public get isElectronApp(): boolean {
-    return this.lib !== undefined;
+    return isElectron();
   }
 
   public send(channel: string, ...args: any[]) {
-    if (this.isElectronApp)
-      this.lib.ipcRenderer.send(channel, args);
+    if (this.isElectronApp && this.remote)
+      this.remote.ipcMain.emit(channel, ...args);
   }
 }

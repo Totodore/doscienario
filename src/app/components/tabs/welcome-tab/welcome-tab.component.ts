@@ -40,6 +40,8 @@ export class WelcomeTabComponent implements ITabElement, OnInit {
   public async ngOnInit() {
     const res = await this.api.checkApiVersion();
     this.hasUpdate = res.versions[res.versions.length - 1] !== version && this.electron.isElectronApp ? res.versions[res.versions.length - 1] : undefined;
+    if (this.hasUpdate)
+      this.logger.log("Update available : " + this.hasUpdate);
   }
   public openSettings() {
     this.tabService.pushTab(ProjectOptionsComponent);

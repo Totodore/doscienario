@@ -4,8 +4,8 @@ import { checkUpdate, downloadAndInstall } from "./updater";
 import { join } from "path";
 
 //Initializing remote module for electron-remote
-require("@electron/remote/main").initialize();
-
+const remote = require("@electron/remote/main");
+remote.initialize();
 class App {
   private readonly url = `./app/index.html`;
   private window: BrowserWindow;
@@ -20,13 +20,12 @@ class App {
       webPreferences: {
         preload: join(__dirname, 'preload.js'),
         nodeIntegration: true,
-        //@ts-ignore
-        enableRemoteModule: true,
+        contextIsolation: false,
       },
     });
     this.config();
-    // await this.window.loadURL("http://localhost:4200/");
     try {
+      remote.enable(this.window.webContents);
       await Promise.all([
         this.window.loadFile(join(__dirname, this.url)),
         this.updateIfNeeded()

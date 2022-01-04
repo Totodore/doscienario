@@ -54,7 +54,6 @@
     "@angular/cli": "~11.0.2",
     "@angular/compiler-cli": "~11.0.1",
     "@types/diff": "^5.0.0",
-    "@types/electron": "^1.6.10",
     "@types/node": "^12.11.1",
     "@types/socket.io-client": "^1.4.35",
     "@types/uuid": "^8.3.0",

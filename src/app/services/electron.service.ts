@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import Electron from "electron";
-import isElectron from 'is-electron';
 import { NGXLogger } from 'ngx-logger';
 @Injectable({
   providedIn: 'root'

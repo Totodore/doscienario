@@ -22,9 +22,9 @@ export class TreeSocketService {
 
 
   @EventHandler(Flags.SEND_BLUEPRINT)
-  onSendBlueprint(packet: SendElementIn) {
+  async onSendBlueprint(packet: SendElementIn) {
     this.project.addSendBlueprint(packet);
-    this.tabs.updateBlueprintTab(packet.reqId, packet.element.id);
+    await this.tabs.updateBlueprintTab(packet.reqId, packet.element.id);
   }
 
   @EventHandler(Flags.OPEN_BLUEPRINT)

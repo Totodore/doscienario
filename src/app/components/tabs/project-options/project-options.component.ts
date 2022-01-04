@@ -1,14 +1,14 @@
+import { DbService } from './../../../services/database/db.service';
 import { TabService } from './../../../services/tab.service';
-import { TabTypes } from './../../../models/tab-element.model';
 import { ConfirmComponent } from './../../utils/confirm/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
-import { SnackbarService } from './../../../services/snackbar.service';
+import { SnackbarService } from '../../../services/ui/snackbar.service';
 import { ApiService } from 'src/app/services/api.service';
 import { SocketService } from '../../../services/sockets/socket.service';
 import { ProjectService } from '../../../services/project.service';
-import { ITabElement } from '../../../models/tab-element.model';
-import { ChangeDetectionStrategy, Component, OnInit, Provider, Type, ViewEncapsulation } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
+import { Component } from '@angular/core';
+import { NGXLogger } from 'ngx-logger';
+import { ITabElement, Tab, TabTypes } from 'src/app/models/sys/tab.model';
 
 @Component({
   selector: 'app-project-options',
@@ -19,6 +19,8 @@ export class ProjectOptionsComponent implements ITabElement {
 
   constructor(
     private readonly tabs: TabService,
+    private readonly logger: NGXLogger,
+    private readonly db: DbService,
     public readonly project: ProjectService,
     public readonly socket: SocketService,
     public readonly api: ApiService,
@@ -45,6 +47,21 @@ export class ProjectOptionsComponent implements ITabElement {
       this.snackbar.snack("Erreur lors de l'export du projet");
   }
 
+  public async clearTabs() {
+    const dialog = this.dialog.open(ConfirmComponent, { data: "Vider les onglets de tous les projets ?" });
+    dialog.componentInstance.confirm.subscribe(async () => {
+      dialog.close();
+      try {
+        await this.db.clear(Tab);
+        this.tabs.closeAllTab();
+        localStorage.removeItem("tabs");
+      } catch (e) {
+        this.logger.error(e);
+        this.snackbar.snack("Erreur lors de la suppression des onglets");
+      }
+    });
+  }
+
   public deleteProject() {
     const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer le projet ?" });
     dialog.componentInstance.confirm.subscribe(async () => {
@@ -55,7 +72,7 @@ export class ProjectOptionsComponent implements ITabElement {
         localStorage.removeItem("tabs");
         this.project.exit();
       } catch (e) {
-        console.error(e);
+        this.logger.error(e);
         this.snackbar.snack("Erreur lors de la suppression du projet");
       }
     });

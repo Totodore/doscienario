@@ -1,4 +1,5 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { NGXLogger } from "ngx-logger";
 import { environment } from "src/environments/environment";
 import { User } from "../models/api/project.model";
 import { UserLoginReq } from "../models/api/user.model";
@@ -7,6 +8,7 @@ export class ApiUtil {
 
   constructor(
     protected http: HttpClient,
+    protected logger: NGXLogger,
   ) { }
 
   public readonly root: string = `${environment.secured ? "https" : "http"}://${environment.apiUrl}`;
@@ -18,7 +20,7 @@ export class ApiUtil {
       localStorage.setItem("jwt", res);
       return true;
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
       return false;
     }
   }
@@ -29,7 +31,7 @@ export class ApiUtil {
       localStorage.setItem("jwt", res);
       return true;
     } catch (err) {
-      console.error(err);
+      this.logger.error(err);
       return false;
     }
   }
@@ -39,7 +41,7 @@ export class ApiUtil {
       localStorage.removeItem("jwt");
       return true;
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
       return false;
     }
   }

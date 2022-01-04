@@ -5,10 +5,11 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { diff as arrayDiff } from "fast-array-diff";
 import { Flags } from 'src/app/models/sockets/flags.enum';
-import { TabTypes } from 'src/app/models/tab-element.model';
 import { DocumentSock } from 'src/app/models/api/document.model';
 import { Blueprint } from 'src/app/models/api/blueprint.model';
 import { Tag } from 'src/app/models/api/tag.model';
+import { NGXLogger } from 'ngx-logger';
+import { TabTypes } from 'src/app/models/sys/tab.model';
 
 @Component({
   selector: 'app-edit-tags',
@@ -19,11 +20,12 @@ export class EditTagsComponent {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: [string, TabTypes],
     public readonly project: ProjectService,
-    private readonly socket: SocketService
+    private readonly socket: SocketService,
+    private readonly logger: NGXLogger,
   ) { }
 
   updateTags(editedTags: string[]) {
-    console.log(editedTags);
+    this.logger.log(editedTags);
     const createdTags = editedTags.filter(el => !this.project.tags.find(value => el === value.title)).map(el => new Tag(el));
     const newTags = [...this.project.tags.filter(el => editedTags.includes(el.title)), ...createdTags];
     const oldTags = this.el.tags ?? [];
@@ -51,7 +53,7 @@ export class EditTagsComponent {
     }
   }
   public tagClick(tagName: string) {
-    console.log(tagName);
+    this.logger.log(tagName);
   }
 
   get el(): Blueprint | DocumentSock {

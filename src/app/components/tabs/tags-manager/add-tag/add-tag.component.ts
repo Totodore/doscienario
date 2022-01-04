@@ -3,9 +3,9 @@ import { ColorTagOut } from './../../../../models/sockets/out/tag.out';
 import { ConfirmComponent } from './../../../utils/confirm/confirm.component';
 import { Flags } from './../../../../models/sockets/flags.enum';
 import { SocketService } from '../../../../services/sockets/socket.service';
-import { SnackbarService } from './../../../../services/snackbar.service';
+import { SnackbarService } from '../../../../services/ui/snackbar.service';
 import { ProjectService } from './../../../../services/project.service';
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Color } from '@angular-material-components/color-picker';
 import { Tag } from 'src/app/models/api/tag.model';
@@ -44,7 +44,7 @@ export class AddTagComponent {
     if (!this.tagName || this.tagName.length == 0)
       this.snackbar.snack("Tag invalide !");
     else {
-      const newTag = new Tag(this.tagName, this.color?.toHexString(false).substr(1));
+      const newTag = new Tag(this.tagName, this.color?.toHexString(false).substring(1));
       if (this.modify) {
         this.project.updateProjectTag(this.oldTag, newTag);
         if (newTag.color != this.oldTag.color)

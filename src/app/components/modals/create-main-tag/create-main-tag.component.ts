@@ -4,7 +4,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { Tag } from 'src/app/models/api/tag.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { ProjectService } from 'src/app/services/project.service';
-import { SnackbarService } from 'src/app/services/snackbar.service';
+import { SnackbarService } from 'src/app/services/ui/snackbar.service';
 import { SocketService } from 'src/app/services/sockets/socket.service';
 
 @Component({
@@ -28,7 +28,7 @@ export class CreateMainTagComponent implements OnInit {
     this.tag.title = val.replace(" ", "-").toLowerCase();
   }
   public onColorChange(color: Color) {
-    this.tag.color = color?.toHexString(false)?.substr(1);
+    this.tag.color = color?.toHexString(false)?.substring(1);
   }
 
   public addTag() {

@@ -1,16 +1,16 @@
 import { SheetSocketService } from './../../../../services/sockets/sheet-socket.service';
 import { TabService } from './../../../../services/tab.service';
 import { ProjectService } from './../../../../services/project.service';
-import { Component, OnInit, EventEmitter, Inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild, ElementRef } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { CKEditor5, CKEditorComponent, ChangeEvent } from '@ckeditor/ckeditor5-angular';
+import { CKEditor5, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 import * as CKEditor from "../../../../../lib/ckeditor.js";
 import { DocumentComponent } from '../document.component';
 import { v4 as uuid } from 'uuid';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { EditorWorkerService } from 'src/app/services/document-worker.service';
 import { Change } from 'src/app/models/sockets/in/element.in';
-import { ProgressService } from 'src/app/services/progress.service';
+import { ProgressService } from 'src/app/services/ui/progress.service';
 import { OpenSheetOut } from 'src/app/models/sockets/out/sheet.out';
 import { ConfirmComponent } from 'src/app/components/utils/confirm/confirm.component';
 import { applyTabPlugin } from 'src/app/utils/doc.utils';
@@ -140,7 +140,7 @@ export class SheetEditorComponent implements OnInit {
 
   private onTagClick(tag: string) {
     if (tag.startsWith("@")) {
-      const docId = this.project.docs.find(el => el.title.toLowerCase() === tag.substr(1).toLowerCase())?.id;
+      const docId = this.project.docs.find(el => el.title.toLowerCase() === tag.substring(1).toLowerCase())?.id;
       if (docId)
         this.tabs.pushTab(DocumentComponent, true, docId);
     } else if (tag.startsWith("#")) {

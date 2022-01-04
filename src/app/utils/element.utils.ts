@@ -1,4 +1,4 @@
-import { Element, ISockContentElement } from "../models/default.model";
+import { ISockContentElement } from "../models/default.model";
 import { WriteElementIn } from "../models/sockets/in/element.in";
 
 export function applyTextChanges(el: ISockContentElement, request: WriteElementIn): string {

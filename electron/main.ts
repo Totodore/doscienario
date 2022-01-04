@@ -1,11 +1,13 @@
-import { app as electron, BrowserWindow, shell } from "electron";
+import { app as electron, BrowserWindow, ipcMain, shell } from "electron";
 import { globalShortcut } from "electron/main";
-import * as path from "path";
 import { checkUpdate, downloadAndInstall } from "./updater";
+import { join } from "path";
 
+//Initializing remote module for electron-remote
+const remote = require("@electron/remote/main");
+remote.initialize();
 class App {
-  private readonly url = `dist/app/index.html`;
-  // private readonly url = `./app/index.html`;
+  private readonly url = `./app/index.html`;
   private window: BrowserWindow;
 
   public async init(): Promise<void> {
@@ -16,17 +18,19 @@ class App {
       titleBarStyle: 'hidden',
       frame: false,
       webPreferences: {
-        preload: path.join(__dirname, './preload.js'),
-        enableRemoteModule: true,
-      }
+        preload: join(__dirname, 'preload.js'),
+        nodeIntegration: true,
+        contextIsolation: false,
+      },
     });
     this.config();
-    // await this.window.loadURL("http://localhost:4200/");
     try {
+      remote.enable(this.window.webContents);
       await Promise.all([
-        this.window.loadFile(this.url),
+        this.window.loadFile(join(__dirname, this.url)),
         this.updateIfNeeded()
       ]);
+      this.addUpdateHandler();
     } catch (e) {
       console.error(e);
     }
@@ -59,6 +63,16 @@ class App {
         this.window.setProgressBar(prog >= 1 ? 2 : prog);
       });
     }
+  }
+
+  private async addUpdateHandler() {
+    ipcMain.on("update", async () => {
+      const res = await checkUpdate();
+      if (res.isUpdateAvailable)
+        await downloadAndInstall(res.url, (prog) => {
+          this.window.setProgressBar(prog >= 1 ? 2 : prog);
+        });
+    });
   }
 }
 

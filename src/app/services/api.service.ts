@@ -1,12 +1,15 @@
-import { ProgressService } from './progress.service';
+import { Logs } from 'src/app/models/api/logs.model';
+import { DbService } from './database/db.service';
+import { ProgressService } from './ui/progress.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { Socket } from 'socket.io-client';
 import { Project } from './../models/api/project.model';
-import { HttpClient, HttpEvent, HttpEventType, HttpHeaders, HttpRequest } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpEventType, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { version } from '../../../package.json';
 import { ApiUtil } from '../utils/api.util';
 import { VersionCheckRes } from '../models/api/system.model';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable({
   providedIn: 'root'
@@ -16,10 +19,12 @@ export class ApiService extends ApiUtil {
   public socket: typeof Socket;
   constructor(
     http: HttpClient,
+    logger: NGXLogger,
     private readonly project: ProjectService,
-    private readonly progress: ProgressService
+    private readonly progress: ProgressService,
+    private readonly db: DbService,
   ) {
-    super(http);
+    super(http, logger);
   }
 
 
@@ -49,9 +54,18 @@ export class ApiService extends ApiUtil {
     this.project.loadData(res);
   }
 
+  public async bugReport(message: string) {
+    this.progress.show();
+    try {
+      const data = (await this.db.getAll(Logs, ["message", "level"])).map(l => l.level + " - " + l.message).join("\n");
+      await this.post("system/bug-report", { data, message });
+    } finally {
+      this.progress.hide();
+    }
+  }
+
   public async checkApiVersion() {
-    const res = await this.get<VersionCheckRes>(`system/check-version?version=${version}`);
-    return res.allowed ? true : res.versions;
+    return await this.get<VersionCheckRes>(`system/check-version?version=${version}`);
   }
 
   public get inProject(): boolean {

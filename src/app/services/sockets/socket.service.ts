@@ -8,8 +8,9 @@ import { Injectable } from '@angular/core';
 import { User } from '../../models/api/project.model';
 import { DocsSocketService } from './docs-socket.service';
 import { TreeSocketService } from './tree-socket.service';
-import { SnackbarService } from '../snackbar.service';
+import { SnackbarService } from '../ui/snackbar.service';
 import { SheetSocketService } from './sheet-socket.service';
+import { NGXLogger } from 'ngx-logger';
 @Injectable({
   providedIn: 'root'
 })
@@ -23,6 +24,7 @@ export class SocketService {
     private readonly docsSocket: DocsSocketService,
     private readonly treeSocket: TreeSocketService,
     private readonly sheetSocket: SheetSocketService,
+    private readonly logger: NGXLogger,
   ) {}
 
   connect() {
@@ -39,12 +41,12 @@ export class SocketService {
 
   @EventHandler("connect")
   onConnect() {
-    console.info("Socket successfully connected");
+    this.logger.info("Socket successfully connected");
   }
 
   @EventHandler("exception")
   onException(error: WsException) {
-    console.error('Ws Exception:', error);
+    this.logger.error('Ws Exception:', error);
     this.snackbar.snack("Erreur avec le serveur!", 1000);
   }
 

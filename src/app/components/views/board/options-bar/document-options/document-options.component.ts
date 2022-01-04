@@ -1,5 +1,4 @@
 import { ColorElementOut } from './../../../../../models/sockets/out/element.out';
-import { TabTypes } from './../../../../../models/tab-element.model';
 import { ConfirmComponent } from './../../../../utils/confirm/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SocketService } from '../../../../../services/sockets/socket.service';
@@ -11,6 +10,7 @@ import { EditTagsComponent } from 'src/app/components/modals/edit-tags/edit-tags
 import { RenameElementOut } from 'src/app/models/sockets/out/element.out';
 import { DocumentSock } from 'src/app/models/api/document.model';
 import { Tag } from 'src/app/models/api/tag.model';
+import { TabTypes } from 'src/app/models/sys/tab.model';
 
 @Component({
   selector: 'app-document-options',

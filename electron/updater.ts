@@ -3,7 +3,9 @@ import { app } from "electron";
 import { createWriteStream, promises as fs } from "fs";
 import { spawn } from "child_process";
 import { join, dirname } from "path";
+import * as https from "https";
 
+const http = axios.create({ httpsAgent: new https.Agent({ rejectUnauthorized: false }) });
 
 export async function checkUpdate(): Promise<CheckUpdateResult> {
   const currentVersion = app.getVersion();
@@ -13,7 +15,7 @@ export async function checkUpdate(): Promise<CheckUpdateResult> {
   };
   let allowedVersions = [];
   try {
-    allowedVersions = (await axios.get(`https://doscenario.scriptis.fr/system/check-version?version=${currentVersion}`)).data.versions;
+    allowedVersions = (await http.get(`https://doscenario.scriptis.fr/system/check-version?version=${currentVersion}`)).data.versions;
   } catch (e) {
     console.error(e);
     return { isUpdateAvailable: false, lastVersion: currentVersion, mandatory: false };
@@ -23,7 +25,7 @@ export async function checkUpdate(): Promise<CheckUpdateResult> {
   if (lastVersion === currentVersion || !await isInstalled())
     return { isUpdateAvailable: false, lastVersion, mandatory: false };
   try {
-    const res = await axios.get(`https://api.github.com/repos/totodore/doscienario/releases/tags/v${lastVersion}`, {
+    const res = await http.get(`https://api.github.com/repos/totodore/doscienario/releases/tags/v${lastVersion}`, {
       headers
     });
     const url: string = res.data.assets.find((el: any) => el.name.includes('doscienario.Setup')).url;
@@ -38,9 +40,9 @@ export async function checkUpdate(): Promise<CheckUpdateResult> {
 
 export const downloadAndInstall = async (url: string, handler: (prog: number) => void) => {
   if (!await isInstalled())
-    return;
+    return false;
   const downloadPath = join(dirname(app.getPath('exe')), './update.exe');
-  const res = await axios.get(url, {
+  const res = await http.get(url, {
     headers: {
       "Accept": "application/octet-stream",
       "Authorization": "token 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",
@@ -49,6 +51,7 @@ export const downloadAndInstall = async (url: string, handler: (prog: number) =>
     responseType: 'stream'
   });
   console.log("Downloading update...", downloadPath);
+  /* tslint:disable-next-line */
   let chunkSize = 0;
   res.data.pipe(createWriteStream(downloadPath));
   res.data.on('data', (chunk: Buffer) => {
@@ -61,6 +64,7 @@ export const downloadAndInstall = async (url: string, handler: (prog: number) =>
   await fs.chmod(downloadPath, '755');
   spawn(downloadPath, [], { detached: true, stdio: ['ignore', 'ignore', 'ignore'] }).unref();
   app.quit();
+  return true;
 }
 
 const isInstalled = async () => {

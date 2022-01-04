@@ -1,5 +1,6 @@
-import { ITabElement, TabTypes } from 'src/app/models/tab-element.model';
-import { ProgressService } from 'src/app/services/progress.service';
+import { Tag } from 'src/app/models/api/tag.model';
+import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
+import { ProgressService } from 'src/app/services/ui/progress.service';
 import { Vector } from 'src/types/global';
 import { v4 as uuid4 } from "uuid";
 
@@ -7,6 +8,7 @@ export abstract class ElementComponent implements ITabElement {
   public tabId?: string;
   public show = false;
   public type: TabTypes;
+  public loaded = false;
 
   protected scroll: Vector;
   protected contentElement: HTMLElement;
@@ -21,6 +23,7 @@ export abstract class ElementComponent implements ITabElement {
   }
   public loadedTab(): void {
     this.progress.hide();
+    this.loaded = true;
   }
   public onClose(): void {
   }
@@ -35,7 +38,10 @@ export abstract class ElementComponent implements ITabElement {
     this.scroll = [this.contentElement?.scrollLeft, this.contentElement?.scrollTop];
   }
 
+  abstract addTags(tags: Tag[]): Promise<void> | void;
+
   public get title(): string {
     return this.contentElement ? "Loading..." : "Unkown";
   }
+  abstract get id(): number;
 }

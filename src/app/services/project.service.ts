@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { Project, User } from './../models/api/project.model';
 import { Injectable } from '@angular/core';
 import { removeNodeFromTree } from '../utils/tree.utils';
-import { TabTypes } from '../models/tab-element.model';
 import { BlueprintComponent } from '../components/tabs/blueprint/blueprint.component';
 import { WorkerManager, WorkerType } from '../utils/worker-manager.utils';
 import { Document, DocumentSock } from '../models/api/document.model';
@@ -17,6 +16,8 @@ import { Element } from '../models/default.model';
 import { DataUpdater } from '../decorators/data-updater.decorator';
 import { applyTextChanges } from '../utils/element.utils';
 import { SearchOptionsComponent } from '../components/views/board/nav-bar/search-options/search-options.component';
+import { NGXLogger } from 'ngx-logger';
+import { TabTypes } from '../models/sys/tab.model';
 
 @Injectable({
   providedIn: 'root'
@@ -33,8 +34,9 @@ export class ProjectService {
   constructor(
     private readonly router: Router,
     private readonly tabs: TabService,
+    private readonly logger: NGXLogger,
   ) {
-    this.searchWorker = new WorkerManager(WorkerType.Search);
+    this.searchWorker = new WorkerManager(WorkerType.Search, this.logger);
   }
 
   private data = new Project(JSON.parse(localStorage.getItem("project-data")!, JSON.dateParser));
@@ -87,7 +89,7 @@ export class ProjectService {
     document.lastChangeId = id;
     document.changes = new Map<number, Change[]>();
     document.clientUpdateId = 0;
-    console.log("Add Send doc");
+    this.logger.log("Document received:", packet.element.id, "tab:", packet.reqId);
     this.openDocs[packet.reqId] = document;
     if (!this.data.documents.find(el => el.id == packet.element.id)) {
       this.data.documents.push(document);
@@ -164,7 +166,7 @@ export class ProjectService {
   }
   @DataUpdater()
   public addSendBlueprint(packet: SendElementIn) {
-    console.log("Add Send blueprint");
+    this.logger.log("Blueprint received:", packet.element.id, "tab:", packet.reqId);
     const blueprint = this.openBlueprints[packet.reqId] = new Blueprint(packet.element);
     if (!this.data.blueprints.find(el => el.id == blueprint.id)) {
       this.data.blueprints.push(blueprint);
@@ -282,7 +284,6 @@ export class ProjectService {
       if (!this.data.tags.find(el => el.title.toLowerCase() === tag.title.toLowerCase()))
         this.data.tags.push(tag);
     }
-    // console.log(this.data.blueprints.find(el => el.id == docId).tags.length, tags.length);
   }
   public setSumarryNode(packet: EditSummaryIn) {
     this.getBlueprint(packet.blueprint)!.nodes.find(el => el.id === packet.node)!.summary = packet.content;
@@ -296,12 +297,12 @@ export class ProjectService {
     sheet.lastChangeId = id;
     sheet.changes = new Map<number, Change[]>();
     sheet.clientUpdateId = 0;
-    console.log("Add Send sheet");
     this.openSheets[packet.reqId] = sheet;
     const parentDoc = this.data.documents.find(el => el.id === sheet.documentId);
     if (!parentDoc.sheets?.find(el => el.id === sheet.id)) {
       (parentDoc.sheets ??= []).push(sheet);
     }
+    this.logger.log("Sheet received:", packet.element.id, "doc:", parentDoc.id, "tab:", packet.reqId);
     // const doc = this.getDoc(sheet.documentId);
     // if (doc) {
     //   const sheetIndex = doc.sheets.findIndex(el => el.id === sheet.id);
@@ -349,8 +350,8 @@ export class ProjectService {
      }
    }
 
-  public async searchFromTags(tags: Tag[], needle?: string) {
-    return await this.searchWorker.postAsyncMessage<Element[]>('searchFromTags', [tags, needle, [...this.docs, ...this.blueprints]]);
+  public async searchFromTags(tags: Tag[], needle?: string, selectNoTags = false) {
+    return await this.searchWorker.postAsyncMessage<Element[]>('searchFromTags', [tags, needle, [...this.docs, ...this.blueprints], selectNoTags]);
   }
   public async filterSecondaryTags(tags: Tag[]) {
     return await this.searchWorker.postAsyncMessage<Tag[]>('filterSecondaryTags', [tags, [...this.docs, ...this.blueprints]]);
@@ -360,6 +361,7 @@ export class ProjectService {
     setTimeout(() => localStorage.setItem("project-data", JSON.stringify(this.data)), 0);
   }
   public exit() {
+    this.logger.log("Exiting current project:", this.id, this.name);
     localStorage.removeItem("project-data");
     localStorage.removeItem("project");
     localStorage.removeItem("tab-index");

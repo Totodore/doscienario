@@ -2,11 +2,12 @@ import { Router } from '@angular/router';
 import { CreateProjectReq, Project, User } from '../../../models/api/project.model';
 import { AskInputComponent } from '../../utils/ask-input/ask-input.component';
 import { MatDialog } from '@angular/material/dialog';
-import { SnackbarService } from '../../../services/snackbar.service';
+import { SnackbarService } from '../../../services/ui/snackbar.service';
 import { UserProjectsRes } from '../../../models/api/user.model';
-import { ProgressService } from '../../../services/progress.service';
+import { ProgressService } from '../../../services/ui/progress.service';
 import { ApiService } from '../../../services/api.service';
 import { Component, OnInit } from '@angular/core';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-menu',
@@ -21,19 +22,20 @@ export class MenuComponent implements OnInit {
     private readonly progress: ProgressService,
     private readonly snackbar: SnackbarService,
     private readonly dialog: MatDialog,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly logger: NGXLogger,
   ) { }
 
   public async ngOnInit(): Promise<void> {
     this.progress.show();
+    this.logger.log("Loading user data and projects");
     try {
       this.data = await this.api.get<User>("user/me");
-      console.log(this.data);
       localStorage.setItem("me", JSON.stringify(this.data));
       this.progress.hide();
     } catch (e) {
       this.snackbar.snack("Impossible de charger les projets !");
-      console.error(e);
+      this.logger.error("Impossible to load user data and projects", e);
       this.progress.hide();
     }
   }
@@ -48,7 +50,7 @@ export class MenuComponent implements OnInit {
         this.data.projects.push(new Project(res));
         this.progress.hide();
       } catch (e) {
-        console.error(e);
+        this.logger.error(e);
         this.snackbar.snack("Une erreur est apparue lors de la création du projet");
         this.progress.hide();
       }
@@ -71,7 +73,7 @@ export class MenuComponent implements OnInit {
       await this.api.openProject(project.id);
       this.router.navigateByUrl("/");
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
       this.snackbar.snack("Impossible de charger le projet");
     } finally {
       this.progress.hide();

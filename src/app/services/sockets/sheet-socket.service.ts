@@ -1,4 +1,4 @@
-import { RenameElementIn, WriteElementIn } from './../../models/sockets/in/element.in';
+import { WriteElementIn } from './../../models/sockets/in/element.in';
 import { WriteElementOut } from './../../models/sockets/out/element.out';
 import { Injectable } from '@angular/core';
 import { EventHandler } from 'src/app/decorators/subscribe-event.decorator';
@@ -8,8 +8,9 @@ import { Change, OpenElementIn, SendElementIn } from 'src/app/models/sockets/in/
 import { ApiService } from '../api.service';
 import { ProjectService } from '../project.service';
 import { TabService } from '../tab.service';
-import { TabTypes } from 'src/app/models/tab-element.model';
 import { DocumentComponent } from 'src/app/components/tabs/document/document.component';
+import { NGXLogger } from 'ngx-logger';
+import { TabTypes } from 'src/app/models/sys/tab.model';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,8 @@ export class SheetSocketService {
   constructor(
     private readonly api: ApiService,
     private readonly project: ProjectService,
-    private readonly tabs: TabService
+    private readonly tabs: TabService,
+    private readonly logger: NGXLogger,
   ) { }
 
 
@@ -37,7 +39,7 @@ export class SheetSocketService {
 
   public updateSheet(elementId: number, tabId: string, changes: Change[], lastChangeId: number, clientUpdateId: number) {
     const sheet = this.project.openSheets[tabId];
-    console.log("Updating sheet", elementId, "tab", tabId);
+    this.logger.log("Updating sheet", elementId, "tab", tabId);
     sheet.changes.set(clientUpdateId, changes);
     this.socket.emit(Flags.WRITE_SHEET, new WriteElementOut(elementId, lastChangeId, changes, this.api.user.id, clientUpdateId));
   }

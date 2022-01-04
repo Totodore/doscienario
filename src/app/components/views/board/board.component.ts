@@ -1,16 +1,16 @@
 import { WelcomeTabComponent } from './../../tabs/welcome-tab/welcome-tab.component';
-import { MenuComponent } from './../menu/menu.component';
 import { BlueprintComponent } from './../../tabs/blueprint/blueprint.component';
 import { TabService } from './../../../services/tab.service';
 import { ProjectService } from 'src/app/services/project.service';
-import { ProgressService } from './../../../services/progress.service';
+import { ProgressService } from '../../../services/ui/progress.service';
 import { ApiService } from './../../../services/api.service';
 import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
 import { SocketService } from '../../../services/sockets/socket.service';
 import { Component, HostListener, OnInit } from '@angular/core';
 import { DocumentComponent } from '../../tabs/document/document.component';
-import { B, M, N, W } from '@angular/cdk/keycodes';
-import { TabTypes } from 'src/app/models/tab-element.model';
+import { B, M, N, TAB, W } from '@angular/cdk/keycodes';
+import { NGXLogger } from 'ngx-logger';
+import { TabTypes } from 'src/app/models/sys/tab.model';
 
 @Component({
   selector: 'app-board',
@@ -31,7 +31,8 @@ export class BoardComponent implements OnInit {
     private readonly api: ApiService,
     private readonly progress: ProgressService,
     private readonly project: ProjectService,
-    private readonly tabs: TabService
+    private readonly tabs: TabService,
+    private readonly logger: NGXLogger,
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -40,11 +41,13 @@ export class BoardComponent implements OnInit {
     try {
       this.progress.show();
       snack = this.snackbar.open("Synchronisation du projet...", null, { duration: null });
+      this.logger.log("Opening project:", this.project.id);
       await this.api.openProject(this.project.id);
-      this.tabs.loadSavedTabs(this.project.id);
+      await this.tabs.loadSavedTabs(this.project.id);
+      this.logger.log("Project opened:", this.project.id, this.project.name);
       this.snackbar.open("Project synchronisé avec succès !", null, { duration: 3000 });
     } catch (e) {
-      console.error(e);
+      this.logger.error("Impossible to open project:", this.project.id, e);
       this.snackbar.open("Impossible de synchroniser le projet...", null, { duration: 3000 });
     } finally {
       this.progress.hide();
@@ -76,6 +79,13 @@ export class BoardComponent implements OnInit {
         e.preventDefault();
         e.stopImmediatePropagation();
         this.tabs.pushTab(WelcomeTabComponent);
+        break;
+      case TAB:
+        if (e.ctrlKey) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          this.tabs.showNextTab();
+        }
         break;
       default:
         break;

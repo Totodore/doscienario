@@ -1,3 +1,6 @@
+import { Logs } from 'src/app/models/api/logs.model';
+import { DbService } from './services/database/db.service';
+import { dbConfig, loggerConfig } from './configs';
 import { NodeComponent } from './components/tabs/blueprint/node/node.component';
 import { BlueprintComponent } from './components/tabs/blueprint/blueprint.component';
 import { AddOptionsComponent } from './components/views/board/nav-bar/add-options/add-options.component';
@@ -6,7 +9,7 @@ import { OptionsSeparatorComponent } from './components/views/board/nav-bar/opti
 import { SearchBarComponent } from './components/views/board/nav-bar/search-options/search-bar/search-bar.component';
 import { DocumentOptionsComponent } from './components/views/board/options-bar/document-options/document-options.component';
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, OnInit } from '@angular/core';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -61,10 +64,15 @@ import { EditMainTagComponent } from './components/modals/edit-main-tag/edit-mai
 import { CreateMainTagComponent } from './components/modals/create-main-tag/create-main-tag.component';
 import { ElementTagsComponent } from './components/views/board/options-bar/element-tags/element-tags.component';
 import { RenameElementComponent } from './components/views/board/options-bar/rename-element/rename-element.component';
-import { AddSheetComponent } from './components/tabs/document/add-sheet/add-sheet.component';
 import { SheetEditorComponent } from './components/tabs/document/sheet-editor/sheet-editor.component';
 import { DocumentSheetListComponent } from './components/views/board/options-bar/document-sheet-list/document-sheet-list.component';
 import { InfoComponent } from './components/utils/info/info.component';
+import { LoggerModule, TOKEN_LOGGER_MAPPER_SERVICE, TOKEN_LOGGER_WRITER_SERVICE } from "ngx-logger";
+import { MapperLoggerService } from './services/logger/mapper-logger.service';
+import { WriterLoggerService } from './services/logger/writer-logger.service';
+import { NgxIndexedDBModule } from 'ngx-indexed-db';
+import { AskTextareaComponent } from './components/utils/ask-textarea/ask-textarea.component';
+import { ContextMenuComponent } from './components/utils/context-menu/context-menu.component';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -103,12 +111,15 @@ import { InfoComponent } from './components/utils/info/info.component';
     CreateMainTagComponent,
     ElementTagsComponent,
     RenameElementComponent,
-    AddSheetComponent,
     SheetEditorComponent,
     DocumentSheetListComponent,
     InfoComponent,
+    AskTextareaComponent,
+    ContextMenuComponent,
   ],
   imports: [
+    LoggerModule.forRoot(loggerConfig),
+    NgxIndexedDBModule.forRoot(dbConfig),
     ReactiveFormsModule,
     BrowserModule,
     AppRoutingModule,
@@ -132,14 +143,28 @@ import { InfoComponent } from './components/utils/info/info.component';
     NgxMatColorPickerModule,
     MatRippleModule,
     DragDropModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: appearance },
     { provide: MAT_COLOR_FORMATS, useValue: NGX_MAT_COLOR_FORMATS },
     { provide: HTTP_INTERCEPTORS, useClass: DateHttpInterceptor, multi: true },
+    { provide: TOKEN_LOGGER_MAPPER_SERVICE, useClass: MapperLoggerService },
+    { provide: TOKEN_LOGGER_WRITER_SERVICE, useClass: WriterLoggerService },
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  
+  constructor(private readonly db: DbService) { 
+    this.clearLogs();
+  }
+
+  /**
+   * Clear logs on startup
+   */
+  public clearLogs() {
+    this.db.clear(Logs);
+  }
+}
 

@@ -4,6 +4,7 @@
 		<mat-chip (click)="hasSelectedTags ? onUnselectAllTags() : onTagAdd()" class="add-icon"><mat-icon [class.remove-tags]="hasSelectedTags" class="mat-18">add</mat-icon></mat-chip>
 		<mat-chip (contextmenu)="onTagRightClick($event, tag)" [selected]="selectedTags.includes(tag)" (click)="toggleTag(tag)"
 			*ngFor="let tag of tags" [style]="'border-color: #' + tag.color">#{{ tag.title }}</mat-chip>
+		<mat-chip (click)="onToggleNoTags()" [selected]="selectedNoTag">#autres</mat-chip>
 	</mat-chip-list>
 	<mat-divider></mat-divider>
 </ng-container>

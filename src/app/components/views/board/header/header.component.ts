@@ -1,7 +1,6 @@
+import { ContextMenuService } from './../../../../services/ui/context-menu.service';
 import { TabService } from '../../../../services/tab.service';
-import { ApiService } from '../../../../services/api.service';
-import { ProgressService } from '../../../../services/progress.service';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-header',
@@ -17,6 +16,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   constructor(
     public readonly tabService: TabService,
+    private readonly context: ContextMenuService
   ) { }
 
   public ngOnInit(): void {
@@ -37,6 +37,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   public tabClosed(index: number) {
     this.tabService.removeTab(index);
+  }
+
+  public tabRightClick(e: MouseEvent) {
+    this.context.show(e, [{ label: "Fermer tous les onglets", action: () => this.tabService.closeAllTab(true) }]);
   }
 
 }

@@ -1,8 +1,7 @@
 import { CreateMainTagComponent } from './../../../../../modals/create-main-tag/create-main-tag.component';
 import { MatDialog } from '@angular/material/dialog';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { EditMainTagComponent } from 'src/app/components/modals/edit-main-tag/edit-main-tag.component';
-import { ProjectService } from 'src/app/services/project.service';
 import { Tag } from 'src/app/models/api/tag.model';
 
 @Component({
@@ -24,6 +23,12 @@ export class SearchTagSortComponent {
 
   @Output()
   public readonly selectedTagsChange = new EventEmitter<Tag[]>();
+
+  @Output()
+  public readonly selectedNoTagChange = new EventEmitter<boolean>();
+
+  @Input()
+  public selectedNoTag = false;
 
   public toggleTag(tag: Tag) {
     const index = this.selectedTags.indexOf(tag);
@@ -54,10 +59,17 @@ export class SearchTagSortComponent {
 
   public onUnselectAllTags() {
     this.selectedTags = [];
+    this.selectedNoTag = false;
     this.selectedTagsChange.emit(this.selectedTags);
+    this.selectedNoTagChange.emit(false);
+  }
+
+  public onToggleNoTags() {
+    this.selectedNoTag = !this.selectedNoTag;
+    this.selectedNoTagChange.emit(this.selectedNoTag);
   }
 
   public get hasSelectedTags() {
-    return this.selectedTags.length > 0;
+    return this.selectedTags.length > 0 || this.selectedNoTag;
   }
 }

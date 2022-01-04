@@ -1,20 +1,23 @@
 import { Vector, Vector3 } from './../../../../types/global.d';
 import { ConfirmComponent } from './../../utils/confirm/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
-import { ProgressService } from './../../../services/progress.service';
+import { ProgressService } from '../../../services/ui/progress.service';
 import { SocketService } from '../../../services/sockets/socket.service';
-import { ITabElement, TabTypes } from './../../../models/tab-element.model';
 import { ProjectService } from './../../../services/project.service';
-import { Component, ViewChild, ElementRef, AfterViewChecked, ViewChildren, QueryList, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, ViewChildren, QueryList, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { Poles, NodeComponent } from './node/node.component';
-import { findChildRels, findLevelByNode, findNodesByLevel, findParentRels, removeNodeFromTree } from 'src/app/utils/tree.utils';
+import { findChildRels, findLevelByNode, findParentRels, removeNodeFromTree } from 'src/app/utils/tree.utils';
 import { WorkerManager, WorkerType } from 'src/app/utils/worker-manager.utils';
-import { SnackbarService } from 'src/app/services/snackbar.service';
+import { SnackbarService } from 'src/app/services/ui/snackbar.service';
 import { environment } from 'src/environments/environment';
 import { ElementComponent } from '../element.component';
 import { CreateNodeOut, PlaceNodeOut, RemoveNodeOut } from 'src/app/models/sockets/out/blueprint.out';
 import { Blueprint, Node, Relationship } from 'src/app/models/api/blueprint.model';
+import { NGXLogger } from 'ngx-logger';
+import { AddTagElementOut } from 'src/app/models/sockets/out/tag.out';
+import { Tag } from 'src/app/models/api/tag.model';
+import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
 
 
 @Component({
@@ -59,9 +62,10 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     progress: ProgressService,
     private readonly snack: SnackbarService,
     private readonly changeDetector: ChangeDetectorRef,
+    private readonly logger: NGXLogger,
   ) {
     super(progress);
-    this.blueprintWorker = new WorkerManager(WorkerType.Blueprint);
+    this.blueprintWorker = new WorkerManager(WorkerType.Blueprint, this.logger);
   }
 
   /**
@@ -352,7 +356,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
       this.wrapper.scrollBy({ top: 10, behavior: 'auto' });
     if (treshold.includes("east") && this.wrapper.scrollLeft + 20 < this.wrapper.scrollLeftMax)
       this.wrapper.scrollBy({ left: 10, behavior: 'auto' });
-    if (treshold.includes("west") &&  this.wrapper.scrollLeft > 10)
+    if (treshold.includes("west") && this.wrapper.scrollLeft > 10)
       this.wrapper.scrollBy({ left: - 10, behavior: 'auto' });
   }
 
@@ -396,6 +400,17 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     return this.nodeEls.find(el => el.data.id === id) || this.rootEl.data.id === id ? this.rootEl : null;
   }
 
+  /**
+   * Add element tag and wait that doc is loaded before adding element tag if needed
+  */
+  public async addTags(tags: Tag[]) {
+    if (!this.loaded)
+      await new Promise<void>(resolve => setInterval(() => this.loaded && resolve(), 100));
+    this.project.updateBlueprintTags(this.tabId, tags);
+    for (const tag of tags)
+      this.socket.socket.emit(Flags.TAG_ADD_BLUEPRINT, new AddTagElementOut(this.id, tag.title));
+  }
+
 
   get blueprint(): Blueprint {
     return this.project.openBlueprints[this.tabId];
@@ -435,7 +450,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     return this.contentElement = this.wrapperEl?.nativeElement;
   }
   private get overlay(): HTMLDivElement {
-    return  this.overlayEl.nativeElement;
+    return this.overlayEl.nativeElement;
   }
   private get defaultMatrix(): Vector3 {
     return [1, 0, 0];

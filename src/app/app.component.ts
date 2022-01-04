@@ -1,3 +1,5 @@
+import { NGXLogger } from 'ngx-logger';
+import { ElectronService } from 'src/app/services/electron.service';
 
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ProgressService } from './services/ui/progress.service';
@@ -20,10 +22,14 @@ export class AppComponent implements OnInit {
     public readonly contextMenu: ContextMenuService,
     private readonly api: ApiService,
     private readonly dialog: MatDialog,
-    private readonly changeDetector: ChangeDetectorRef
+    private readonly changeDetector: ChangeDetectorRef,
+    private readonly electron: ElectronService,
+    private readonly logger: NGXLogger,
   ) { }
 
   public async ngOnInit() {
+    if (this.electron.isElectronApp)
+      this.logger.log("Electron app bundle detected");
     this.progress.changeDetector = this.changeDetector;
     const res = await this.api.checkApiVersion();
     this.isCompatible = res.allowed;

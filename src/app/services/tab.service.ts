@@ -48,10 +48,13 @@ export class TabService {
 
   public async loadSavedTabs(projectId: number) {
     this.projectId = projectId;
-    for (const tab of (await this.getSavedTabs())) {
-      this.pushTab(this.availableTabs[tab.tabType], false, tab.elId as number);
+    const savedTabs = await this.getSavedTabs();
+    this.logger.log("Starting to load", savedTabs.length, "saved tabs");
+    for (const tab of savedTabs) {
+      await this.pushTab(this.availableTabs[tab.tabType], false, tab.elId as number);
       this.logger.log("Loading saved tab :", this.availableTabs[tab.tabType].name);
     }
+    this.logger.log("Finished loading saved tabs");
     this.showTab(this.focusedTabIndex);
   }
 

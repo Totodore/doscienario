@@ -4,7 +4,7 @@ import { ConfirmComponent } from './../../utils/confirm/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SnackbarService } from '../../../services/ui/snackbar.service';
 import { ApiService } from 'src/app/services/api.service';
-import { SocketService } from '../../../services/sockets/socket.service';
+import { IoHandler } from '../../../services/sockets/io.handler.service';
 import { ProjectService } from '../../../services/project.service';
 import { Component } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
@@ -22,7 +22,7 @@ export class ProjectOptionsComponent implements ITabElement {
     private readonly logger: NGXLogger,
     private readonly db: DbService,
     public readonly project: ProjectService,
-    public readonly socket: SocketService,
+    public readonly socket: IoHandler,
     public readonly api: ApiService,
     public readonly snackbar: SnackbarService,
     public readonly dialog: MatDialog,

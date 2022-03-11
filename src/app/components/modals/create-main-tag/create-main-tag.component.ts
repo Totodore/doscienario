@@ -4,8 +4,8 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { Tag } from 'src/app/models/api/tag.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { ProjectService } from 'src/app/services/project.service';
-import { SnackbarService } from 'src/app/services/ui/snackbar.service';
 import { SocketService } from 'src/app/services/sockets/socket.service';
+import { SnackbarService } from 'src/app/services/ui/snackbar.service';
 
 @Component({
   templateUrl: './create-main-tag.component.html',
@@ -40,7 +40,7 @@ export class CreateMainTagComponent implements OnInit {
       return;
     }
     this.project.addProjectTag(this.tag);
-    this.socket.socket.emit(Flags.CREATE_TAG, this.tag);
+    this.socket.emit(Flags.CREATE_TAG, this.tag);
     this.dialogRef.close();
   }
 

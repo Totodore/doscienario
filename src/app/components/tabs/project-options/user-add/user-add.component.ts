@@ -1,4 +1,4 @@
-import { SocketService } from '../../../../services/sockets/socket.service';
+import { IoHandler } from '../../../../services/sockets/io.handler.service';
 import { Component, OnInit } from '@angular/core';
 import { User } from 'src/app/models/api/project.model';
 import { ApiService } from 'src/app/services/api.service';
@@ -19,7 +19,7 @@ export class UserAddComponent implements OnInit {
     public readonly project: ProjectService,
     public readonly api: ApiService,
     public readonly progress: ProgressService,
-    public readonly socket: SocketService,
+    public readonly socket: IoHandler,
     public readonly snackbar: SnackbarService,
     private readonly logger: NGXLogger,
   ) { }

@@ -1,25 +1,26 @@
-import { ContextMenuService } from './../../../services/ui/context-menu.service';
-import { EditorWorkerService } from './../../../services/document-worker.service';
-import { ApiService } from 'src/app/services/api.service';
-import { TabService } from './../../../services/tab.service';
-import { ProgressService } from 'src/app/services/ui/progress.service';
-import { ProjectService } from 'src/app/services/project.service';
-import { Component, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { CKEditor5 } from '@ckeditor/ckeditor5-angular';
-import { Flags } from 'src/app/models/sockets/flags.enum';
-import { ElementComponent } from '../element.component';
-import { DocsSocketService } from 'src/app/services/sockets/docs-socket.service';
-import { Change } from 'src/app/models/sockets/in/element.in';
-import { DocumentSock } from 'src/app/models/api/document.model';
+import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { SheetEditorComponent } from './sheet-editor/sheet-editor.component';
+import { CKEditor5 } from '@ckeditor/ckeditor5-angular';
+import { DocumentSock } from 'src/app/models/api/document.model';
 import { Sheet } from 'src/app/models/api/sheet.model';
+import { Tag } from 'src/app/models/api/tag.model';
+import { Flags } from 'src/app/models/sockets/flags.enum';
+import { Change } from 'src/app/models/sockets/in/element.in';
+import { AddTagElementOut } from 'src/app/models/sockets/out/tag.out';
+import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
+import { ApiService } from 'src/app/services/api.service';
+import { ProjectService } from 'src/app/services/project.service';
+import { DocIoHandler } from 'src/app/services/sockets/doc-io.handler.service';
+import { SocketService } from 'src/app/services/sockets/socket.service';
+import { ProgressService } from 'src/app/services/ui/progress.service';
 import { applyTabPlugin, findStrFromSelection } from 'src/app/utils/doc.utils';
 import * as CKEditor from "../../../../lib/ckeditor";
 import { ConfirmComponent } from '../../utils/confirm/confirm.component';
-import { AddTagElementOut } from 'src/app/models/sockets/out/tag.out';
-import { Tag } from 'src/app/models/api/tag.model';
-import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
+import { ElementComponent } from '../element.component';
+import { EditorWorkerService } from './../../../services/document-worker.service';
+import { TabService } from './../../../services/tab.service';
+import { ContextMenuService } from './../../../services/ui/context-menu.service';
+import { SheetEditorComponent } from './sheet-editor/sheet-editor.component';
 
 @Component({
   selector: 'app-document',
@@ -84,7 +85,8 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   private hasEdited: boolean = false;
 
   constructor(
-    private readonly socket: DocsSocketService,
+    private readonly docIo: DocIoHandler,
+    private readonly socket: SocketService,
     private readonly project: ProjectService,
     private readonly tabs: TabService,
     private readonly docWorker: EditorWorkerService,
@@ -97,7 +99,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   }
 
   public onClose() {
-    this.socket.socket.emit(Flags.CLOSE_DOC, this.id);
+    this.socket.emit(Flags.CLOSE_DOC, this.id);
     super.onClose();
   }
 
@@ -109,7 +111,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
    */
   public openTab(id: string | number): string {
     super.openTab(id);
-    this.socket.socket.emit(Flags.OPEN_DOC, [this.tabId, id]);
+    this.socket.emit(Flags.OPEN_DOC, [this.tabId, id]);
     this.docWorker.worker.addEventListener<Change[]>(`diff-${this.tabId}`, (data) => this.onDocParsed(data));
     if (!this.tabId)
       throw new Error("No tabId for document");
@@ -161,7 +163,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     this.hasEdited = true;
     if (Math.abs(data.length - this.doc.content.length) > 500) {
       const change: Change = [2, null, data];
-      this.socket.updateDocument(this.id, this.tabId!, [change], this.doc.lastChangeId, ++this.doc.clientUpdateId!);
+      this.docIo.updateDocument(this.id, this.tabId!, [change], this.doc.lastChangeId, ++this.doc.clientUpdateId!);
     } else {
       this.docWorker.worker.postMessage<[string, string]>(`diff-${this.tabId}`, [this.doc.content, data]);
       this.progressWatcher();
@@ -178,7 +180,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     this.displayProgress = false;
     this.progress.hide();
     try {
-      this.socket.updateDocument(this.id, this.tabId!, changes, this.doc.lastChangeId, ++this.doc.clientUpdateId);
+      this.docIo.updateDocument(this.id, this.tabId!, changes, this.doc.lastChangeId, ++this.doc.clientUpdateId);
     } catch (error) {   }
   }
 
@@ -286,7 +288,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   private removeSheet(sheet: Sheet) {
     const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer cette note ?" });
     dialog.componentInstance.confirm.subscribe(() => {
-      this.socket.socket.emit(Flags.REMOVE_SHEET, [sheet.id, this.id]);
+      this.socket.emit(Flags.REMOVE_SHEET, [sheet.id, this.id]);
       this.project.removeSheet(sheet.id, this.id);
       this.onRemoveSheet(sheet);
       dialog.close();
@@ -408,7 +410,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       await new Promise<void>(resolve => setInterval(() => this.loaded && resolve(), 100));
     this.project.updateDocTags(this.tabId, tags);
     for (const tag of tags)
-      this.socket.socket.emit(Flags.TAG_ADD_DOC, new AddTagElementOut(this.id, tag.title));
+      this.socket.emit(Flags.TAG_ADD_DOC, new AddTagElementOut(this.id, tag.title));
   }
 
   get doc(): DocumentSock {

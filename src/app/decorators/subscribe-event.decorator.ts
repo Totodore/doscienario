@@ -1,11 +1,9 @@
+import { SocketService } from '../services/sockets/socket.service';
 import { Flags } from './../models/sockets/flags.enum';
-import { Socket } from "socket.io-client";
 
-export function registerHandlers(listeners: any[], socket: typeof Socket) {
-  for (const listener of listeners as Listener[]) {
-    for (let [event, handler] of listener.handlers)
-      socket.on(event, (...args: any[]) => handler.call(listener, ...args));
-  }
+export function registerHandler(listener: any, socket: SocketService) {
+  for (let [event, handler] of (listener as Listener).handlers)
+    socket.on(event, (...args: any[]) => handler.call(listener, ...args));
 }
 export function EventHandler(event: Flags | string) {
   return function (target: any, key: any) {

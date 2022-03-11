@@ -1,23 +1,23 @@
-import { WelcomeTabComponent } from './../../tabs/welcome-tab/welcome-tab.component';
-import { BlueprintComponent } from './../../tabs/blueprint/blueprint.component';
-import { TabService } from './../../../services/tab.service';
-import { ProjectService } from 'src/app/services/project.service';
-import { ProgressService } from '../../../services/ui/progress.service';
-import { ApiService } from './../../../services/api.service';
-import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
-import { SocketService } from '../../../services/sockets/socket.service';
-import { Component, HostListener, OnInit } from '@angular/core';
-import { DocumentComponent } from '../../tabs/document/document.component';
 import { B, M, N, TAB, W } from '@angular/cdk/keycodes';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
 import { NGXLogger } from 'ngx-logger';
 import { TabTypes } from 'src/app/models/sys/tab.model';
+import { ProjectService } from 'src/app/services/project.service';
+import { SocketService } from 'src/app/services/sockets/socket.service';
+import { ProgressService } from '../../../services/ui/progress.service';
+import { DocumentComponent } from '../../tabs/document/document.component';
+import { ApiService } from './../../../services/api.service';
+import { TabService } from './../../../services/tab.service';
+import { BlueprintComponent } from './../../tabs/blueprint/blueprint.component';
+import { WelcomeTabComponent } from './../../tabs/welcome-tab/welcome-tab.component';
 
 @Component({
   selector: 'app-board',
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss']
 })
-export class BoardComponent implements OnInit {
+export class BoardComponent implements OnInit, OnDestroy {
 
 
 
@@ -35,8 +35,12 @@ export class BoardComponent implements OnInit {
     private readonly logger: NGXLogger,
   ) { }
 
+  public ngOnDestroy(): void {
+    this.socket.disconnect();
+  }
+
   async ngOnInit(): Promise<void> {
-    this.socket.connect();
+    this.socket.connect(this.project.id);
     let snack: MatSnackBarRef<TextOnlySnackBar>;
     try {
       this.progress.show();

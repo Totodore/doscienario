@@ -1,24 +1,26 @@
 import { Injectable } from '@angular/core';
-import { EventHandler } from 'src/app/decorators/subscribe-event.decorator';
+import { EventHandler, registerHandler } from 'src/app/decorators/subscribe-event.decorator';
+import { Relationship } from 'src/app/models/api/blueprint.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
+import { CreateNodeIn, CreateRelationIn, EditSummaryIn, PlaceNodeIn, RemoveNodeIn, RemoveRelationIn } from 'src/app/models/sockets/in/blueprint.in';
 import { CloseElementIn, ColorElementIn, OpenElementIn, SendElementIn } from 'src/app/models/sockets/in/element.in';
 import { AddTagElementIn, RemoveTagElementIn } from 'src/app/models/sockets/in/tag.in';
-import { ApiService } from '../api.service';
+import { SocketService } from 'src/app/services/sockets/socket.service';
 import { ProjectService } from '../project.service';
 import { TabService } from '../tab.service';
-import { CreateNodeIn, CreateRelationIn, EditSummaryIn, PlaceNodeIn, RemoveNodeIn, RemoveRelationIn } from 'src/app/models/sockets/in/blueprint.in';
-import { Relationship } from 'src/app/models/api/blueprint.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class TreeSocketService {
+export class TreeIoHandler {
 
   constructor(
-    private readonly api: ApiService,
     private readonly project: ProjectService,
-    private readonly tabs: TabService
-  ) { }
+    private readonly tabs: TabService,
+    private readonly socket: SocketService,
+  ) { 
+    registerHandler(this, this.socket);
+  }
 
 
   @EventHandler(Flags.SEND_BLUEPRINT)
@@ -98,5 +100,4 @@ export class TreeSocketService {
   onSumarryNode(packet: EditSummaryIn) {
     this.project.setSumarryNode(packet);
   }
-  public get socket() { return this.api.socket; }
 }

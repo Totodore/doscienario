@@ -1,28 +1,32 @@
-import { WriteElementIn } from './../../models/sockets/in/element.in';
-import { WriteElementOut } from './../../models/sockets/out/element.out';
 import { Injectable } from '@angular/core';
-import { EventHandler } from 'src/app/decorators/subscribe-event.decorator';
+import { NGXLogger } from 'ngx-logger';
+import { DocumentComponent } from 'src/app/components/tabs/document/document.component';
+import { EventHandler, registerHandler } from 'src/app/decorators/subscribe-event.decorator';
 import { Sheet } from 'src/app/models/api/sheet.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { Change, OpenElementIn, SendElementIn } from 'src/app/models/sockets/in/element.in';
+import { TabTypes } from 'src/app/models/sys/tab.model';
+import { WriteElementIn } from '../../models/sockets/in/element.in';
+import { WriteElementOut } from '../../models/sockets/out/element.out';
 import { ApiService } from '../api.service';
 import { ProjectService } from '../project.service';
 import { TabService } from '../tab.service';
-import { DocumentComponent } from 'src/app/components/tabs/document/document.component';
-import { NGXLogger } from 'ngx-logger';
-import { TabTypes } from 'src/app/models/sys/tab.model';
+import { SocketService } from './socket.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class SheetSocketService {
+export class SheetIoHandler {
 
   constructor(
     private readonly api: ApiService,
     private readonly project: ProjectService,
     private readonly tabs: TabService,
     private readonly logger: NGXLogger,
-  ) { }
+    private readonly socket: SocketService,
+  ) { 
+    registerHandler(this, this.socket);
+  }
 
 
   @EventHandler(Flags.OPEN_SHEET)
@@ -67,5 +71,4 @@ export class SheetSocketService {
     return this.tabs.getTab<DocumentComponent>(TabTypes.DOCUMENT, typeof sheet === 'number' ? sheet : sheet.documentId);
   }
 
-  public get socket() { return this.api.socket; }
 }

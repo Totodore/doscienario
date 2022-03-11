@@ -1,3 +1,4 @@
+import { Socket } from 'socket.io-client';
 import { ColorTagOut } from './../../../models/sockets/out/tag.out';
 import { Color } from '@angular-material-components/color-picker';
 import { Component, Inject } from '@angular/core';
@@ -6,7 +7,7 @@ import { Tag } from 'src/app/models/api/tag.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { RenameTagOut } from 'src/app/models/sockets/out/tag.out';
 import { ProjectService } from 'src/app/services/project.service';
-import { SocketService } from 'src/app/services/sockets/socket.service';
+import { IoHandler } from 'src/app/services/sockets/io.handler.service';
 import { ConfirmComponent } from '../../utils/confirm/confirm.component';
 
 @Component({
@@ -21,7 +22,7 @@ export class EditMainTagComponent {
   constructor(
     @Inject(MAT_DIALOG_DATA) public tag: Tag,
     private readonly dialog: MatDialog,
-    private readonly socket: SocketService,
+    private readonly socket: Socket,
     private readonly project: ProjectService,
     private readonly dialogRef: MatDialogRef<EditMainTagComponent>,
   ) {
@@ -37,7 +38,7 @@ export class EditMainTagComponent {
     const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer le tag ?" });
     dialog.componentInstance.confirm.subscribe(() => {
       this.project.searchComponent.tagSortComponent.unSelectTag(this.tag);
-      this.socket.socket.emit(Flags.REMOVE_TAG, this.tag.title);
+      this.socket.emit(Flags.REMOVE_TAG, this.tag.title);
       this.project.removeProjectTag(this.tag.title);
       dialog.close();
       this.dialogRef.close();
@@ -53,9 +54,9 @@ export class EditMainTagComponent {
 
   public onConfirm() {
     if (this.tag.color != this.oldTag.color)
-      this.socket.socket.emit(Flags.COLOR_TAG, new ColorTagOut(this.oldTag.title, this.tag.color));
+      this.socket.emit(Flags.COLOR_TAG, new ColorTagOut(this.oldTag.title, this.tag.color));
     if (this.tag.title != this.oldTag.title)
-      this.socket.socket.emit(Flags.RENAME_TAG, new RenameTagOut(this.oldTag.title, this.tag.title));
+      this.socket.emit(Flags.RENAME_TAG, new RenameTagOut(this.oldTag.title, this.tag.title));
     this.project.updateProjectTag(this.oldTag, this.tag);
     this.dialogRef.close();
   }

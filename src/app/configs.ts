@@ -1,8 +1,8 @@
-import { Tab } from './models/sys/tab.model';
-import { Logs } from './models/api/logs.model';
+import { Type } from '@angular/core';
 import { DBConfig } from 'ngx-indexed-db';
 import { INGXLoggerConfig, NgxLoggerLevel } from 'ngx-logger';
-import { Type } from '@angular/core';
+import { Logs } from './models/api/logs.model';
+import { Tab } from './models/sys/tab.model';
 
 export const loggerConfig: INGXLoggerConfig = {
   level: NgxLoggerLevel.INFO,

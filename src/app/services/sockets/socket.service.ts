@@ -1,82 +1,68 @@
-import { ProjectService } from 'src/app/services/project.service';
-import { Flags } from '../../models/sockets/flags.enum';
-import { ApiService } from '../api.service';
-import { environment } from '../../../environments/environment';
-import { Socket, connect } from 'socket.io-client';
-import { EventHandler, registerHandlers } from '../../decorators/subscribe-event.decorator';
-import { Injectable } from '@angular/core';
-import { User } from '../../models/api/project.model';
-import { DocsSocketService } from './docs-socket.service';
-import { TreeSocketService } from './tree-socket.service';
-import { SnackbarService } from '../ui/snackbar.service';
-import { SheetSocketService } from './sheet-socket.service';
-import { NGXLogger } from 'ngx-logger';
+import { ApiService } from 'src/app/services/api.service';
+import { Injectable } from "@angular/core";
+import { Socket } from "ngx-socket-io";
+import { Observable } from "rxjs";
+import { environment } from "src/environments/environment";
+
 @Injectable({
   providedIn: 'root'
 })
 export class SocketService {
+  private _socket: Socket;
 
-  public socket: typeof Socket;
   constructor(
-    private readonly api: ApiService,
-    private readonly snackbar: SnackbarService,
-    private readonly project: ProjectService,
-    private readonly docsSocket: DocsSocketService,
-    private readonly treeSocket: TreeSocketService,
-    private readonly sheetSocket: SheetSocketService,
-    private readonly logger: NGXLogger,
-  ) {}
+    private readonly api: ApiService
+  ) { }
 
-  connect() {
-    this.socket = connect(`${environment.secured ? "wss" : "ws"}://${environment.apiUrl}`, {
-      path: "/dash",
-      query: {
-        "project": localStorage.getItem("project"),
-        "authorization": this.api.jwt
+  public connect(project: number) {
+    this._socket = new Socket({
+      url: `${environment.secured ? "wss" : "ws"}://${environment.apiUrl}`,
+      options: {
+        path: "/dash",
+        query: {
+          project: project.toString(),
+          authorization: this.api.jwt,
+        },
       }
     });
-    registerHandlers([this, this.docsSocket, this.treeSocket, this.sheetSocket], this.socket);
-    this.api.socket = this.socket;
+    this._socket.connect();
   }
 
-  @EventHandler("connect")
-  onConnect() {
-    this.logger.info("Socket successfully connected");
+  public disconnect() {
+    this._socket?.disconnect();
+    this._socket = null;
   }
 
-  @EventHandler("exception")
-  onException(error: WsException) {
-    this.logger.error('Ws Exception:', error);
-    this.snackbar.snack("Erreur avec le serveur!", 1000);
-  }
+  // Wrap socket instance
 
-  @EventHandler(Flags.RENAME_PROJECT)
-  onUpdateProject(name: string) {
-    this.project.name = name;
+  public get subscribersCounter(): Record<string, number> {
+    return this._socket.subscribersCounter;
   }
-
-  updateProject(name: string) {
-    this.socket.emit(Flags.RENAME_PROJECT, name);
+  public get eventObservables$(): Record<string, Observable<any>> {
+    return this._socket.eventObservables$;
   }
-
-  updateUserProject(users: User[]) {
-    const addedUser = users.filter(el => !this.project.projectUsers.find(value => el.id === value.id))?.[0];
-    const removedUser = this.project.projectUsers.filter(el => !users.find(value => el.id === value.id))?.[0];
-    if (addedUser)
-      this.socket.emit(Flags.ADD_USER_PROJECT, addedUser);
-    else if (removedUser)
-      this.socket.emit(Flags.REMOVE_USER_PROJECT, removedUser);
+  public of(namespace: string): void {
+    return this._socket.of(namespace);
+  };
+  public on(eventName: string, callback: Function): void {
+    return this._socket.on(eventName, callback);
   }
-
-  @EventHandler(Flags.ADD_USER_PROJECT)
-  onAddUserProject(user: User) {
-    this.project.addProjectUser(user);
+  public once(eventName: string, callback: Function): void {
+    return this._socket.once(eventName, callback);
   }
-
-  @EventHandler(Flags.REMOVE_USER_PROJECT)
-  onRemoveUserProject(user: User) {
-    this.project.removeProjectUser(user);
+  public emit(_eventName: string, ..._args: any[]): any {
+    return this._socket.emit(_eventName, ..._args);
+  }
+  public removeListener(_eventName: string, _callback?: Function): any {
+    return this._socket.removeListener(_eventName, _callback);
+  }
+  public removeAllListeners(_eventName?: string): any {
+    return this._socket.removeAllListeners(_eventName);
+  }
+  public fromEvent<T>(eventName: string): Observable<T> {
+    return this._socket.fromEvent(eventName);
+  }
+  public fromOneTimeEvent<T>(eventName: string): Promise<T> {
+    return this._socket.fromOneTimeEvent(eventName);
   }
 }
-
-type WsException = { status: string, message: string };

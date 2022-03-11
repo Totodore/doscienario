@@ -1,14 +1,14 @@
-import { RenameTagOut } from 'src/app/models/sockets/out/tag.out';
-import { ColorTagOut } from './../../../../models/sockets/out/tag.out';
-import { ConfirmComponent } from './../../../utils/confirm/confirm.component';
-import { Flags } from './../../../../models/sockets/flags.enum';
-import { SocketService } from '../../../../services/sockets/socket.service';
-import { SnackbarService } from '../../../../services/ui/snackbar.service';
-import { ProjectService } from './../../../../services/project.service';
+import { Color } from '@angular-material-components/color-picker';
 import { Component, Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Color } from '@angular-material-components/color-picker';
 import { Tag } from 'src/app/models/api/tag.model';
+import { RenameTagOut } from 'src/app/models/sockets/out/tag.out';
+import { SocketService } from 'src/app/services/sockets/socket.service';
+import { SnackbarService } from '../../../../services/ui/snackbar.service';
+import { Flags } from './../../../../models/sockets/flags.enum';
+import { ColorTagOut } from './../../../../models/sockets/out/tag.out';
+import { ProjectService } from './../../../../services/project.service';
+import { ConfirmComponent } from './../../../utils/confirm/confirm.component';
 
 @Component({
   selector: 'app-add-tag',
@@ -48,13 +48,13 @@ export class AddTagComponent {
       if (this.modify) {
         this.project.updateProjectTag(this.oldTag, newTag);
         if (newTag.color != this.oldTag.color)
-          this.socket.socket.emit(Flags.COLOR_TAG, new ColorTagOut(newTag.title, newTag.color));
+          this.socket.emit(Flags.COLOR_TAG, new ColorTagOut(newTag.title, newTag.color));
         if (newTag.title != this.oldTag.title)
-          this.socket.socket.emit(Flags.RENAME_TAG, new RenameTagOut(this.oldTag.title, newTag.title));
+          this.socket.emit(Flags.RENAME_TAG, new RenameTagOut(this.oldTag.title, newTag.title));
       }
       else {
         this.project.addProjectTag(newTag);
-        this.socket.socket.emit(Flags.CREATE_TAG, newTag);
+        this.socket.emit(Flags.CREATE_TAG, newTag);
       }
       this.dialogRef.close();
     }
@@ -62,7 +62,7 @@ export class AddTagComponent {
   public removeTag() {
     const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer le tag ?" });
     dialog.componentInstance.confirm.subscribe(() => {
-      this.socket.socket.emit(Flags.REMOVE_TAG, this.oldTag.title);
+      this.socket.emit(Flags.REMOVE_TAG, this.oldTag.title);
       this.project.removeProjectTag(this.oldTag.title);
       dialog.close();
       this.dialogRef.close();

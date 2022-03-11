@@ -16,7 +16,6 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class ApiService extends ApiUtil {
 
-  public socket: typeof Socket;
   constructor(
     http: HttpClient,
     logger: NGXLogger,

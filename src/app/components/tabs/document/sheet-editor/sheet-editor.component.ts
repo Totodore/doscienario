@@ -1,19 +1,20 @@
-import { SheetSocketService } from './../../../../services/sockets/sheet-socket.service';
-import { TabService } from './../../../../services/tab.service';
-import { ProjectService } from './../../../../services/project.service';
-import { Component, OnInit, Inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { CKEditor5, ChangeEvent } from '@ckeditor/ckeditor5-angular';
-import * as CKEditor from "../../../../../lib/ckeditor.js";
-import { DocumentComponent } from '../document.component';
-import { v4 as uuid } from 'uuid';
-import { Flags } from 'src/app/models/sockets/flags.enum';
-import { EditorWorkerService } from 'src/app/services/document-worker.service';
-import { Change } from 'src/app/models/sockets/in/element.in';
-import { ProgressService } from 'src/app/services/ui/progress.service';
-import { OpenSheetOut } from 'src/app/models/sockets/out/sheet.out';
+import { ChangeEvent, CKEditor5 } from '@ckeditor/ckeditor5-angular';
 import { ConfirmComponent } from 'src/app/components/utils/confirm/confirm.component';
+import { Flags } from 'src/app/models/sockets/flags.enum';
+import { Change } from 'src/app/models/sockets/in/element.in';
+import { OpenSheetOut } from 'src/app/models/sockets/out/sheet.out';
+import { EditorWorkerService } from 'src/app/services/document-worker.service';
+import { SocketService } from 'src/app/services/sockets/socket.service.js';
+import { ProgressService } from 'src/app/services/ui/progress.service';
 import { applyTabPlugin } from 'src/app/utils/doc.utils';
+import { v4 as uuid } from 'uuid';
+import * as CKEditor from "../../../../../lib/ckeditor.js";
+import { SheetIoHandler } from '../../../../services/sockets/sheet-io.handler.service';
+import { DocumentComponent } from '../document.component';
+import { ProjectService } from './../../../../services/project.service';
+import { TabService } from './../../../../services/tab.service';
 
 @Component({
   templateUrl: './sheet-editor.component.html',
@@ -60,7 +61,8 @@ export class SheetEditorComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) data: [number, number | string],
     private readonly project: ProjectService,
     private readonly tabs: TabService,
-    private readonly socket: SheetSocketService,
+    private readonly sheetIo: SheetIoHandler,
+    private readonly socket: SocketService,
     private readonly editorWorker: EditorWorkerService,
     private readonly progress: ProgressService,
     private readonly dialogRef: MatDialogRef<SheetEditorComponent>,
@@ -76,7 +78,7 @@ export class SheetEditorComponent implements OnInit {
 
   public ngOnInit(): void {
     this.progress.show();
-    this.socket.socket.emit(Flags.OPEN_SHEET, new OpenSheetOut(this.tabId, this.docId, this.sheetId, this.title));
+    this.socket.emit(Flags.OPEN_SHEET, new OpenSheetOut(this.tabId, this.docId, this.sheetId, this.title));
     this.editorWorker.worker.addEventListener<Change[]>(`diff-${this.tabId}`, data => this.onChangeParsed(data));
   }
 
@@ -89,7 +91,7 @@ export class SheetEditorComponent implements OnInit {
     const data = e.editor.getData();
     if (Math.abs(data.length - this.sheet.content.length) > 500) {
       const change: Change = [2, null, data];
-      this.socket.updateSheet(this.id, this.tabId, [change], this.sheet.lastChangeId, ++this.sheet.clientUpdateId);
+      this.sheetIo.updateSheet(this.id, this.tabId, [change], this.sheet.lastChangeId, ++this.sheet.clientUpdateId);
     } else
       this.editorWorker.worker.postMessage<[string, string]>(`diff-${this.tabId}`, [this.sheet.content, data]);
     this.project.openSheets[this.tabId].content = data;
@@ -106,7 +108,7 @@ export class SheetEditorComponent implements OnInit {
   }
 
   public onChangeParsed(changes: Change[]) {
-    this.socket.updateSheet(this.id, this.tabId, changes, this.sheet.lastChangeId, ++this.sheet.clientUpdateId);
+    this.sheetIo.updateSheet(this.id, this.tabId, changes, this.sheet.lastChangeId, ++this.sheet.clientUpdateId);
   }
 
   public onSheetClose() {
@@ -116,7 +118,7 @@ export class SheetEditorComponent implements OnInit {
   public onSheetDelete() {
     const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer cette note ?" });
     dialog.componentInstance.confirm.subscribe(() => {
-      this.socket.socket.emit(Flags.REMOVE_SHEET, [this.id, this.docId]);
+      this.socket.emit(Flags.REMOVE_SHEET, [this.id, this.docId]);
       (this.tabs.displayedTab[1] as DocumentComponent)?.onRemoveSheet?.(this.sheet);
       this.project.removeSheet(this.tabId, this.docId);
       this.onSheetClose();

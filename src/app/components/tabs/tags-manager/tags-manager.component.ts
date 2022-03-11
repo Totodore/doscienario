@@ -1,5 +1,5 @@
 import { ITabElement } from 'src/app/models/sys/tab.model';
-import { SocketService } from '../../../services/sockets/socket.service';
+import { IoHandler } from '../../../services/sockets/io.handler.service';
 import { AddTagComponent } from './add-tag/add-tag.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ProjectService } from './../../../services/project.service';
@@ -8,6 +8,7 @@ import { diff as arrayDiff } from "fast-array-diff";
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { Tag } from 'src/app/models/api/tag.model';
 import { TabTypes } from 'src/app/models/sys/tab.model';
+import { SocketService } from 'src/app/services/sockets/socket.service';
 @Component({
   selector: 'app-tags-manager',
   templateUrl: './tags-manager.component.html',
@@ -44,9 +45,9 @@ export class TagsManagerComponent implements ITabElement {
 
     //Little patch with filter method to avoid repetitions in diff.added and removed
     for (const addedTag of diff.added.filter(el => !diff.removed.find(val => val.title === el.title)))
-      this.socket.socket.emit(Flags.CREATE_TAG, addedTag);
+      this.socket.emit(Flags.CREATE_TAG, addedTag);
     for (const removedTag of diff.removed.filter(el => !diff.added.find(val => val.title == el.title)))
-      this.socket.socket.emit(Flags.REMOVE_TAG, removedTag.title);
+      this.socket.emit(Flags.REMOVE_TAG, removedTag.title);
   }
 
   public onSecondaryTagClick(tagName: string) {

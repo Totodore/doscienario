@@ -1,23 +1,23 @@
-import { Vector, Vector3 } from './../../../../types/global.d';
-import { ConfirmComponent } from './../../utils/confirm/confirm.component';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ProgressService } from '../../../services/ui/progress.service';
-import { SocketService } from '../../../services/sockets/socket.service';
-import { ProjectService } from './../../../services/project.service';
-import { Component, ViewChild, ElementRef, ViewChildren, QueryList, OnInit, ChangeDetectorRef } from '@angular/core';
+import { NGXLogger } from 'ngx-logger';
+import { Blueprint, Node, Relationship } from 'src/app/models/api/blueprint.model';
+import { Tag } from 'src/app/models/api/tag.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
-import { Poles, NodeComponent } from './node/node.component';
+import { CreateNodeOut, PlaceNodeOut, RemoveNodeOut } from 'src/app/models/sockets/out/blueprint.out';
+import { AddTagElementOut } from 'src/app/models/sockets/out/tag.out';
+import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
+import { SocketService } from 'src/app/services/sockets/socket.service';
+import { SnackbarService } from 'src/app/services/ui/snackbar.service';
 import { findChildRels, findLevelByNode, findParentRels, removeNodeFromTree } from 'src/app/utils/tree.utils';
 import { WorkerManager, WorkerType } from 'src/app/utils/worker-manager.utils';
-import { SnackbarService } from 'src/app/services/ui/snackbar.service';
 import { environment } from 'src/environments/environment';
+import { ProgressService } from '../../../services/ui/progress.service';
 import { ElementComponent } from '../element.component';
-import { CreateNodeOut, PlaceNodeOut, RemoveNodeOut } from 'src/app/models/sockets/out/blueprint.out';
-import { Blueprint, Node, Relationship } from 'src/app/models/api/blueprint.model';
-import { NGXLogger } from 'ngx-logger';
-import { AddTagElementOut } from 'src/app/models/sockets/out/tag.out';
-import { Tag } from 'src/app/models/api/tag.model';
-import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
+import { Vector, Vector3 } from './../../../../types/global.d';
+import { ProjectService } from './../../../services/project.service';
+import { ConfirmComponent } from './../../utils/confirm/confirm.component';
+import { NodeComponent, Poles } from './node/node.component';
 
 
 @Component({
@@ -82,7 +82,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
    */
   public openTab(id?: string | number): string {
     super.openTab(id);
-    this.socket.socket.emit(Flags.OPEN_BLUEPRINT, [this.tabId, id]);
+    this.socket.emit(Flags.OPEN_BLUEPRINT, [this.tabId, id]);
     return this.tabId;
   }
 
@@ -130,7 +130,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   }
 
   private createNewNode([ox, oy]: Vector, [ex, ey]: Vector, parentId: number) {
-    this.socket.socket.emit(Flags.CREATE_NODE, new CreateNodeOut(
+    this.socket.emit(Flags.CREATE_NODE, new CreateNodeOut(
       parentId,
       this.id,
       ex,
@@ -205,7 +205,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     const childLevel = findLevelByNode(child.data, this.root, this.nodes, this.blueprint.relationships);
     const parentLevel = findLevelByNode(this.allNodes.find(el => el.id == this.ghostNode.parent.id), this.root, this.nodes, this.blueprint.relationships);
     if (childLevel > parentLevel) {
-      this.socket.socket.emit(Flags.CREATE_RELATION, new Relationship({
+      this.socket.emit(Flags.CREATE_RELATION, new Relationship({
         parentId: this.ghostNode.parent.id,
         childId: child.data.id,
         blueprint: this.blueprint,
@@ -229,7 +229,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
       );
       this.project.openBlueprints[this.tabId].nodes = this.project.openBlueprints[this.tabId].nodes.filter(el => !data.nodes.includes(el.id));
       this.project.openBlueprints[this.tabId].relationships = this.project.openBlueprints[this.tabId].relationships.filter(el => !data.rels.includes(el.id));
-      this.socket.socket.emit(Flags.REMOVE_NODE, new RemoveNodeOut(el.data.id, this.id));
+      this.socket.emit(Flags.REMOVE_NODE, new RemoveNodeOut(el.data.id, this.id));
     });
   }
 
@@ -321,11 +321,11 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     const nodeData = this.nodes.find(el => el.id === node.id);
     for (const rel of this.rels) {
       if (rel.childId === node.id) {
-        this.socket.socket.emit(Flags.PLACE_RELATIONSHIP, rel);
+        this.socket.emit(Flags.PLACE_RELATIONSHIP, rel);
       } else if (rel.parentId === node.id)
-        this.socket.socket.emit(Flags.PLACE_RELATIONSHIP, rel);
+        this.socket.emit(Flags.PLACE_RELATIONSHIP, rel);
     }
-    this.socket.socket.emit(Flags.PLACE_NODE, new PlaceNodeOut(this.id, node.id, [nodeData.x, nodeData.y]));
+    this.socket.emit(Flags.PLACE_NODE, new PlaceNodeOut(this.id, node.id, [nodeData.x, nodeData.y]));
     this.drawState = "none";
   }
 
@@ -386,9 +386,9 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     console.timeEnd("auto-pos");
     this.progress.hide();
     for (const rel of this.rels)
-      this.socket.socket.emit(Flags.PLACE_RELATIONSHIP, rel);
+      this.socket.emit(Flags.PLACE_RELATIONSHIP, rel);
     for (const node of nodes)
-      this.socket.socket.emit(Flags.PLACE_NODE, new PlaceNodeOut(this.id, node.id, [node.x, node.y]));
+      this.socket.emit(Flags.PLACE_NODE, new PlaceNodeOut(this.id, node.id, [node.x, node.y]));
   }
 
   /**
@@ -408,7 +408,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
       await new Promise<void>(resolve => setInterval(() => this.loaded && resolve(), 100));
     this.project.updateBlueprintTags(this.tabId, tags);
     for (const tag of tags)
-      this.socket.socket.emit(Flags.TAG_ADD_BLUEPRINT, new AddTagElementOut(this.id, tag.title));
+      this.socket.emit(Flags.TAG_ADD_BLUEPRINT, new AddTagElementOut(this.id, tag.title));
   }
 
 

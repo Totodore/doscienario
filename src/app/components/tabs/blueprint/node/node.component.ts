@@ -1,19 +1,19 @@
-import { DrawStates } from './../blueprint.component';
-import { ProgressService } from '../../../../services/ui/progress.service';
-import { NodeEditorComponent } from './node-editor/node-editor.component';
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
+import { Node } from 'src/app/models/api/blueprint.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
+import { Change } from 'src/app/models/sockets/in/element.in';
+import { EditSummaryOut } from 'src/app/models/sockets/out/blueprint.out';
+import { EditorWorkerService } from 'src/app/services/document-worker.service';
+import { ProjectService } from 'src/app/services/project.service';
+import { SocketService } from 'src/app/services/sockets/socket.service';
+import { v4 } from 'uuid';
+import { ProgressService } from '../../../../services/ui/progress.service';
 import { Vector } from './../../../../../types/global.d';
 import { TabService } from './../../../../services/tab.service';
-import { Component, Input, OnInit, Output, EventEmitter, HostListener, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-import { MatIcon } from '@angular/material/icon';
-import { ProjectService } from 'src/app/services/project.service';
-import { EditorWorkerService } from 'src/app/services/document-worker.service';
-import { v4 } from 'uuid';
-import { TreeSocketService } from 'src/app/services/sockets/tree-socket.service';
-import { Change } from 'src/app/models/sockets/in/element.in';
-import { Node } from 'src/app/models/api/blueprint.model';
-import { EditSummaryOut } from 'src/app/models/sockets/out/blueprint.out';
+import { DrawStates } from './../blueprint.component';
+import { NodeEditorComponent } from './node-editor/node-editor.component';
 @Component({
   selector: 'app-node',
   templateUrl: './node.component.html',
@@ -80,7 +80,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
   constructor(
     private readonly project: ProjectService,
     private readonly tabs: TabService,
-    private readonly socket: TreeSocketService,
+    private readonly socket: SocketService,
     private readonly dialog: MatDialog,
     private readonly progress: ProgressService,
     private readonly editorWorker: EditorWorkerService,
@@ -134,7 +134,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
     this.remove.emit();
   }
   public onChange(val: string) {
-    this.socket.socket.emit(Flags.SUMARRY_NODE, new EditSummaryOut(this.data.id, val, this.blueprintId));
+    this.socket.emit(Flags.SUMARRY_NODE, new EditSummaryOut(this.data.id, val, this.blueprintId));
   }
 
   public openDetailsView() {

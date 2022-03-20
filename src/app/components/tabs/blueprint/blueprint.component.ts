@@ -1,3 +1,4 @@
+import { TreeIoHandler } from './../../../services/sockets/tree-io.handler.service';
 import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { NGXLogger } from 'ngx-logger';
@@ -63,6 +64,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     private readonly snack: SnackbarService,
     private readonly changeDetector: ChangeDetectorRef,
     private readonly logger: NGXLogger,
+    _: TreeIoHandler,   // Unused tree io handler in the current class but it should be declarated somewhere to be included in the bundle
   ) {
     super(progress);
     this.blueprintWorker = new WorkerManager(WorkerType.Blueprint, this.logger);

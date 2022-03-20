@@ -24,9 +24,9 @@ export class TreeIoHandler {
 
 
   @EventHandler(Flags.SEND_BLUEPRINT)
-  async onSendBlueprint(packet: SendElementIn) {
+  onSendBlueprint(packet: SendElementIn) {
     this.project.addSendBlueprint(packet);
-    await this.tabs.updateBlueprintTab(packet.reqId, packet.element.id);
+    this.tabs.updateBlueprintTab(packet.reqId, packet.element.id);
   }
 
   @EventHandler(Flags.OPEN_BLUEPRINT)

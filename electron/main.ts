@@ -7,7 +7,7 @@ import { join } from "path";
 const remote = require("@electron/remote/main");
 remote.initialize();
 class App {
-  private readonly url = `./app/index.html`;
+  private readonly url = `http://localhost:4200`;
   private window: BrowserWindow;
 
   public async init(): Promise<void> {
@@ -27,7 +27,7 @@ class App {
     try {
       remote.enable(this.window.webContents);
       await Promise.all([
-        this.window.loadFile(join(__dirname, this.url)),
+        this.window.loadURL(this.url),
         this.updateIfNeeded()
       ]);
       this.addUpdateHandler();
@@ -37,13 +37,22 @@ class App {
   }
 
   public config() {
-    this.window.webContents.on("will-navigate", (e, url) => {
-      if (!url.startsWith("file://"))
+    this.window.webContents.setWindowOpenHandler((details) => {
+      if (details.url.startsWith("http")) {
+        shell.openExternal(details.url);
+        return { action: "deny" }
+      } else return { action: "allow" }
+    });
+    this.window.webContents.on("new-window", (e, url) => {
+      if (url.startsWith("http")) {
         shell.openExternal(url);
+        e.preventDefault();
+      }
     });
     this.window.setMenu(null);
     this.window.menuBarVisible = false;
     this.window.removeMenu();
+    this.window.on('ready-to-show', () => this.window.show())
     this.window.on('closed', () => {
       this.window = null;
     });

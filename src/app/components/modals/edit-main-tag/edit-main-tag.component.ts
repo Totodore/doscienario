@@ -1,4 +1,3 @@
-import { Socket } from 'socket.io-client';
 import { ColorTagOut } from './../../../models/sockets/out/tag.out';
 import { Color } from '@angular-material-components/color-picker';
 import { Component, Inject } from '@angular/core';
@@ -9,6 +8,7 @@ import { RenameTagOut } from 'src/app/models/sockets/out/tag.out';
 import { ProjectService } from 'src/app/services/project.service';
 import { IoHandler } from 'src/app/services/sockets/io.handler.service';
 import { ConfirmComponent } from '../../utils/confirm/confirm.component';
+import { SocketService } from 'src/app/services/sockets/socket.service';
 
 @Component({
   templateUrl: './edit-main-tag.component.html',
@@ -22,7 +22,7 @@ export class EditMainTagComponent {
   constructor(
     @Inject(MAT_DIALOG_DATA) public tag: Tag,
     private readonly dialog: MatDialog,
-    private readonly socket: Socket,
+    private readonly socket: SocketService,
     private readonly project: ProjectService,
     private readonly dialogRef: MatDialogRef<EditMainTagComponent>,
   ) {

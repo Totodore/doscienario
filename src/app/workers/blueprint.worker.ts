@@ -23,18 +23,15 @@ addEventListener('message', (e: MessageEvent<[string, any] | string>) => {
 type RelationshipCache = { [key: number]: Relationship[] };
 
 function autoPosBlueprint(nodes: Node[], rels: Relationship[], margin: Vector, node?: Node): [Node[], Relationship[]] {
-  //@ts-ignore
-  const nodesData: NodeStruct = Object.fromEntries(nodes.map(el => [el.id, el]));
+  const nodesData: NodeStruct = Object.fromEntries(nodes.map(el => [el.id.toString(), el]));
   const root = nodes.find(el => el.isRoot);
   const nodeLevel = node ? findLevelByNode(node, root, nodes, rels) : null;
   //We get the depth of the blueprint
   const depth = nodeLevel || findDepth(root, rels, nodesData);
 
   const nodesLevelCache = _findNodesLevels(_createCustomNode(root), rels, nodes.map(node => _createCustomNode(node)), -1, 0);
-  //@ts-ignore
-  const childCache: RelationshipCache = Object.fromEntries(nodes.map(node => [node.id, []]));
-  //@ts-ignore
-  const parentCache: RelationshipCache = Object.fromEntries(nodes.map(node => [node.id, []]));
+  const childCache: RelationshipCache = Object.fromEntries(nodes.map(node => [node.id.toString(), []]));
+  const parentCache: RelationshipCache = Object.fromEntries(nodes.map(node => [node.id.toString(), []]));
   for (let rel of rels) {
     childCache[rel.parentId].push(rel);
     parentCache[rel.childId].push(rel);
@@ -54,8 +51,7 @@ function autoPosBlueprint(nodes: Node[], rels: Relationship[], margin: Vector, n
     const clonedNodes: Node[] = Object.create(els);
     let bestPermutation: number[], bestDistance: number = Infinity;
 
-    //@ts-ignore
-    const clonedNodesById: NodeStruct = Object.fromEntries(clonedNodes.map(node => [node.id, node]));
+    const clonedNodesById: NodeStruct = Object.fromEntries(clonedNodes.map(node => [node.id.toString(), node]));
     
     //We simulate all the permutation to find the best one
     for (const permutation of permute(clonedNodes.map(el => el.id))) {
@@ -78,6 +74,9 @@ function autoPosBlueprint(nodes: Node[], rels: Relationship[], margin: Vector, n
   return [nodes, rels];
 }
 
+/**
+ * Computes the permutation of the array
+ */
 function* permute(permutation: number[]) {
   const length = permutation.length;
   const c = Array(length).fill(0);

@@ -12,13 +12,13 @@ import { SocketService } from 'src/app/services/sockets/socket.service';
 import { SnackbarService } from 'src/app/services/ui/snackbar.service';
 import { findChildRels, findLevelByNode, findParentRels, removeNodeFromTree } from 'src/app/utils/tree.utils';
 import { WorkerManager, WorkerType } from 'src/app/utils/worker-manager.utils';
-import { environment } from 'src/environments/environment';
 import { ProgressService } from '../../../services/ui/progress.service';
 import { ElementComponent } from '../element.component';
-import { Vector, Vector3 } from './../../../../types/global.d';
+import { Vector } from './../../../../types/global.d';
 import { ProjectService } from './../../../services/project.service';
 import { ConfirmComponent } from './../../utils/confirm/confirm.component';
 import { NodeComponent, Poles } from './node/node.component';
+import { scale, translate, compose, Matrix, toCSS, decomposeTSR, identity } from 'transformation-matrix';
 
 
 @Component({
@@ -48,12 +48,13 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   public gridMode: boolean;
   public scrollPoles: Set<Poles> = new Set();
   public drawState: DrawStates = "none";
-  public zoomMatrix: Vector3; //[1: Scale, 2: x translation, 3: y translation]
 
   public readonly type = TabTypes.BLUEPRINT;
   public ghostNode?: TemporaryNode;
+
   private scrollIntervalId: number;
   private tresholdMousePole: Poles[];
+  private transformMatrix: Matrix = identity();
   private readonly blueprintWorker: WorkerManager;
 
   constructor(
@@ -91,33 +92,28 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   public loadedTab() {
     super.loadedTab();
     this.configView();
-    this.zoomMatrix = this.defaultMatrix;
   }
 
   /**
    * Allow the user to zoom on the viewport (can be call from a wheel event or from another ui method)
-   * !Currently only allowed in dev mode
    * */
   public onWheel(e: WheelEvent | number): void {
-    if (environment.production) return;
     if (e instanceof WheelEvent) {
       e.preventDefault();
-      if ((this.zoomMatrix[0] >= 1 && e.deltaY < 0) || (this.zoomMatrix[0] <= 0.2 && e.deltaY > 0))
+      if ((this.transformMatrix.a >= 1 && e.deltaY < 0) || (this.transformMatrix.a <= 0.2 && e.deltaY > 0))
         return;
-      let [scale, px, py] = this.zoomMatrix;
-      const xs = (e.clientX - px) / scale;
-      const ys = (e.clientY - py) / scale;
-      (-e.deltaY > 0) ? (scale *= 1.1) : (scale /= 1.1);
-      px = e.clientX - xs * scale;
-      py = e.clientY - ys * scale;
-      this.zoomMatrix = [scale > 1 ? 1 : scale < 0.2 ? 0.2 : scale, px, py];
+      const ratio = (-e.deltaY > 0) ? 1.1 : 1 / 1.1;
+      const matrix = compose(
+        this.transformMatrix,
+        scale(ratio, ratio, e.clientX, e.clientY),
+      );
+      matrix.a = matrix.d = Math.clamp(matrix.a, 0.2, 1);
+      this.transformMatrix = matrix;
     } else {
       if (e > 1 || e < 0.2)
         return;
-      this.zoomMatrix = this.defaultMatrix;
-      this.zoomMatrix[0] = e;
+      this.transformMatrix.a = this.transformMatrix.d = e;
     }
-    this.configView();
   }
   /**
    * On mouse click event
@@ -148,11 +144,10 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
    * It is call each time the zooming Matrix change so the scroll can be readjusted
   */
   private configView() {
-    if (this.wrapper)
-      this.wrapper.scrollTo({
-        top: (this.overlay.clientHeight / 2) * (this.zoomMatrix?.[0] || 1) - this.wrapper.clientHeight / 2,
-        left: (this.overlay.clientWidth / 2) * (this.zoomMatrix?.[0] || 1),
-      });
+    const width = this.overlay.clientWidth;
+    const height = this.overlay.clientHeight;
+    const viewHeight = this.wrapper.clientHeight;
+    this.transformMatrix = translate(- width / 2, - (height / 2 - viewHeight / 2));
   }
 
 
@@ -172,8 +167,8 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
 
   private moveGhost(pos: Vector) {
     const rec = this.overlay.getBoundingClientRect();
-    this.ghostNode.ex = (pos[0] / this.zoomMatrix?.[0] || 1) - rec.left - rec.width / 2;
-    this.ghostNode.ey = (pos[1] / this.zoomMatrix?.[0] || 1) - rec.top - rec.height / 2;
+    this.ghostNode.ex = (pos[0] / this.overlayScale) - rec.left - rec.width / 2;
+    this.ghostNode.ey = (pos[1] / this.overlayScale) - rec.top - rec.height / 2;
     this.changeDetector.detectChanges();
   }
 
@@ -262,8 +257,11 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     if (this.drawState === "moving") {
       e.stopImmediatePropagation();
       e.preventDefault();
-      this.wrapper.scrollTop -= e.movementY;
-      this.wrapper.scrollLeft -= e.movementX;
+      const zoom = this.overlayScale;
+      this.transformMatrix = compose(
+        this.transformMatrix,
+        translate(e.movementX / zoom, e.movementY / zoom),
+      );
     }
     else if (this.drawState === "drawing" || this.drawState === "dragging") {
       const currTreshold = this.tresholdMouse([e.clientX, e.clientY]);
@@ -295,8 +293,8 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   public onDragMove(offset: Vector, node: Node, component: NodeComponent): void {
     const overlayRect = this.overlay.getBoundingClientRect();
     const wrapperRect = component.wrapper.nativeElement.getBoundingClientRect();
-    let x = offset[0] - (overlayRect.width / 2) / (this.zoomMatrix?.[0] || 1) - wrapperRect.width;
-    let y = offset[1] - (overlayRect.height / 2) / (this.zoomMatrix?.[0] || 1) + wrapperRect.height / 2;
+    let x = offset[0] - (overlayRect.width / 2) / (this.overlayScale) - wrapperRect.width;
+    let y = offset[1] - (overlayRect.height / 2) / (this.overlayScale) + wrapperRect.height / 2;
     x -= node.x;
     y -= node.y;
     const parentRel = findParentRels(node, this.rels);
@@ -384,7 +382,6 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     }
     this.nodes = nodes = data[0];
     this.rels = data[1];
-    this.configView();
     console.timeEnd("auto-pos");
     this.progress.hide();
     for (const rel of this.rels)
@@ -447,15 +444,21 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   get id(): number {
     return this.blueprint?.id;
   }
+  public get cssTransformMatrix() {
+    return toCSS(this.transformMatrix);
+  }
+  public get overlayScale() {
+    return this.transformMatrix.a;
+  }
+  public get overlayTranslation() {
+    return decomposeTSR(this.transformMatrix).translate;
+  }
 
   private get wrapper(): HTMLDivElement {
     return this.contentElement = this.wrapperEl?.nativeElement;
   }
   private get overlay(): HTMLDivElement {
     return this.overlayEl.nativeElement;
-  }
-  private get defaultMatrix(): Vector3 {
-    return [1, 0, 0];
   }
 }
 

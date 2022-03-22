@@ -34,10 +34,10 @@
 }
 
 .wrapper {
-  min-width: 100%;
-  min-height: calc(100vh -  30px - 53px);
+  width: 100%;
+  height: calc(100vh -  30px - 53px);
   position: relative;
-  overflow: auto;
+  overflow: hidden;
 
   &.grabbing {
     cursor: grabbing;
@@ -66,8 +66,8 @@
     top: 0px;
     left: 0px;
     z-index: 10;
-    transform-origin: 0px 0px;
-		will-change: transform;
+    transform-origin: center;
+		will-change: contents;
 
     &.dragging {
       cursor: move;
@@ -105,6 +105,9 @@
         100px 100px,
         100px 100px;
     }
+		&.zoomed::after {
+			transform: scale(2);
+		}
 
     app-node {
       position: absolute;

@@ -4,7 +4,7 @@
 		<div class="overlay" *ngIf="blueprint" #overlayEl [class.dragging]="drawState == 'dragging'"
 			(mousedown)="onMouseDown($event)" (mouseup)="onMouseUp($event)" (mousemove)="onMouseMove($event)"
 			(mouseout)="onMouseUp($event)" (click)="onClick($event)"
-			[style.transform]="zoomMatrix ? 'scale('+zoomMatrix[0]+')' : ''">
+			[style.transform]="cssTransformMatrix" [class.zoomed]="overlayScale < 0.5">
 			<svg>
 				<g *ngFor="let rel of rels" [overlay]="overlayEl" [data]="rel" relation></g>
 				<g *ngIf="ghostNode" [overlay]="overlayEl" [data]="ghostNode" relation class="ghost"></g>

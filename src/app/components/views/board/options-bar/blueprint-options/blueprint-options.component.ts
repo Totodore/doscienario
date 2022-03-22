@@ -43,9 +43,9 @@ export class BlueprintOptionsComponent {
   onZoom(e: KeyboardEvent, val: string) {
     let ratio: number;
     e.preventDefault();
-    if (e.keyCode == DOWN_ARROW) {
+    if (e.key == "ArrowDown") {
       ratio = parseFloat(val) - 1;
-    } else if (e.keyCode == UP_ARROW) {
+    } else if (e.key == "ArrowUp") {
       ratio = parseFloat(val) + 1;
     } else return;
     this.component.onWheel(ratio / 100);

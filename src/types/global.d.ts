@@ -27,6 +27,11 @@ declare global {
   interface JSON {
     dateParser: (key: string, value: any) => any;
   }
+  interface Object {
+    fromEntries<T>(this: Object, entries: [string, T][]): { [key: string]: T };
+  }
 }
-export type Vector<T = number> = [T, T];
+export type Vector4<T = number> = [T, T, T, T];
 export type Vector3<T = number> = [T, T, T];
+export type Vector2<T = number> = [T, T];
+export type Vector<T = number> = Vector2<T>;

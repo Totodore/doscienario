@@ -105,7 +105,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
       const ratio = (-e.deltaY > 0) ? 1.1 : 1 / 1.1;
       const matrix = compose(
         this.transformMatrix,
-        scale(ratio, ratio, e.clientX, e.clientY),
+        scale(ratio, ratio, e.clientX - this.wrapper.clientWidth / 2, e.clientY - this.wrapper.clientHeight / 2),
       );
       matrix.a = matrix.d = Math.clamp(matrix.a, 0.2, 1);
       this.transformMatrix = matrix;

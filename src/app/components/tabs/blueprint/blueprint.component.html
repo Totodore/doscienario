@@ -19,8 +19,8 @@
 				(remove)="onRemove(nodeEl)"
 				(relationBegin)="beginRelation(nodeEl, $event)"
 				(relationBind)="bindRelation(nodeEl, $event)" 
-				(moveStart)="onDragStart()" 
-				(move)="onDragMove($event, node, nodeEl)"
+				(moveStart)="onDragStart(node, nodeEl)" 
+				(move)="onDragMove($event)"
 				(moveEnd)="onDragEnd(node)">
 			</app-node>
 			<app-node *ngIf="ghostNode" class="skeleton" 

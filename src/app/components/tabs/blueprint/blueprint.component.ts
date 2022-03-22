@@ -55,6 +55,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   private scrollIntervalId: number;
   private tresholdMousePole: Poles[];
   private transformMatrix: Matrix = identity();
+  private movingNodeData: MovingNodeData;
   private readonly blueprintWorker: WorkerManager;
 
   constructor(
@@ -282,33 +283,41 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   /**
    * Enable dragging mode
    */
-  public onDragStart() {
+  public onDragStart(node: Node, component: NodeComponent) {
     this.drawState = "dragging";
+    this.movingNodeData = {
+      node,
+      nodeRect: component.wrapper.nativeElement.getBoundingClientRect(),
+      childRels: findChildRels(node, this.blueprint.relationships),
+      parentRels: findParentRels(node, this.blueprint.relationships),
+    }
   }
   /**
    * Move all parent and child rel of a moving node
    * @param offset the moving offset
    * @param node the node that is moving
    */
-  public onDragMove(offset: Vector, node: Node, component: NodeComponent): void {
+  public onDragMove(offset: Vector): void {
+    if (!this.movingNodeData)
+      return;
+    const { node, nodeRect, childRels, parentRels } = this.movingNodeData;
     const overlayRect = this.overlay.getBoundingClientRect();
-    const wrapperRect = component.wrapper.nativeElement.getBoundingClientRect();
-    let x = offset[0] - (overlayRect.width / 2) / (this.overlayScale) - wrapperRect.width;
-    let y = offset[1] - (overlayRect.height / 2) / (this.overlayScale) + wrapperRect.height / 2;
-    x -= node.x;
-    y -= node.y;
-    const parentRel = findParentRels(node, this.rels);
-    const childRel = findChildRels(node, this.rels);
-    for (const rel of parentRel) {
-      rel.ex += x;
-      rel.ey += y;
+    // Absolute position of the node 
+    const x = offset[0] - (overlayRect.width / 2) / this.overlayScale - nodeRect.width / this.overlayScale;
+    const y = offset[1] - (overlayRect.height / 2) / this.overlayScale + nodeRect.height / (2 * this.overlayScale);
+    // dx,dy positions
+    const dx = x - node.x;
+    const dy = y - node.y;
+    for (const rel of parentRels) {
+      rel.ex += dx;
+      rel.ey += dy;
     }
-    for (const rel of childRel) {
-      rel.ox += x;
-      rel.oy += y;
+    for (const rel of childRels) {
+      rel.ox += dx;
+      rel.oy += dy;
     }
-    node.x += x;
-    node.y += y;
+    node.x = x;
+    node.y = y;
   }
 
   /**
@@ -327,6 +336,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     }
     this.socket.emit(Flags.PLACE_NODE, new PlaceNodeOut(this.id, node.id, [nodeData.x, nodeData.y]));
     this.drawState = "none";
+    this.movingNodeData = null;
   }
 
   /**
@@ -472,4 +482,10 @@ export interface TemporaryNode {
   w: number;
   parent: Node;
   pole: Poles
+}
+export interface MovingNodeData {
+  node: Node;
+  parentRels: Relationship[];
+  childRels: Relationship[];
+  nodeRect: DOMRect;
 }

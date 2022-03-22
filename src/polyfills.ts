@@ -96,6 +96,8 @@ Math.factorial = (num: number) => {
     return (num * Math.factorial(num - 1));
 }
 
+Math.clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
+
 if (window.JSON && !window.JSON.dateParser) {
   var reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/;
   var reMsAjax = /^\/Date\((d|-|.*)\)[\/|\\]$/;

@@ -21,6 +21,7 @@ declare global {
 
   interface Math {
     factorial(num: number): number;
+    clamp(num: number, min: number, max: number): number;
   }
 
   interface JSON {

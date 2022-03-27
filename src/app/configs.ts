@@ -5,7 +5,7 @@ import { Logs } from './models/api/logs.model';
 import { Tab } from './models/sys/tab.model';
 
 export const loggerConfig: INGXLoggerConfig = {
-  level: NgxLoggerLevel.INFO,
+  level: NgxLoggerLevel.DEBUG,
   disableFileDetails: false,
   timestampFormat: 'dd/MM/YYYY - HH:mm:ss',
 };

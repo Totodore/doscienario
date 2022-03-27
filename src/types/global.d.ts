@@ -35,3 +35,9 @@ export type Vector4<T = number> = [T, T, T, T];
 export type Vector3<T = number> = [T, T, T];
 export type Vector2<T = number> = [T, T];
 export type Vector<T = number> = Vector2<T>;
+export type Rect = {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+}

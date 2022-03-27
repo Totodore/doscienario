@@ -40,7 +40,7 @@ export class BlueprintOptionsComponent {
   }
 
 
-  onZoom(e: KeyboardEvent, val: string) {
+  public onZoom(e: KeyboardEvent, val: string) {
     let ratio: number;
     e.preventDefault();
     if (e.key == "ArrowDown") {
@@ -51,7 +51,7 @@ export class BlueprintOptionsComponent {
     this.component.onWheel(ratio / 100);
   }
 
-  openTagEdit() {
+  public openTagEdit() {
     this.dialog.open(EditTagsComponent, {
       data: [this.tabId, TabTypes.BLUEPRINT],
       width: "600px",
@@ -60,18 +60,22 @@ export class BlueprintOptionsComponent {
     });
   }
 
-  autoPosBlueprint() {
+  public autoPosBlueprint() {
     this.component.autoPos();
   }
 
-  toggleAutoMode() {
+  public resetViewport() {
+    this.component.autoSizeViewport();
+  }
+
+  public toggleAutoMode() {
     this.component.autoMode = !this.component.autoMode;
   }
-  toggleGrid() {
+  public toggleGrid() {
     this.component.gridMode = !this.component.gridMode;
   }
 
-  deleteBlueprint() {
+  public deleteBlueprint() {
     const dialog = this.dialog.open(ConfirmComponent, {
       data: "Supprimer l'arbre ?"
     });

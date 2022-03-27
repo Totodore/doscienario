@@ -1,3 +1,4 @@
+import { Rect } from "src/types/global";
 import { Node, Relationship } from "../models/api/blueprint.model";
 
 /**
@@ -110,6 +111,18 @@ export function findLevelByNode(node: Node, root: Node, nodes: Node[], rels: Rel
       break;
   }
   return i;
+}
+
+// left / top / right / bottom
+export function getTreeRect(rects: Rect[], cx: number, cy: number): Rect {
+  const rect: Rect = { left: cx, top: cy, width: 0, height: 0 };
+  for (const nodeRect of rects) {
+    rect.left = Math.min(rect.left, nodeRect.left);
+    rect.top = Math.min(rect.top, nodeRect.top);
+    rect.width = Math.max(rect.width, nodeRect.left + nodeRect.width - rect.left);
+    rect.height = Math.max(rect.height, nodeRect.top + nodeRect.height - rect.top); 
+  }
+  return rect;
 }
 // function findBestOrder(nodes: Node[], rels: Relationship[], o: Tuple, margin: Tuple) {
 //   const usedStates: number[][] = Array(nodes.length);

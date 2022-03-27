@@ -10,7 +10,7 @@ import { AddTagElementOut } from 'src/app/models/sockets/out/tag.out';
 import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
 import { SocketService } from 'src/app/services/sockets/socket.service';
 import { SnackbarService } from 'src/app/services/ui/snackbar.service';
-import { findChildRels, findLevelByNode, findParentRels, removeNodeFromTree } from 'src/app/utils/tree.utils';
+import { findChildRels, findLevelByNode, findParentRels, getTreeRect, removeNodeFromTree } from 'src/app/utils/tree.utils';
 import { WorkerManager, WorkerType } from 'src/app/utils/worker-manager.utils';
 import { ProgressService } from '../../../services/ui/progress.service';
 import { ElementComponent } from '../element.component';
@@ -92,7 +92,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
 
   public loadedTab() {
     super.loadedTab();
-    this.configView();
+    this.autoSizeViewport();
   }
 
   /**
@@ -101,20 +101,35 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   public onWheel(e: WheelEvent | number): void {
     if (e instanceof WheelEvent) {
       e.preventDefault();
-      if ((this.transformMatrix.a >= 1 && e.deltaY < 0) || (this.transformMatrix.a <= 0.2 && e.deltaY > 0))
-        return;
       const ratio = (-e.deltaY > 0) ? 1.1 : 1 / 1.1;
-      const matrix = compose(
-        this.transformMatrix,
-        scale(ratio, ratio, e.clientX - this.wrapper.clientWidth / 2, e.clientY - this.wrapper.clientHeight / 2),
-      );
-      matrix.a = matrix.d = Math.clamp(matrix.a, 0.2, 1);
-      this.transformMatrix = matrix;
+      if ((this.overlayScale >= 1 && e.deltaY < 0) || (this.overlayScale <= 0.2 && e.deltaY > 0))
+        return;
+      const [ox, oy] = [
+        - this.overlayTranslation.tx / this.overlayScale + this.wrapper.clientWidth / 2,
+        - this.overlayTranslation.tx / this.overlayScale + this.wrapper.clientHeight / 2
+      ];
+      if (this.overlayScale * ratio <= 0.2) {
+        this.transformMatrix = compose(
+          this.transformMatrix,
+          scale(0.2 / this.overlayScale, 0.2 / this.overlayScale, ox, oy),
+        );
+      } else if (this.overlayScale * ratio >= 1) {
+        this.transformMatrix = compose(
+          this.transformMatrix,
+          scale(1 / this.overlayScale, 1 / this.overlayScale, ox, oy),
+        )
+      } else { 
+        this.transformMatrix = compose(
+          this.transformMatrix,
+          scale(ratio, ratio, ox, oy),
+        );
+      }
     } else {
       if (e > 1 || e < 0.2)
         return;
       this.transformMatrix.a = this.transformMatrix.d = e;
     }
+    this.logger.log("Updating transform matrix", this.cssTransformMatrix);
   }
   /**
    * On mouse click event
@@ -144,11 +159,34 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
    * Set the middle scroll position
    * It is call each time the zooming Matrix change so the scroll can be readjusted
   */
-  private configView() {
-    const width = this.overlay.clientWidth;
-    const height = this.overlay.clientHeight;
+  public autoSizeViewport() {
+    const overlayWidth = this.overlay.clientWidth;
+    const overlayHeight = this.overlay.clientHeight;
     const viewHeight = this.wrapper.clientHeight;
-    this.transformMatrix = translate(- width / 2, - (height / 2 - viewHeight / 2));
+    const viewWidth = this.wrapper.clientWidth;
+    const treeBoxs: DOMRect[] = this.nodeEls.map(node => {
+      const width = node.wrapper.nativeElement.getBoundingClientRect().width / this.overlayScale;
+      const height = node.wrapper.nativeElement.getBoundingClientRect().height / this.overlayScale;
+      return {
+        x: overlayWidth / 2 + node.data.x,
+        y: overlayHeight / 2 + node.data.y,
+        left: overlayWidth / 2 + node.data.x,
+        top: overlayHeight / 2 + node.data.y,
+        width,
+        height,
+        bottom: overlayHeight / 2 + node.data.y + width,
+        right: overlayWidth / 2 + node.data.x + height,
+        toJSON: null,
+      };
+    });
+    const treeRect = getTreeRect(treeBoxs, overlayWidth / 2, overlayHeight / 2);
+    const scalingRatio = Math.max(0.2, Math.min(viewWidth / treeRect.width, viewHeight / treeRect.height) * 0.9);
+    this.transformMatrix = compose(
+        scale(scalingRatio, scalingRatio, 0, 0),
+        translate( - treeRect.left, - treeRect.top),
+        translate((viewWidth - treeRect.width * scalingRatio) / 2, (viewHeight - treeRect.height * scalingRatio) / 2),
+    );
+    this.logger.log("Updating transform matrix", this.cssTransformMatrix);
   }
 
 
@@ -255,6 +293,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
    * @param e 
    */
   public onMouseMove(e: MouseEvent) {
+    // console.log(e.clientX + this.overlayTranslation.tx, e.clientY + this.overlayTranslation.ty);
     if (this.drawState === "moving") {
       e.stopImmediatePropagation();
       e.preventDefault();
@@ -263,6 +302,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
         this.transformMatrix,
         translate(e.movementX / zoom, e.movementY / zoom),
       );
+      this.logger.log("Updating transform matrix", this.cssTransformMatrix);
     }
     else if (this.drawState === "drawing" || this.drawState === "dragging") {
       const currTreshold = this.tresholdMouse([e.clientX, e.clientY]);

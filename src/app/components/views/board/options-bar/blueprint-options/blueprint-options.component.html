@@ -23,4 +23,18 @@
 			<input type="text" #zoom matInput (keydown)="onZoom($event, zoom.value)" [ngModel]="(component.overlayScale * 100).toFixed() + '%'">
 		</mat-form-field>
   </div>
+	<div class="blueprint-options">
+		<button mat-stroked-button class="toggle-btn" (click)="resetViewport()">
+			<mat-icon color="accent">filter_center_focus</mat-icon>
+		</button>
+		<button mat-stroked-button class="toggle-btn" (click)="resetViewport()">
+			<mat-icon color="accent">filter_center_focus</mat-icon>
+		</button>
+		<button mat-stroked-button class="toggle-btn" (click)="resetViewport()">
+			<mat-icon color="accent">filter_center_focus</mat-icon>
+		</button>
+		<button mat-stroked-button class="toggle-btn" (click)="resetViewport()">
+			<mat-icon color="accent">filter_center_focus</mat-icon>
+		</button>
+	</div>
 </div>

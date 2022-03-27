@@ -118,7 +118,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
           this.transformMatrix,
           scale(1 / this.overlayScale, 1 / this.overlayScale, ox, oy),
         )
-      } else { 
+      } else {
         this.transformMatrix = compose(
           this.transformMatrix,
           scale(ratio, ratio, ox, oy),
@@ -182,9 +182,9 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     const treeRect = getTreeRect(treeBoxs, overlayWidth / 2, overlayHeight / 2);
     const scalingRatio = Math.max(0.2, Math.min(viewWidth / treeRect.width, viewHeight / treeRect.height) * 0.9);
     this.transformMatrix = compose(
-        scale(scalingRatio, scalingRatio, 0, 0),
-        translate( - treeRect.left, - treeRect.top),
-        translate((viewWidth - treeRect.width * scalingRatio) / 2, (viewHeight - treeRect.height * scalingRatio) / 2),
+      scale(scalingRatio, scalingRatio, 0, 0),
+      translate(- treeRect.left, - treeRect.top),
+      translate((viewWidth - treeRect.width * scalingRatio) / 2, (viewHeight - treeRect.height * scalingRatio) / 2),
     );
     this.logger.log("Updating transform matrix", this.cssTransformMatrix);
   }
@@ -438,6 +438,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
       this.socket.emit(Flags.PLACE_RELATIONSHIP, rel);
     for (const node of nodes)
       this.socket.emit(Flags.PLACE_NODE, new PlaceNodeOut(this.id, node.id, [node.x, node.y]));
+    this.autoSizeViewport();
   }
 
   /**

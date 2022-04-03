@@ -2,7 +2,7 @@ import { TreeIoHandler } from './../../../services/sockets/tree-io.handler.servi
 import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { NGXLogger } from 'ngx-logger';
-import { Blueprint, Node, Relationship } from 'src/app/models/api/blueprint.model';
+import { Blueprint, BlueprintSock, Node, Pole, Relationship } from 'src/app/models/api/blueprint.model';
 import { Tag } from 'src/app/models/api/tag.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { CreateNodeOut, PlaceNodeOut, RemoveNodeOut } from 'src/app/models/sockets/out/blueprint.out';
@@ -17,7 +17,7 @@ import { ElementComponent } from '../element.component';
 import { Vector } from './../../../../types/global.d';
 import { ProjectService } from './../../../services/project.service';
 import { ConfirmComponent } from './../../utils/confirm/confirm.component';
-import { NodeComponent, Poles } from './node/node.component';
+import { NodeComponent } from './node/node.component';
 import { scale, translate, compose, Matrix, toCSS, decomposeTSR, identity } from 'transformation-matrix';
 
 
@@ -46,14 +46,14 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   public magnetMode = false;
   public autoMode: boolean;
   public gridMode: boolean;
-  public scrollPoles: Set<Poles> = new Set();
+  public scrollPoles: Set<Pole> = new Set();
   public drawState: DrawStates = "none";
 
   public readonly type = TabTypes.BLUEPRINT;
   public ghostNode?: TemporaryNode;
 
   private scrollIntervalId: number;
-  private tresholdMousePole: Poles[];
+  private tresholdMousePole: Pole[];
   private transformMatrix: Matrix = identity();
   private movingNodeData: MovingNodeData;
   private readonly blueprintWorker: WorkerManager;
@@ -98,11 +98,23 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   /**
    * Allow the user to zoom on the viewport (can be call from a wheel event or from another ui method)
    * */
-  public onWheel(e: WheelEvent | number): void {
-    if (e instanceof WheelEvent) {
-      e.preventDefault();
-      const ratio = (-e.deltaY > 0) ? 1.1 : 1 / 1.1;
-      if ((this.overlayScale >= 1 && e.deltaY < 0) || (this.overlayScale <= 0.2 && e.deltaY > 0))
+  public onWheel(e: WheelEvent): void {
+    e.preventDefault();
+    if (e.ctrlKey)
+      this.onZoom((-e.deltaY > 0) ? 1.1 : 1 / 1.1);
+    else {
+      const zoom = this.overlayScale;
+      this.transformMatrix = compose(
+        this.transformMatrix,
+        translate(-e.deltaX / zoom, -e.deltaY / zoom),
+      );
+    }
+    this.logger.log("Updating transform matrix", this.cssTransformMatrix);
+  }
+
+  public onZoom(ratio: number): void {
+    if (ratio < 1.5 && ratio > 0.5) {
+      if ((this.overlayScale >= 1 && ratio > 1) || (this.overlayScale <= 0.2 && ratio < 1))
         return;
       const [ox, oy] = [
         - this.overlayTranslation.tx / this.overlayScale + this.wrapper.clientWidth / 2,
@@ -124,12 +136,9 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
           scale(ratio, ratio, ox, oy),
         );
       }
-    } else {
-      if (e > 1 || e < 0.2)
-        return;
-      this.transformMatrix.a = this.transformMatrix.d = e;
     }
-    this.logger.log("Updating transform matrix", this.cssTransformMatrix);
+    else if (ratio >= 20 && ratio <= 100)
+      this.transformMatrix.a = this.transformMatrix.d = ratio / 100;
   }
   /**
    * On mouse click event
@@ -137,13 +146,17 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   public onClick(e: MouseEvent) {
     if (this.drawState === "drawing") {
       e.preventDefault();
-      this.createNewNode([this.ghostNode.ox, this.ghostNode.oy], [this.ghostNode.ex, this.ghostNode.ey], this.ghostNode.parent.id);
+      this.createNewNode(
+        [this.ghostNode.ox, this.ghostNode.oy],
+        [this.ghostNode.ex, this.ghostNode.ey],
+        Pole.East, Pole.West,
+        this.ghostNode.parent.id);
       this.drawState = "none";
       this.ghostNode = null;
     }
   }
 
-  private createNewNode([ox, oy]: Vector, [ex, ey]: Vector, parentId: number) {
+  private createNewNode([ox, oy]: Vector, [ex, ey]: Vector, parentPole: Pole, childPole: Pole, parentId: number) {
     this.socket.emit(Flags.CREATE_NODE, new CreateNodeOut(
       parentId,
       this.id,
@@ -152,6 +165,8 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
       ox,
       oy,
       0,
+      parentPole,
+      childPole,
     ));
   }
 
@@ -164,28 +179,36 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     const overlayHeight = this.overlay.clientHeight;
     const viewHeight = this.wrapper.clientHeight;
     const viewWidth = this.wrapper.clientWidth;
-    const treeBoxs: DOMRect[] = this.nodeEls.map(node => {
-      const width = node.wrapper.nativeElement.getBoundingClientRect().width / this.overlayScale;
-      const height = node.wrapper.nativeElement.getBoundingClientRect().height / this.overlayScale;
-      return {
-        x: overlayWidth / 2 + node.data.x,
-        y: overlayHeight / 2 + node.data.y,
-        left: overlayWidth / 2 + node.data.x,
-        top: overlayHeight / 2 + node.data.y,
-        width,
-        height,
-        bottom: overlayHeight / 2 + node.data.y + width,
-        right: overlayWidth / 2 + node.data.x + height,
-        toJSON: null,
-      };
-    });
-    const treeRect = getTreeRect(treeBoxs, overlayWidth / 2, overlayHeight / 2);
-    const scalingRatio = Math.max(0.2, Math.min(viewWidth / treeRect.width, viewHeight / treeRect.height) * 0.9);
-    this.transformMatrix = compose(
-      scale(scalingRatio, scalingRatio, 0, 0),
-      translate(- treeRect.left, - treeRect.top),
-      translate((viewWidth - treeRect.width * scalingRatio) / 2, (viewHeight - treeRect.height * scalingRatio) / 2),
-    );
+    if (this.nodeEls.length == 0) {
+      this.transformMatrix = compose(
+        scale(1),
+        translate(- overlayWidth / 2, - overlayHeight / 2 + viewHeight / 2),
+      );
+    } else {
+
+      const treeBoxs: DOMRect[] = this.nodeEls.map(node => {
+        const width = node.wrapper.nativeElement.getBoundingClientRect().width / this.overlayScale;
+        const height = node.wrapper.nativeElement.getBoundingClientRect().height / this.overlayScale;
+        return {
+          x: overlayWidth / 2 + node.data.x,
+          y: overlayHeight / 2 + node.data.y,
+          left: overlayWidth / 2 + node.data.x,
+          top: overlayHeight / 2 + node.data.y,
+          width,
+          height,
+          bottom: overlayHeight / 2 + node.data.y + width,
+          right: overlayWidth / 2 + node.data.x + height,
+          toJSON: null,
+        };
+      });
+      const treeRect = getTreeRect(treeBoxs, overlayWidth / 2, overlayHeight / 2);
+      const scalingRatio = Math.max(0.2, Math.min(viewWidth / treeRect.width, viewHeight / treeRect.height, 1) * 0.9);
+      this.transformMatrix = compose(
+        scale(scalingRatio, scalingRatio, 0, 0),
+        translate(- treeRect.left, - treeRect.top),
+        translate((viewWidth - treeRect.width * scalingRatio) / 2, (viewHeight - treeRect.height * scalingRatio) / 2),
+      );
+    }
     this.logger.log("Updating transform matrix", this.cssTransformMatrix);
   }
 
@@ -194,14 +217,14 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     if (this.drawState === "drawing")
       this.moveGhost([e.clientX, e.clientY]);
     if (this.wrapper.scrollTop < 20)
-      this.scrollPoles.add("north");
-    else this.scrollPoles.delete("north");
+      this.scrollPoles.add(Pole.North);
+    else this.scrollPoles.delete(Pole.North);
     if (this.wrapper.scrollTop > this.wrapper.scrollTopMax - 20)
-      this.scrollPoles.add("south");
-    else this.scrollPoles.delete("south");
+      this.scrollPoles.add(Pole.South);
+    else this.scrollPoles.delete(Pole.South);
     if (this.wrapper.scrollLeft > this.wrapper.scrollLeftMax - 20)
-      this.scrollPoles.add("east");
-    else this.scrollPoles.delete("east");
+      this.scrollPoles.add(Pole.East);
+    else this.scrollPoles.delete(Pole.East);
   }
 
   private moveGhost(pos: Vector) {
@@ -211,7 +234,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     this.changeDetector.detectChanges();
   }
 
-  public beginRelation(parent: NodeComponent, pos: [number, number, Poles, boolean?]) {
+  public beginRelation(parent: NodeComponent, pos: [number, number, Pole, boolean?]) {
     const rightClick = pos[3] || false;
     const pole = pos[2];
     if (this.autoMode && !rightClick) {
@@ -221,7 +244,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
       ], [
         pos[0] + 100,
         pos[1]
-      ], parent.data.id);
+      ], pos[2], Pole.West, parent.data.id);
     } else {
       this.drawState = "drawing";
       this.ghostNode = {
@@ -238,17 +261,18 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   }
 
   public bindRelation(child: NodeComponent, anchorPos: [number, number]) {
-    const childLevel = findLevelByNode(child.data, this.root, this.nodes, this.blueprint.relationships);
-    const parentLevel = findLevelByNode(this.allNodes.find(el => el.id == this.ghostNode.parent.id), this.root, this.nodes, this.blueprint.relationships);
+    const childLevel = findLevelByNode(child.data, this.root, this.nodes, this.blueprint.relsArr);
+    const parentLevel = findLevelByNode(this.allNodes.find(el => el.id == this.ghostNode.parent.id), this.root, this.nodes, this.blueprint.relsArr);
     if (childLevel > parentLevel) {
       this.socket.emit(Flags.CREATE_RELATION, new Relationship({
         parentId: this.ghostNode.parent.id,
         childId: child.data.id,
         blueprint: this.blueprint,
-        ex: anchorPos[0] + this.wrapper.scrollLeft,
-        ey: anchorPos[1] + this.wrapper.scrollTop - this.overlay.clientHeight / 2 - 48,
-        ox: this.ghostNode.ox,
-        oy: this.ghostNode.oy - this.overlay.clientHeight / 2
+        parentPole: this.ghostNode.pole,
+        // ex: anchorPos[0] + this.wrapper.scrollLeft,
+        // ey: anchorPos[1] + this.wrapper.scrollTop - this.overlay.clientHeight / 2 - 48,
+        // ox: this.ghostNode.ox,
+        // oy: this.ghostNode.oy - this.overlay.clientHeight / 2
       }));
       this.ghostNode = null;
       this.drawState = "none";
@@ -261,10 +285,12 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
       dialog.close();
       const data = removeNodeFromTree(el.data.id,
         this.nodes.map(el => el.id),
-        this.blueprint.relationships.map(el => [el.parentId, el.childId, el.id])
+        this.rels.map(el => [el.parentId, el.childId, el.id])
       );
-      this.project.openBlueprints[this.tabId].nodes = this.project.openBlueprints[this.tabId].nodes.filter(el => !data.nodes.includes(el.id));
-      this.project.openBlueprints[this.tabId].relationships = this.project.openBlueprints[this.tabId].relationships.filter(el => !data.rels.includes(el.id));
+      for (const node of data.nodes)
+        this.blueprint.nodesMap.delete(node);
+      for (const rel of data.rels)
+        this.blueprint.relsMap.delete(rel);
       this.socket.emit(Flags.REMOVE_NODE, new RemoveNodeOut(el.data.id, this.id));
     });
   }
@@ -328,8 +354,8 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     this.movingNodeData = {
       node,
       nodeRect: component.wrapper.nativeElement.getBoundingClientRect(),
-      childRels: findChildRels(node, this.blueprint.relationships),
-      parentRels: findParentRels(node, this.blueprint.relationships),
+      childRels: findChildRels(node, this.blueprint.relsArr),
+      parentRels: findParentRels(node, this.blueprint.relsArr),
     }
   }
   /**
@@ -348,14 +374,14 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     // dx,dy positions
     const dx = x - node.x;
     const dy = y - node.y;
-    for (const rel of parentRels) {
-      rel.ex += dx;
-      rel.ey += dy;
-    }
-    for (const rel of childRels) {
-      rel.ox += dx;
-      rel.oy += dy;
-    }
+    // for (const rel of parentRels) {
+    //   rel.ex += dx;
+    //   rel.ey += dy;
+    // }
+    // for (const rel of childRels) {
+    //   rel.ox += dx;
+    //   rel.oy += dy;
+    // }
     node.x = x;
     node.y = y;
   }
@@ -382,31 +408,31 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   /**
    * Detect if the mouse is in a Pole
    */
-  private tresholdMouse(pos: Vector): Poles[] {
+  private tresholdMouse(pos: Vector): Pole[] {
     const treshold = 48;
-    const poles: Poles[] = [];
+    const poles: Pole[] = [];
     if (pos[1] - 48 < treshold)
-      poles.push("north");
+      poles.push(Pole.North);
     if (pos[1] > window.innerHeight - treshold)
-      poles.push("south");
+      poles.push(Pole.South);
     if (pos[0] > this.wrapper.clientWidth - treshold)
-      poles.push("east");
+      poles.push(Pole.East);
     if (pos[0] < treshold)
-      poles.push("west");
+      poles.push(Pole.West);
     return poles;
   }
 
   /**
    * AddaptViewport to Mouse (increase viewport and scroll)
    */
-  private adaptViewport(treshold: Poles[]) {
-    if (treshold.includes("north") && this.wrapper.scrollTop > 10)
+  private adaptViewport(treshold: Pole[]) {
+    if (treshold.includes(Pole.North) && this.wrapper.scrollTop > 10)
       this.wrapper.scrollBy({ top: - 10, behavior: 'auto' });
-    if (treshold.includes("south") && this.wrapper.scrollTop + 20 < this.wrapper.scrollTopMax)
+    if (treshold.includes(Pole.South) && this.wrapper.scrollTop + 20 < this.wrapper.scrollTopMax)
       this.wrapper.scrollBy({ top: 10, behavior: 'auto' });
-    if (treshold.includes("east") && this.wrapper.scrollLeft + 20 < this.wrapper.scrollLeftMax)
+    if (treshold.includes(Pole.East) && this.wrapper.scrollLeft + 20 < this.wrapper.scrollLeftMax)
       this.wrapper.scrollBy({ left: 10, behavior: 'auto' });
-    if (treshold.includes("west") && this.wrapper.scrollLeft > 10)
+    if (treshold.includes(Pole.West) && this.wrapper.scrollLeft > 10)
       this.wrapper.scrollBy({ left: - 10, behavior: 'auto' });
   }
 
@@ -419,23 +445,23 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     this.progress.show();
     let nodes = this.allNodes;
     const margin: Vector = [100, 50];
+
+    // We add width and height DOM values;
     for (const node of nodes) {
       const el = this.getNodeEl(node.id).wrapper.nativeElement;
       node.width = el.clientWidth;
       node.height = el.clientHeight;
     }
-    const data: [Node[], Relationship[]] = await this.blueprintWorker.postAsyncMessage(`autopos-${this.tabId}`, [nodes, this.rels, margin, node]);
-    if (!data) {
+    const results: Node[] = await this.blueprintWorker.postAsyncMessage(`autopos-${this.tabId}`, [nodes, this.rels, margin, node]);
+    if (!results) {
       this.snack.snack("Ouups ! Impossible d'agencer cet arbre");
       console.timeEnd("auto-pos");
       return;
     }
-    this.nodes = nodes = data[0];
-    this.rels = data[1];
+    for (const newNode of results)
+      Object.assign(this.blueprint.nodesMap.get(newNode.id), newNode);
     console.timeEnd("auto-pos");
     this.progress.hide();
-    for (const rel of this.rels)
-      this.socket.emit(Flags.PLACE_RELATIONSHIP, rel);
     for (const node of nodes)
       this.socket.emit(Flags.PLACE_NODE, new PlaceNodeOut(this.id, node.id, [node.x, node.y]));
     this.autoSizeViewport();
@@ -443,11 +469,12 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
 
   /**
    * Get a node element from the node id
+   * TODO: Optimize this method
    * @param id the id of the node
    * @returns the node component
    */
   private getNodeEl(id: number): NodeComponent {
-    return this.nodeEls.find(el => el.data.id === id) || this.rootEl.data.id === id ? this.rootEl : null;
+    return this.nodeEls.find(el => el.data.id === id) || (this.rootEl.data.id === id ? this.rootEl : null);
   }
 
   /**
@@ -462,26 +489,32 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   }
 
 
-  get blueprint(): Blueprint {
+  get nodesMap(): Map<number, Node> {
+    return this.blueprint.nodesMap;
+  }
+  get relsMap(): Map<number, Relationship> {
+    return this.blueprint.relsMap;
+  }
+  get relIds(): number[] {
+    return [...this.blueprint.relsMap.keys()];
+  }
+  get nodeIds(): number[] {
+    return [...this.blueprint.nodesMap.keys()];
+  }
+  get blueprint(): BlueprintSock {
     return this.project.openBlueprints[this.tabId];
   }
   get root(): Node {
-    return this.blueprint?.nodes?.find(el => el.isRoot);
+    return this.nodes.find(el => el.isRoot);
   }
   get nodes(): Node[] {
-    return this.blueprint?.nodes?.filter(el => !el.isRoot);
+    return this.allNodes.filter(el => !el.isRoot);
   }
   get allNodes(): Node[] {
-    return this.blueprint?.nodes;
+    return this.blueprint.nodesArr;
   }
   get rels(): Relationship[] {
-    return this.blueprint.relationships;
-  }
-  set nodes(nodes: Node[]) {
-    this.project.openBlueprints[this.tabId].nodes = nodes;
-  }
-  set rels(rels: Relationship[]) {
-    this.project.openBlueprints[this.tabId].relationships = rels;
+    return this.blueprint.relsArr;
   }
 
   get title(): string {
@@ -522,7 +555,7 @@ export interface TemporaryNode {
   h: number;
   w: number;
   parent: Node;
-  pole: Poles
+  pole: Pole
 }
 export interface MovingNodeData {
   node: Node;

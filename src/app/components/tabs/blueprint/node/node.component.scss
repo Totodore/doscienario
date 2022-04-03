@@ -75,22 +75,22 @@
     position: absolute;
     box-shadow: 0 0 8px -3px rgb(0 0 0 / 50%);
 
-    &.north {
+    &.N {
       top: -17px;
       left: 50%;
       transform: scale(0.8), translateX(-50%);
     }
-    &.south {
+    &.S {
       bottom: -17px;
       left: 50%;
       transform: scale(0.8) translateX(-50%);
     }
-    &.west {
+    &.W {
       left: -17px;
       top: 50%;
       transform: scale(0.8) translateY(-50%);
     }
-    &.east {
+    &.E {
       right: -17px;
       top: 50%;
       transform: scale(0.8) translateY(-50%);
@@ -104,10 +104,10 @@
     .add-relation {
       visibility: visible;
       opacity: 1;
-      &.west, &.east {
+      &.W, &.E {
         transform: scale(1) translateY(-50%);
       }
-      &.north, &.south {
+      &.N, &.S {
         transform: scale(1) translateX(-50%);
       }
     }

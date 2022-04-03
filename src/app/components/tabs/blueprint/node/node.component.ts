@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
-import { Node } from 'src/app/models/api/blueprint.model';
+import { Bounds, Node, Pole } from 'src/app/models/api/blueprint.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { Change } from 'src/app/models/sockets/in/element.in';
 import { EditSummaryOut } from 'src/app/models/sockets/out/blueprint.out';
@@ -40,7 +40,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
   public overlay: HTMLDivElement;
 
   @Output()
-  private readonly relationBegin = new EventEmitter<[number, number, Poles, boolean?]>();
+  private readonly relationBegin = new EventEmitter<[number, number, Pole, boolean?]>();
 
   @Output()
   private readonly relationBind = new EventEmitter<Vector>();
@@ -70,7 +70,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
   @ViewChild("addRel", { static: false })
   public addRelBtn: ElementRef<HTMLSpanElement>;
 
-  public btnAnchor: Poles = "north";
+  public btnAnchor: Pole = Pole.North;
   public mouseHoverButton = false;
   private initialized: boolean;
   private nodeUuid = v4();
@@ -96,6 +96,10 @@ export class NodeComponent implements AfterViewInit, OnInit {
       this.addRelBtn.nativeElement.addEventListener("mouseleave", () => this.mouseHoverButton = false);
       this.initialized = true;
     }
+    if (this.data) {
+      this.data.height = this.wrapper.nativeElement.clientHeight;
+      this.data.width = this.wrapper.nativeElement.clientWidth;
+    }
   }
 
   /**
@@ -104,22 +108,22 @@ export class NodeComponent implements AfterViewInit, OnInit {
   public onAddRelButton(icon: MatIcon, e: Event, rightClick = false) {
     e.preventDefault();
     e.stopImmediatePropagation();
-    const rels = this.project.getBlueprint(this.tabs.displayedTab[1].id).relationships.filter(el => el.childId === this.data.id);
+    const rels = this.project.getBlueprint(this.tabs.displayedTab[1].id).relsArr.filter(el => el.childId === this.data.id);
     let [x, y] = [this.data.x, this.data.y];
     const [w, h] = [this.wrapper.nativeElement.clientWidth, this.wrapper.nativeElement.clientHeight];
     switch (this.btnAnchor) {
-      case "north":
+      case Pole.North:
         y -= h / 2;
         x -= h / 2;
         break;
-      case "south":
+      case Pole.South:
         y += h / 2;
         x += w / 2;
         break;
-      case "east":
+      case Pole.East:
         x += w;
         break;
-      case "west":
+      case Pole.West:
         break;
     }
     if (this.drawState === "drawing" && this.parentGhost !== this && !rels.find(el => el.parentId === this.parentGhost.data.id)) {
@@ -180,13 +184,13 @@ export class NodeComponent implements AfterViewInit, OnInit {
     if (this.mouseHoverButton) return;
     const [w, h] = [this.wrapper.nativeElement.parentElement.clientWidth, this.wrapper.nativeElement.parentElement.clientHeight];
     if (e.offsetX < w / 4 && !this.data?.isRoot)
-      this.btnAnchor = "west";
+      this.btnAnchor = Pole.West;
     else if (e.offsetX > (3 * w) / 4)
-      this.btnAnchor = "east";
+      this.btnAnchor = Pole.East;
     else if (e.offsetY > h / 2)
-      this.btnAnchor = "south";
+      this.btnAnchor = Pole.South;
     else if (e.offsetY < h / 2)
-      this.btnAnchor = "north";
+      this.btnAnchor = Pole.North;
   }
 
   public onDragStart(e: MouseEvent) {
@@ -214,5 +218,13 @@ export class NodeComponent implements AfterViewInit, OnInit {
     this.overlay.removeEventListener("mouseup", this.onUp);
     this.moveEnd.emit();
   }
+
+  public get bounds(): Bounds {
+    return {
+      x: this.data.x,
+      y: this.data.y,
+      width: this.wrapper?.nativeElement?.clientWidth || this.data.width,
+      height: this.wrapper?.nativeElement?.clientHeight || this.data.height
+    }
+  }
 }
-export type Poles = "north" | "east" | "south" | "west";

@@ -7,7 +7,7 @@ import { removeNodeFromTree } from '../utils/tree.utils';
 import { BlueprintComponent } from '../components/tabs/blueprint/blueprint.component';
 import { WorkerManager, WorkerType } from '../utils/worker-manager.utils';
 import { Document, DocumentSock } from '../models/api/document.model';
-import { Blueprint, Relationship } from '../models/api/blueprint.model';
+import { Blueprint, BlueprintSock, Node, Relationship } from '../models/api/blueprint.model';
 import { Tag } from '../models/api/tag.model';
 import { SheetSock } from '../models/api/sheet.model';
 import { Change, OpenElementIn, SendElementIn, WriteElementIn } from '../models/sockets/in/element.in';
@@ -25,7 +25,7 @@ import { TabTypes } from '../models/sys/tab.model';
 export class ProjectService {
 
   public openDocs: { [k: string]: DocumentSock } = {};
-  public openBlueprints: { [k: string]: Blueprint } = {};
+  public openBlueprints: { [k: string]: BlueprintSock } = {};
   public openSheets: { [k: string]: SheetSock } = {};
 
   public searchComponent!: SearchOptionsComponent;
@@ -167,7 +167,7 @@ export class ProjectService {
   @DataUpdater()
   public addSendBlueprint(packet: SendElementIn) {
     this.logger.log("Blueprint received:", packet.element.id, "tab:", packet.reqId);
-    const blueprint = this.openBlueprints[packet.reqId] = new Blueprint(packet.element);
+    const blueprint = this.openBlueprints[packet.reqId] = new BlueprintSock(packet.element);
     if (!this.data.blueprints.find(el => el.id == blueprint.id)) {
       this.data.blueprints.push(blueprint);
     }
@@ -231,7 +231,7 @@ export class ProjectService {
 
   @DataUpdater()
   public async addBlueprintNode(packet: CreateNodeIn) {
-    this.getBlueprint(packet.node.blueprint.id)!.nodes.push(packet.node);
+    this.getBlueprint(packet.node.blueprint.id)!.nodesMap.set(packet.node.id, new Node(packet.node));
     if (this.tabs.displayedTab[1].type === TabTypes.BLUEPRINT && this.tabs.displayedTab[1].id === packet.node.blueprint.id && packet.user === packet.node.createdBy.id) {
       window.setTimeout(async () => {
         const component = this.tabs.displayedTab[1] as BlueprintComponent;
@@ -243,7 +243,7 @@ export class ProjectService {
 
   @DataUpdater()
   public placeBlueprintNode(packet: PlaceNodeIn) {
-    const node = this.getBlueprint(packet.blueprintId)!.nodes.find(el => el.id === packet.id);
+    const node = this.getBlueprint(packet.blueprintId)!.nodesMap.get(packet.id)!;
     if (node) {
       node.x = packet.pos[0];
       node.y = packet.pos[1];
@@ -251,28 +251,33 @@ export class ProjectService {
   }
   @DataUpdater()
   public placeBlueprintRel(packet: Relationship) {
-    const rel = this.getBlueprint(packet.blueprint.id)!.relationships.find(el => el.id === packet.id);
+    const rel = this.getBlueprint(packet.blueprint.id)!.relsMap.get(packet.id);
     if (rel) {
-      rel.ex = packet.ex;
-      rel.ey = packet.ey;
-      rel.ox = packet.ox;
-      rel.oy = packet.oy;
+      // rel.ex = packet.ex;
+      // rel.ey = packet.ey;
+      // rel.ox = packet.ox;
+      // rel.oy = packet.oy;
     }
   }
   @DataUpdater()
   public removeBlueprintNode(packet: RemoveNodeIn) {
     const blueprint = this.getBlueprint(packet.blueprintId);
     if (!blueprint) return;
-    const data = removeNodeFromTree(packet.nodeId, blueprint.nodes.map(el => el.id), blueprint.relationships.map(el => [el.parentId, el.childId, el.id]));
-    blueprint.nodes = blueprint.nodes.filter(el => !data.nodes.includes(el.id));
-    blueprint.relationships = blueprint.relationships.filter(el => !data.rels.includes(el.id));
+    const data = removeNodeFromTree(packet.nodeId, blueprint.nodesArr.map(el => el.id), blueprint.relsArr.map(el => [el.parentId, el.childId, el.id]));
+    for (const node of blueprint.nodesArr.filter(el => !data.nodes.includes(el.id)))
+      blueprint.nodesMap.delete(node.id);
+    for (const rel of blueprint.relsArr.filter(el => !data.rels.includes(el.id)))
+      blueprint.relsMap.delete(rel.id);
+
   }
   public addBlueprintRelation(packet: CreateRelationIn) {
-    this.getBlueprint(packet.blueprint)!.relationships.push(packet.relation);
+    this.getBlueprint(packet.blueprint)!.relsMap.set(packet.relation.id, new Relationship(packet.relation));
   }
+  //Todo: Check potential issue
   public removeBlueprintRelation(packet: RemoveRelationIn) {
-    const index = this.getBlueprint(packet.blueprint)!.relationships.findIndex(el => el.id === packet.blueprint);
-    this.getBlueprint(packet.blueprint)!.relationships.splice(index, 1);
+    // const index = this.getBlueprint(packet.blueprint)!.relationships.findIndex(el => el.id === packet.blueprint);
+    this.getBlueprint(packet.blueprint)!.relsMap.delete(packet.blueprint);
+
   }
 
   @DataUpdater()
@@ -286,7 +291,8 @@ export class ProjectService {
     }
   }
   public setSumarryNode(packet: EditSummaryIn) {
-    this.getBlueprint(packet.blueprint)!.nodes.find(el => el.id === packet.node)!.summary = packet.content;
+    this.getBlueprint(packet.blueprint).nodesMap.get(packet.node)!.summary = packet.content;
+    // this.getBlueprint(packet.blueprint)!.nodes.find(el => el.id === packet.node)!.summary = packet.content;
   }
 
 

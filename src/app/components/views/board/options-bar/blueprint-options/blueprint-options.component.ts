@@ -48,7 +48,7 @@ export class BlueprintOptionsComponent {
     } else if (e.key == "ArrowUp") {
       ratio = parseFloat(val) + 1;
     } else return;
-    this.component.onWheel(ratio / 100);
+    this.component.onZoom(ratio);
   }
 
   public openTagEdit() {

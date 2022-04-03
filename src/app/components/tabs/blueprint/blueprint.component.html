@@ -6,22 +6,24 @@
 			(mouseout)="onMouseUp($event)" (click)="onClick($event)"
 			[style.transform]="cssTransformMatrix" [class.zoomed]="overlayScale < 0.5">
 			<svg>
-				<g *ngFor="let rel of rels" [overlay]="overlayEl" [data]="rel" relation></g>
+				<g *ngFor="let relId of relIds" [overlay]="overlayEl" [data]="relsMap.get(relId)" 
+					[parentNode]="blueprint.nodesMap.get(relsMap.get(relId).parentId)" 
+					[childNode]="blueprint.nodesMap.get(relsMap.get(relId).childId)" relation></g>
 				<g *ngIf="ghostNode" [overlay]="overlayEl" [data]="ghostNode" relation class="ghost"></g>
 			</svg>
 			<app-node [blueprintId]="id" [tabId]="tabId" class="root" #rootEl [data]="root"
 				(relationBegin)="beginRelation(rootEl, $event)">
 			</app-node>
-			<app-node #nodeEl *ngFor="let node of nodes" [overlay]="overlayEl" [blueprintId]="id" [tabId]="tabId"
-				[style.left]="'calc(50% + ' + node.x + 'px)'" 
-				[style.top]="'calc(50% + ' + node.y + 'px)'" 
-				[data]="node"
+			<app-node #nodeEl *ngFor="let nodeId of nodeIds" [overlay]="overlayEl" [blueprintId]="id" [tabId]="tabId"
+				[data]="nodesMap.get(nodeId)"
+				[style.left]="'calc(50% + ' + nodesMap.get(nodeId).x + 'px)'" 
+				[style.top]="'calc(50% + ' + nodesMap.get(nodeId).y + 'px)'" 
 				(remove)="onRemove(nodeEl)"
 				(relationBegin)="beginRelation(nodeEl, $event)"
 				(relationBind)="bindRelation(nodeEl, $event)" 
-				(moveStart)="onDragStart(node, nodeEl)" 
+				(moveStart)="onDragStart(nodesMap.get(nodeId), nodeEl)" 
 				(move)="onDragMove($event)"
-				(moveEnd)="onDragEnd(node)">
+				(moveEnd)="onDragEnd(nodesMap.get(nodeId))">
 			</app-node>
 			<app-node *ngIf="ghostNode" class="skeleton" 
 				[style.left]="'calc(50% + ' + ghostNode.ex + 'px)'"

@@ -46,7 +46,9 @@
     "updater": {
       "active": true,
       "dialog": true,
-      "endpoints": "https://api.doscienario.com/system/"
+      "endpoints": [
+        "https://api.doscienario.com/system/"
+      ]
     },
     "allowlist": {
       "all": true

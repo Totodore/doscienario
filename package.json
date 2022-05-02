@@ -12,9 +12,6 @@
     "ng": "ng",
     "start": "ng serve --disable-host-check -o",
     "build": "ng build --prod --optimization=false --base-href ./",
-    "build:electron": "tsc --project tsconfig.electron.json",
-    "build:linux": "electron-builder build -l --publish=never",
-    "build:windows": "electron-builder build -w --publish=never",
     "format:imports": "tslint --config tslint-imports.json --fix --project .",
     "lint": "ng lint",
     "tauri": "tauri"

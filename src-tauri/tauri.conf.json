@@ -44,11 +44,7 @@
       }
     },
     "updater": {
-      "active": true,
-      "dialog": true,
-      "endpoints": [
-        "https://api.doscienario.com/system/"
-      ]
+      "active": false
     },
     "allowlist": {
       "all": true

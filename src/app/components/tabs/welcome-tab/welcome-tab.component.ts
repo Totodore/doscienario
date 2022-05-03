@@ -11,7 +11,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { version } from "../../../../../package.json";
 import { NGXLogger } from 'ngx-logger';
 import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
-import { ElectronService } from 'src/app/services/electron.service';
 @Component({
   selector: 'app-welcome-tab',
   templateUrl: './welcome-tab.component.html',
@@ -34,12 +33,11 @@ export class WelcomeTabComponent implements ITabElement, OnInit {
     private readonly snackbar: SnackbarService,
     private readonly dialog: MatDialog,
     private readonly logger: NGXLogger,
-    private readonly electron: ElectronService,
   ) { }
 
   public async ngOnInit() {
     const res = await this.api.checkApiVersion();
-    this.hasUpdate = res.versions[res.versions.length - 1] !== version && this.electron.isElectronApp ? res.versions[res.versions.length - 1] : undefined;
+    this.hasUpdate = res.versions[res.versions.length - 1] !== version ? res.versions[res.versions.length - 1] : undefined;
     if (this.hasUpdate)
       this.logger.log("Update available : " + this.hasUpdate);
   }
@@ -78,12 +76,6 @@ export class WelcomeTabComponent implements ITabElement, OnInit {
     });
   }
 
-  public update() {
-    if (this.electron.isElectronApp) {
-      this.tabService.closeAllTab();
-      this.electron.send("update", this.hasUpdate);
-    }
-  }
   public async exit() {
     this.tabService.closeAllTab();
     this.project.exit();

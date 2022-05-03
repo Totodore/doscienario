@@ -5,7 +5,6 @@
   <button mat-stroked-button color="accent" (click)="reSync()">Re-synchroniser le projet <mat-icon matSuffix>sync</mat-icon></button>
   <button mat-stroked-button color="accent" (click)="bugReport()">Signaler un bug <mat-icon matSuffix>bug_report</mat-icon></button>
   <button mat-stroked-button color="accent" (click)="exit()">Changer de projet <mat-icon matSuffix>logout</mat-icon></button>
-	<button *ngIf="hasUpdate" mat-stroked-button color="accent" (click)="update()">Mise à jour de dosciénario <mat-icon class="mat-18">update</mat-icon></button>
 	<h3 class="version">Version actuelle : v{{ version }}</h3>
   <mat-divider></mat-divider>
   <div class="shortcuts">

@@ -1,6 +1,6 @@
 {
   "package": {
-    "productName": "doscienario",
+    "productName": "Doscienario",
     "version": "2.1.0"
   },
   "build": {
@@ -44,7 +44,12 @@
       }
     },
     "updater": {
-      "active": false
+      "active": true,
+      "dialog": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDlGOTBFNTFDRDMxMzJCNzgKUldSNEt4UFRIT1dRbnpjamJJQ05nZG04ODF0Sy95YzlsUHN5Uk9YWllFcXhDNjk2ZUNSRjJSV0sK",
+      "endpoints": [
+        "https://api.scriptis.fr/system/tauri-update/{{target}}/{{current_version}}"
+      ]
     },
     "allowlist": {
       "all": true

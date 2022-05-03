@@ -42,3 +42,6 @@ Thumbs.db
 dist/**
 build/**
 package-lock.json
+
+*.key
+*.key.pub

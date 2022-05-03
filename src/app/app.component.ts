@@ -1,3 +1,4 @@
+import { TauriService } from 'src/app/services/tauri.service';
 import { NGXLogger } from 'ngx-logger';
 
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
@@ -23,12 +24,14 @@ export class AppComponent implements OnInit {
     private readonly dialog: MatDialog,
     private readonly changeDetector: ChangeDetectorRef,
     private readonly logger: NGXLogger,
+    private readonly tauri: TauriService
   ) { }
 
   public async ngOnInit() {
     this.progress.changeDetector = this.changeDetector;
     const res = await this.api.checkApiVersion();
     this.isCompatible = res.allowed;
+    this.tauri.closeSplashscreen();
     if (!res.allowed) {
       this.dialog.open(InfoComponent, {
         data: {

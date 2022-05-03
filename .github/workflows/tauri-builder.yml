@@ -1,4 +1,4 @@
-name: Electron builder
+name: Tauri Builder
 
 on:
   push:

@@ -56,7 +56,21 @@
         "height": 600,
         "center": true,
         "resizable": true,
-        "fullscreen": false
+        "fullscreen": false,
+        "visible": false,
+        "label": "main"
+      },
+      {
+        "width": 300,
+        "height": 400,
+        "center": true,
+        "transparent": true,
+        "decorations": false,
+        "resizable": false,
+        "url": "splashscreen.html",
+        "label": "splashscreen",
+        "skipTaskbar": true,
+        "alwaysOnTop": true
       }
     ],
     "security": {

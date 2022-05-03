@@ -2,15 +2,34 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"type": "npm",
-			"script": "start",
-			"problemMatcher": [],
-			"label": "npm: start",
-			"detail": "ng serve --disable-host-check",
+			"type": "process",
+			"label": "build",
+			"command": "echo dev server stopped",
+			"dependsOn": [
+				"npm: start",
+				"tauri: build"
+			],
 			"group": {
 				"kind": "build",
 				"isDefault": true
-			}
+			},
+			"problemMatcher": []
+		},
+		{
+			"type": "npm",
+			"script": "start",
+			"label": "npm: start",
+			"detail": "ng serve --disable-host-check",
+			"group": "build"
+		},
+		{
+			"label": "tauri: build",
+			"type": "shell",
+			"command": "cargo",
+			"args": [
+				"tauri",
+				"dev"
+			]
 		}
 	]
 }

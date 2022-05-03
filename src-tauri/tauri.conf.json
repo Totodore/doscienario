@@ -1,7 +1,7 @@
 {
   "package": {
     "productName": "doscienario",
-    "version": "../package.json"
+    "version": "2.1.0"
   },
   "build": {
     "distDir": "../dist/app",

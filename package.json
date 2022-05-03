@@ -1,6 +1,6 @@
 {
   "name": "doscienario",
-  "version": "2.0.47",
+  "version": "2.1.0",
   "description": "Application de gestion de projets créatifs",
   "main": "dist/main.js",
   "author": {
@@ -55,7 +55,6 @@
     "@types/node": "^12.11.1",
     "@types/uuid": "^8.3.0",
     "angular-cli-ghpages": "^1.0.0-rc.1",
-    "app-builder-bin": "^4.1.0",
     "codelyzer": "^6.0.0",
     "reflect-metadata": "^0.1.13",
     "ts-node": "~8.3.0",
@@ -64,30 +63,5 @@
     "tslint": "^6.1.3",
     "tslint-etc": "^1.13.10",
     "typescript": "~4.0.2"
-  },
-  "build": {
-    "appId": "fr.scriptis.doscienario",
-    "directories": {
-      "output": "build"
-    },
-    "files": [
-      "dist/**/*",
-      "node_modules/**/*",
-      "icons/**/*"
-    ],
-    "win": {
-      "target": [
-        "nsis",
-        "portable"
-      ],
-      "icon": "icons/icon.ico"
-    },
-    "linux": {
-      "target": [
-        "AppImage"
-      ],
-      "category": "Office",
-      "icon": "icons/icon.png"
-    }
   }
 }

@@ -157,6 +157,8 @@ export class TabService {
    * Show the next tab after the current one
    */
   public showNextTab() {
+    if (this.tabs.length <= 1)
+      return;
     const index = this.focusedTabIndex >= this.tabs.length ? 0 : this.focusedTabIndex + 1;
     return this.showTab(index);
   }

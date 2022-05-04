@@ -49,21 +49,24 @@ function autoPosBlueprint(nodes: Node[], rels: Relationship[], margin: Vector, n
     //We clones the nodes and the rels to make a simulation
     const clonedNodes: Node[] = Object.create(els);
     let bestPermutation: number[], bestDistance: number = Infinity;
-
     const clonedNodesById: NodeStruct = Object.fromEntries(clonedNodes.map(node => [node.id.toString(), node]));
+    const nodesData1: NodeStruct = Object.fromEntries(nodes.map(el => [el.id.toString(), new Node(el)]));
 
     //We simulate all the permutation to find the best one
     for (const permutation of permute(clonedNodes.map(el => el.id))) {
       //For each cloned siblings
+      // Summed distance between the nodes and its parent
       let distance = 0;
       let ey = oy;
       for (let k = 0; k < permutation.length; k++) {
         clonedNodesById[permutation[k]].y = ey;
-        distance += getParentRelDistance(parentCache[permutation[k]], nodesData);
+        nodesData1[permutation[k]].y = ey;
+        ey += clonedNodesById[permutation[k]].height + margin[1];
+        distance += getParentRelDistance(parentCache[permutation[k]], nodesData1);
         if (distance >= bestDistance)
           break;
-        ey += clonedNodesById[permutation[k]].height + margin[1];
       }
+      // If the distance is lower than the best distance we save the permutation
       if (distance < bestDistance) {
         bestDistance = distance;
         bestPermutation = permutation;

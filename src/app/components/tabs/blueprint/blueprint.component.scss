@@ -85,7 +85,9 @@
       height: 100%;
       top: 0px;
       left: 0px;
-      background:
+    }
+		&.grid::after {
+			background:
         linear-gradient(-90deg, #6161610d 1px, transparent 1px),
         linear-gradient(#6161610d 1px, transparent 1px),
         linear-gradient(-90deg, rgba(0, 0, 0, .04) 1px, transparent 1px),
@@ -104,7 +106,7 @@
         100px 100px,
         100px 100px,
         100px 100px;
-    }
+		}
 		&.zoomed::after {
 			transform: scale(2);
 		}

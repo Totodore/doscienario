@@ -1,5 +1,5 @@
 import { TreeIoHandler } from './../../../services/sockets/tree-io.handler.service';
-import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { NGXLogger } from 'ngx-logger';
 import { Blueprint, BlueprintSock, Node, Pole, Relationship } from 'src/app/models/api/blueprint.model';
@@ -56,6 +56,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   private tresholdMousePole: Pole[];
   private transformMatrix: Matrix = identity();
   private movingNodeData: MovingNodeData;
+  private viewportLocked = false;
   private readonly blueprintWorker: WorkerManager;
 
   constructor(
@@ -110,6 +111,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
       );
     }
     this.logger.log("Updating transform matrix", this.cssTransformMatrix);
+    this.viewportLocked = false;
   }
 
   public onZoom(ratio: number): void {
@@ -171,10 +173,13 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   }
 
   /**
-   * Set the middle scroll position
-   * It is call each time the zooming Matrix change so the scroll can be readjusted
+   * Set the correct view to see all the nodes in the viewport
+   * It is called automatically at each resize
   */
-  public autoSizeViewport() {
+  @HostListener('window:resize', ['$event'])
+  public autoSizeViewport(windowEvent?: Event) {
+    if (!this.viewportLocked && windowEvent)
+      return;
     const overlayWidth = this.overlay.clientWidth;
     const overlayHeight = this.overlay.clientHeight;
     const viewHeight = this.wrapper.clientHeight;
@@ -209,6 +214,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
         translate((viewWidth - treeRect.width * scalingRatio) / 2, (viewHeight - treeRect.height * scalingRatio) / 2),
       );
     }
+    this.viewportLocked = true;
     this.logger.log("Updating transform matrix", this.cssTransformMatrix);
   }
 
@@ -225,6 +231,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     if (this.wrapper.scrollLeft > this.wrapper.scrollLeftMax - 20)
       this.scrollPoles.add(Pole.East);
     else this.scrollPoles.delete(Pole.East);
+    this.viewportLocked = false;
   }
 
   private moveGhost(pos: Vector) {
@@ -329,6 +336,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
         translate(e.movementX / zoom, e.movementY / zoom),
       );
       this.logger.log("Updating transform matrix", this.cssTransformMatrix);
+      this.viewportLocked = false;
     }
     else if (this.drawState === "drawing" || this.drawState === "dragging") {
       const currTreshold = this.tresholdMouse([e.clientX, e.clientY]);

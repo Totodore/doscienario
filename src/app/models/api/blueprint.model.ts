@@ -5,8 +5,6 @@ import { Tag } from './tag.model';
 export class Blueprint extends Element {
   public nodes: Node[];
   public relationships: Relationship[];
-  public x: number;
-  public y: number;
   public tags: Tag[];
   public readonly type = DataType.Blueprint;
 }

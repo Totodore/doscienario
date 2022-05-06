@@ -114,7 +114,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
     switch (this.btnAnchor) {
       case Pole.North:
         y -= h / 2;
-        x -= h / 2;
+        x += w / 2;
         break;
       case Pole.South:
         y += h / 2;

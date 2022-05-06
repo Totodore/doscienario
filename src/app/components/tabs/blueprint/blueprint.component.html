@@ -25,7 +25,7 @@
 				(move)="onDragMove($event)"
 				(moveEnd)="onDragEnd(nodesMap.get(nodeId))">
 			</app-node>
-			<app-node *ngIf="ghostNode" class="skeleton" 
+			<app-node *ngIf="ghostNode" class="skeleton" id="ghostnode"
 				[style.left]="'calc(50% + ' + ghostNode.ex + 'px)'"
 				[style.top]="'calc(50% + ' + ghostNode.ey + 'px)'">
 			</app-node>

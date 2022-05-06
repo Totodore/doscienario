@@ -19,6 +19,7 @@ import { ProjectService } from './../../../services/project.service';
 import { ConfirmComponent } from './../../utils/confirm/confirm.component';
 import { NodeComponent } from './node/node.component';
 import { scale, translate, compose, Matrix, toCSS, decomposeTSR, identity } from 'transformation-matrix';
+import { ESCAPE } from '@angular/cdk/keycodes';
 
 
 @Component({
@@ -109,6 +110,10 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
         this.transformMatrix,
         translate(-e.deltaX / zoom, -e.deltaY / zoom),
       );
+      if (this.drawState == "drawing")
+        this.translateGhost([e.deltaX / zoom, e.deltaY / zoom]);
+      else if (this.drawState == "dragging")
+        this.onDragTranslate([e.deltaX / zoom, e.deltaY / zoom]);
     }
     this.logger.log("Updating transform matrix", this.cssTransformMatrix);
     this.viewportLocked = false;
@@ -116,12 +121,13 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
 
   public onZoom(ratio: number): void {
     if (ratio < 1.5 && ratio > 0.5) {
-      if ((this.overlayScale >= 1 && ratio > 1) || (this.overlayScale <= 0.2 && ratio < 1))
+      if ((this.overlayScale >= 1 && ratio > 1) || (this.overlayScale <= 0.2 && ratio < 1) || this.drawState == "drawing" || this.drawState == "dragging")
         return;
       const [ox, oy] = [
         - this.overlayTranslation.tx / this.overlayScale + this.wrapper.clientWidth / 2,
-        - this.overlayTranslation.tx / this.overlayScale + this.wrapper.clientHeight / 2
+        - this.overlayTranslation.ty / this.overlayScale + this.wrapper.clientHeight / 2
       ];
+      // Bind the zoom between 0.2 and 1
       if (this.overlayScale * ratio <= 0.2) {
         this.transformMatrix = compose(
           this.transformMatrix,
@@ -218,10 +224,16 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     this.logger.log("Updating transform matrix", this.cssTransformMatrix);
   }
 
+  @HostListener('document:keydown', ['$event'])
+  public onKeypress(e: KeyboardEvent) {
+    if (e.keyCode === ESCAPE && this.drawState === "drawing") {
+      this.drawState = "none";
+      this.ghostNode = null;
+    }
+  }
+
 
   public onScroll(e: WheelEvent) {
-    if (this.drawState === "drawing")
-      this.moveGhost([e.clientX, e.clientY]);
     if (this.wrapper.scrollTop < 20)
       this.scrollPoles.add(Pole.North);
     else this.scrollPoles.delete(Pole.North);
@@ -234,11 +246,23 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     this.viewportLocked = false;
   }
 
+  /**
+   * @param pos Coordinates relative to the top left corber of the overlay 
+   * TODO: Patch ghostnode Y relative
+   */
   private moveGhost(pos: Vector) {
-    const rec = this.overlay.getBoundingClientRect();
-    this.ghostNode.ex = (pos[0] / this.overlayScale) - rec.left - rec.width / 2;
-    this.ghostNode.ey = (pos[1] / this.overlayScale) - rec.top - rec.height / 2;
-    this.changeDetector.detectChanges();
+    const overlayRect = this.overlay.getBoundingClientRect();
+    const nodeHeight = document.querySelector("#ghostnode")!.clientHeight;
+    console.log(nodeHeight);
+    this.ghostNode.ex = pos[0] - (overlayRect.width / 2) / this.overlayScale;
+    this.ghostNode.ey = pos[1] - (overlayRect.height / 2) / this.overlayScale - nodeHeight;
+  }
+  /**
+   * @param offset The translate offset to apply to the ghost node
+   */
+  private translateGhost(offset: Vector) {
+    this.ghostNode.ex += offset[0];
+    this.ghostNode.ey += offset[1];
   }
 
   public beginRelation(parent: NodeComponent, pos: [number, number, Pole, boolean?]) {
@@ -252,6 +276,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
         pos[0] + 100,
         pos[1]
       ], pos[2], Pole.West, parent.data.id);
+      this.logger.log("Creating node in auto mode");
     } else {
       this.drawState = "drawing";
       this.ghostNode = {
@@ -262,8 +287,9 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
         ex: pos[0],
         ey: pos[1],
         pole,
-        parent: parent.data
+        parent: parent.data,
       }
+      this.logger.log("Starting drawing ghost node", this.ghostNode);
     }
   }
 
@@ -276,10 +302,6 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
         childId: child.data.id,
         blueprint: this.blueprint,
         parentPole: this.ghostNode.pole,
-        // ex: anchorPos[0] + this.wrapper.scrollLeft,
-        // ey: anchorPos[1] + this.wrapper.scrollTop - this.overlay.clientHeight / 2 - 48,
-        // ox: this.ghostNode.ox,
-        // oy: this.ghostNode.oy - this.overlay.clientHeight / 2
       }));
       this.ghostNode = null;
       this.drawState = "none";
@@ -346,11 +368,13 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
         this.scrollIntervalId = null;
       }
       if (currTreshold.length > 0 && !this.scrollIntervalId) {
-        this.scrollIntervalId = window.setInterval(() => this.adaptViewport(currTreshold), 16.6);   //60fps
+        this.scrollIntervalId = window.setInterval(() => this.adaptViewport(currTreshold, e), 16.6);   //60fps
         this.tresholdMousePole = currTreshold;
       }
-    } if (this.drawState === "drawing") {
-      this.moveGhost([e.x, e.y]);
+    }
+    if (this.drawState === "drawing") {
+      // Conversion from screen coordinates to overlay coordinates
+      this.moveGhost([(e.clientX - this.overlayTranslation.tx) / this.overlayScale, (e.clientY - this.overlayTranslation.ty) / this.overlayScale]);
     }
 
   }
@@ -362,36 +386,28 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     this.movingNodeData = {
       node,
       nodeRect: component.wrapper.nativeElement.getBoundingClientRect(),
-      childRels: findChildRels(node, this.blueprint.relsArr),
-      parentRels: findParentRels(node, this.blueprint.relsArr),
     }
   }
   /**
    * Move all parent and child rel of a moving node
-   * @param offset the moving offset
-   * @param node the node that is moving
+   * @param pos the mouse position
    */
-  public onDragMove(offset: Vector): void {
+  public onDragMove(pos: Vector): void {
     if (!this.movingNodeData)
       return;
-    const { node, nodeRect, childRels, parentRels } = this.movingNodeData;
+    const { node, nodeRect } = this.movingNodeData;
     const overlayRect = this.overlay.getBoundingClientRect();
     // Absolute position of the node 
-    const x = offset[0] - (overlayRect.width / 2) / this.overlayScale - nodeRect.width / this.overlayScale;
-    const y = offset[1] - (overlayRect.height / 2) / this.overlayScale + nodeRect.height / (2 * this.overlayScale);
-    // dx,dy positions
-    const dx = x - node.x;
-    const dy = y - node.y;
-    // for (const rel of parentRels) {
-    //   rel.ex += dx;
-    //   rel.ey += dy;
-    // }
-    // for (const rel of childRels) {
-    //   rel.ox += dx;
-    //   rel.oy += dy;
-    // }
-    node.x = x;
-    node.y = y;
+    node.x = pos[0] - (overlayRect.width / 2) / this.overlayScale - nodeRect.width / this.overlayScale;
+    node.y = pos[1] - (overlayRect.height / 2) / this.overlayScale + nodeRect.height / (2 * this.overlayScale);
+  }
+
+  public onDragTranslate(offset: Vector): void {
+    if (!this.movingNodeData)
+      return;
+    const { node } = this.movingNodeData;
+    node.x += offset[0];
+    node.y += offset[1];
   }
 
   /**
@@ -433,15 +449,24 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   /**
    * AddaptViewport to Mouse (increase viewport and scroll)
    */
-  private adaptViewport(treshold: Pole[]) {
-    if (treshold.includes(Pole.North) && this.wrapper.scrollTop > 10)
-      this.wrapper.scrollBy({ top: - 10, behavior: 'auto' });
-    if (treshold.includes(Pole.South) && this.wrapper.scrollTop + 20 < this.wrapper.scrollTopMax)
-      this.wrapper.scrollBy({ top: 10, behavior: 'auto' });
-    if (treshold.includes(Pole.East) && this.wrapper.scrollLeft + 20 < this.wrapper.scrollLeftMax)
-      this.wrapper.scrollBy({ left: 10, behavior: 'auto' });
-    if (treshold.includes(Pole.West) && this.wrapper.scrollLeft > 10)
-      this.wrapper.scrollBy({ left: - 10, behavior: 'auto' });
+  private adaptViewport(treshold: Pole[], e: MouseEvent) {
+    if (this.drawState != "drawing" && this.drawState != "dragging")
+      return;
+    const delta = [0, 0];
+    const scale = 10;
+    if (treshold.includes(Pole.North))
+      delta[1] = 1;
+    if (treshold.includes(Pole.South))
+      delta[1] = -1;
+    if (treshold.includes(Pole.East))
+      delta[0] = -1;
+    if (treshold.includes(Pole.West))
+      delta[0] = 1;
+    if (this.drawState == "drawing")
+      this.translateGhost([- delta[0] * scale, - delta[1] * scale]);
+    else if (this.drawState == "dragging")
+      this.onDragTranslate([- delta[0] * scale, - delta[1] * scale]);
+    this.transformMatrix = compose(this.transformMatrix, translate(delta[0] * scale, delta[1] * scale));
   }
 
   /** 
@@ -563,11 +588,9 @@ export interface TemporaryNode {
   h: number;
   w: number;
   parent: Node;
-  pole: Pole
+  pole: Pole;
 }
 export interface MovingNodeData {
   node: Node;
-  parentRels: Relationship[];
-  childRels: Relationship[];
   nodeRect: DOMRect;
 }

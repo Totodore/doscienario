@@ -14,7 +14,7 @@ import { ContextMenuService } from './services/ui/context-menu.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  
+
   public isCompatible = false;
 
   constructor(
@@ -32,6 +32,7 @@ export class AppComponent implements OnInit {
     const res = await this.api.checkApiVersion();
     this.isCompatible = res.allowed;
     this.tauri.closeSplashscreen();
+    this.disableContextMenu();
     if (!res.allowed) {
       this.dialog.open(InfoComponent, {
         data: {
@@ -43,5 +44,17 @@ export class AppComponent implements OnInit {
         disableClose: true
       });
     }
+  }
+
+  private disableContextMenu() {
+    document.addEventListener('contextmenu', e => {
+      e.preventDefault();
+      return false;
+    }, { capture: true })
+
+    document.addEventListener('selectstart', e => {
+      e.preventDefault();
+      return false;
+    }, { capture: true })
   }
 }

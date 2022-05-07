@@ -1,3 +1,4 @@
+import { ContextMenuService } from './../../../../services/ui/context-menu.service';
 import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -84,6 +85,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
     private readonly dialog: MatDialog,
     private readonly progress: ProgressService,
     private readonly editorWorker: EditorWorkerService,
+    private readonly contextMenu: ContextMenuService
   ) { }
 
   public ngOnInit() {
@@ -94,12 +96,25 @@ export class NodeComponent implements AfterViewInit, OnInit {
     if (!this.initialized) {
       this.addRelBtn.nativeElement.addEventListener("mouseenter", () => this.mouseHoverButton = true);
       this.addRelBtn.nativeElement.addEventListener("mouseleave", () => this.mouseHoverButton = false);
+      this.wrapper.nativeElement.addEventListener("contextmenu", e => this.onContextMenu(e));
       this.initialized = true;
     }
     if (this.data) {
       this.data.height = this.wrapper.nativeElement.clientHeight;
       this.data.width = this.wrapper.nativeElement.clientWidth;
     }
+  }
+
+  public onContextMenu(e: MouseEvent) {
+    e.preventDefault();
+    this.contextMenu.show(e, [
+      {
+        icon: "delete",
+        color: "red",
+        label: "Supprimer",
+        action: () => this.onRemoveClick(e)
+      }
+    ]);
   }
 
   /**

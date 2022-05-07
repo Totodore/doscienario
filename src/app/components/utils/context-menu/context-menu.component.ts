@@ -46,5 +46,6 @@ export class ContextMenuComponent {
 export type ContextMenuItem = {
   label: string;
   icon?: string;
+  color?: string;
   action: () => void;
 }

@@ -59,12 +59,13 @@ function autoPosBlueprint(nodes: Node[], rels: Relationship[], margin: Vector, n
       let distance = 0;
       let ey = oy;
       for (let k = 0; k < permutation.length; k++) {
+        ey += clonedNodesById[permutation[k]].height / 2;
         clonedNodesById[permutation[k]].y = ey;
         nodesData1[permutation[k]].y = ey;
-        ey += clonedNodesById[permutation[k]].height + margin[1];
         distance += getParentRelDistance(parentCache[permutation[k]], nodesData1);
         if (distance >= bestDistance)
-          break;
+        break;
+        ey += clonedNodesById[permutation[k]].height / 2 + margin[1];
       }
       // If the distance is lower than the best distance we save the permutation
       if (distance < bestDistance) {
@@ -72,14 +73,14 @@ function autoPosBlueprint(nodes: Node[], rels: Relationship[], margin: Vector, n
         bestPermutation = permutation;
       }
     }
-    console.log(bestDistance, bestPermutation);
     els.sort((a, b) => bestPermutation.indexOf(a.id) - bestPermutation.indexOf(b.id));
     // We apply the permutation to the nodes and the rels
     let ey = oy;
     for (let j = 0; j < els.length; j++) {
       els[j].x = ox;
+      ey += els[j].height / 2;
       els[j].y = ey;
-      ey += els[j].height + margin[1];
+      ey += els[j].height / 2 + margin[1];
       outputNodes.push(els[j]);
     }
   }

@@ -1,5 +1,9 @@
 # Doscienario
-
+## TODO
+* Rework blueprint local storage system
+* Rework Document local storage system
+* Hard test blueprint
+* Blueprint magnet mode
 ## List of current editor plugins
 * Autoformat
 * Block quote

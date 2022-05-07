@@ -6,14 +6,15 @@ use tauri::Manager;
 
 #[tauri::command]
 async fn close_splashscreen(window: tauri::Window) {
-	println!("Application ready, closing splashscreen");
 	// Close splashscreen
 	if let Some(splashscreen) = window.get_window("splashscreen") {
+		println!("Application ready, closing splashscreen");
 		splashscreen.close().unwrap();
 	}
+	let main_window = window.get_window("main").unwrap();
 	// Show main window
-	window.get_window("main").unwrap().show().unwrap();
-	window.set_focus().unwrap();
+	main_window.show().unwrap();
+	main_window.set_focus().unwrap();
 }
 
 fn main() {

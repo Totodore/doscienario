@@ -157,7 +157,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
       this.createNewNode(
         [this.ghostNode.ox, this.ghostNode.oy],
         [this.ghostNode.ex, this.ghostNode.ey],
-        Pole.East, Pole.West,
+        this.ghostNode.pole, Pole.West,
         this.ghostNode.parent.id);
       this.drawState = "none";
       this.ghostNode = null;

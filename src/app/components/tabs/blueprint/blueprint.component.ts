@@ -252,10 +252,8 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
    */
   private moveGhost(pos: Vector) {
     const overlayRect = this.overlay.getBoundingClientRect();
-    const nodeHeight = document.querySelector("#ghostnode")!.clientHeight;
-    console.log(nodeHeight);
     this.ghostNode.ex = pos[0] - (overlayRect.width / 2) / this.overlayScale;
-    this.ghostNode.ey = pos[1] - (overlayRect.height / 2) / this.overlayScale - nodeHeight;
+    this.ghostNode.ey = pos[1] - (overlayRect.height / 2) / this.overlayScale;
   }
   /**
    * @param offset The translate offset to apply to the ghost node
@@ -374,7 +372,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     }
     if (this.drawState === "drawing") {
       // Conversion from screen coordinates to overlay coordinates
-      this.moveGhost([(e.clientX - this.overlayTranslation.tx) / this.overlayScale, (e.clientY - this.overlayTranslation.ty) / this.overlayScale]);
+      this.moveGhost([(e.clientX - this.overlayTranslation.tx) / this.overlayScale, (e.clientY - 48 - this.overlayTranslation.ty) / this.overlayScale]);
     }
 
   }

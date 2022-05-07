@@ -3,7 +3,7 @@
 		(scroll)="onScroll($any($event))">
 		<div class="overlay" *ngIf="blueprint" #overlayEl [class.dragging]="drawState == 'dragging'"
 			(mousedown)="onMouseDown($event)" (mouseup)="onMouseUp($event)" (mousemove)="onMouseMove($event)"
-			(mouseout)="onMouseUp($event)" (click)="onClick($event)" [class.grid]="gridMode"
+			(mouseleave)="onMouseLeave($event)" (mouseenter)="onMouseEnter($event)" (click)="onClick($event)" [class.grid]="gridMode"
 			[style.transform]="cssTransformMatrix" [class.zoomed]="overlayScale < 0.5">
 			<svg>
 				<g *ngFor="let relId of relIds" [overlay]="overlayEl" [data]="relsMap.get(relId)" 

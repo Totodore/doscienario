@@ -1,8 +1,8 @@
 import { TreeIoHandler } from './../../../services/sockets/tree-io.handler.service';
-import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { NGXLogger } from 'ngx-logger';
-import { Blueprint, BlueprintSock, Node, Pole, Relationship } from 'src/app/models/api/blueprint.model';
+import { BlueprintSock, Node, Pole, Relationship } from 'src/app/models/api/blueprint.model';
 import { Tag } from 'src/app/models/api/tag.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { CreateNodeOut, PlaceNodeOut, RemoveNodeOut } from 'src/app/models/sockets/out/blueprint.out';
@@ -10,7 +10,7 @@ import { AddTagElementOut } from 'src/app/models/sockets/out/tag.out';
 import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
 import { SocketService } from 'src/app/services/sockets/socket.service';
 import { SnackbarService } from 'src/app/services/ui/snackbar.service';
-import { findChildRels, findLevelByNode, findParentRels, getTreeRect, removeNodeFromTree } from 'src/app/utils/tree.utils';
+import { findLevelByNode, getTreeRect, removeNodeFromTree } from 'src/app/utils/tree.utils';
 import { WorkerManager, WorkerType } from 'src/app/utils/worker-manager.utils';
 import { ProgressService } from '../../../services/ui/progress.service';
 import { ElementComponent } from '../element.component';
@@ -58,6 +58,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   private transformMatrix: Matrix = identity();
   private movingNodeData: MovingNodeData;
   private viewportLocked = false;
+  private mouseOut = false;
   private readonly blueprintWorker: WorkerManager;
 
   constructor(
@@ -66,7 +67,6 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     private readonly socket: SocketService,
     progress: ProgressService,
     private readonly snack: SnackbarService,
-    private readonly changeDetector: ChangeDetectorRef,
     private readonly logger: NGXLogger,
     _: TreeIoHandler,   // Unused tree io handler in the current class but it should be declarated somewhere to be included in the bundle
   ) {
@@ -341,6 +341,13 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     if (this.drawState == "moving")
       this.drawState = "none";
   }
+
+  public onMouseLeave(e: MouseEvent) {
+    this.mouseOut = true;
+  }
+  public onMouseEnter(e: MouseEvent) {
+    this.mouseOut = false;
+  }
   /**
    * Handle the mouse moving event on the blueprint, handle mouse scrolling, mouse drawing and mouse dragging
    * @param e 
@@ -448,7 +455,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
    * AddaptViewport to Mouse (increase viewport and scroll)
    */
   private adaptViewport(treshold: Pole[], e: MouseEvent) {
-    if (this.drawState != "drawing" && this.drawState != "dragging")
+    if ((this.drawState != "drawing" && this.drawState != "dragging") || this.mouseOut)
       return;
     const delta = [0, 0];
     const scale = 10;

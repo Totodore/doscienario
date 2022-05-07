@@ -26,46 +26,43 @@ function autoPosBlueprint(nodes: Node[], rels: Relationship[], margin: Vector, n
   const outputNodes: Node[] = [];
   const nodesData: NodeStruct = Object.fromEntries(nodes.map(el => [el.id.toString(), new Node(el)]));
   const root = nodes.find(el => el.isRoot);
-  const nodeLevel = node ? findLevelByNode(node, root, nodes, rels) : null;
-  //We get the depth of the blueprint
-  const depth = nodeLevel || findDepth(root, rels, nodesData);
+  const startNodeLevel = node ? findLevelByNode(node, root, nodes, rels) : null;
+  const depth = startNodeLevel || findDepth(root, rels, nodesData);
 
-  const nodesLevelCache = _findNodesLevels(_createCustomNode(root), rels, nodes.map(node => _createCustomNode(node)), -1, 0);
-  // const childCache: RelationshipBoundsCache = Object.fromEntries(nodes.map(node => [node.id.toString(), []]));
+  // Nodes by level(s) (a node may have multiple levels)
+  // We have to regenerate
+  const nodesLevelCache = _findNodesLevels(_createCustomNode(root), rels, Object.values(nodesData).map(node => _createCustomNode(node)), -1, 0);
+
+  // Parent relationships by node id
   const parentCache: RelationshipCache = Object.fromEntries(nodes.map(node => [node.id.toString(), []]));
-  for (let rel of rels) {
+  for (let rel of rels)
     parentCache[rel.childId].push(new Relationship(rel));
-  }
 
   //Foreach level we get all the nodes and their parents
-  for (let i = nodeLevel || 1; i < depth + 1; i++) {
-    let els = findNodesByLevel(root, rels, nodes, i, 0, nodesLevelCache).map(node => new Node(node));
+  for (let i = startNodeLevel || 1; i < depth + 1; i++) {
+
+    let levelNodes = findNodesByLevel(root, rels, nodes, i, 0, nodesLevelCache).map(node => new Node(node));
     const parents = i > 1 ? findNodesByLevel(root, rels, nodes, i - 1, 0, nodesLevelCache) : [root];
 
     //We compute an horizontal origin from the max right pos of the parents + the margin
     const ox = parents.reduce((prev, curr) => prev > curr.width + curr.x ? prev : curr.width + curr.x, 0) + margin[0];
     //We compute a vertical origin from the height of all the sibligs + this margin
-    const oy = - (els.reduce((prev, curr) => prev + curr.height + margin[1], 0) / 2) + margin[1];
+    const oy = - (levelNodes.reduce((prev, curr) => prev + curr.height + margin[1], 0) / 2) + margin[1] / 2;
     //We clones the nodes and the rels to make a simulation
-    const clonedNodes: Node[] = Object.create(els);
     let bestPermutation: number[], bestDistance: number = Infinity;
-    const clonedNodesById: NodeStruct = Object.fromEntries(clonedNodes.map(node => [node.id.toString(), node]));
-    const nodesData1: NodeStruct = Object.fromEntries(nodes.map(el => [el.id.toString(), new Node(el)]));
-
     //We simulate all the permutation to find the best one
-    for (const permutation of permute(clonedNodes.map(el => el.id))) {
-      //For each cloned siblings
+    for (const permutation of permute(levelNodes.map(el => el.id))) {
+      // For each cloned siblings
       // Summed distance between the nodes and its parent
       let distance = 0;
       let ey = oy;
       for (let k = 0; k < permutation.length; k++) {
-        ey += clonedNodesById[permutation[k]].height / 2;
-        clonedNodesById[permutation[k]].y = ey;
-        nodesData1[permutation[k]].y = ey;
-        distance += getParentRelDistance(parentCache[permutation[k]], nodesData1);
+        ey += nodesData[permutation[k]].height / 2;
+        nodesData[permutation[k]].y = ey;
+        distance += getParentRelDistance(parentCache[permutation[k]], nodesData);
         if (distance >= bestDistance)
-        break;
-        ey += clonedNodesById[permutation[k]].height / 2 + margin[1];
+          break;
+        ey += nodesData[permutation[k]].height / 2 + margin[1];
       }
       // If the distance is lower than the best distance we save the permutation
       if (distance < bestDistance) {
@@ -73,15 +70,19 @@ function autoPosBlueprint(nodes: Node[], rels: Relationship[], margin: Vector, n
         bestPermutation = permutation;
       }
     }
-    els.sort((a, b) => bestPermutation.indexOf(a.id) - bestPermutation.indexOf(b.id));
+    levelNodes.sort((a, b) => bestPermutation.indexOf(a.id) - bestPermutation.indexOf(b.id));
     // We apply the permutation to the nodes and the rels
     let ey = oy;
-    for (let j = 0; j < els.length; j++) {
-      els[j].x = ox;
-      ey += els[j].height / 2;
-      els[j].y = ey;
-      ey += els[j].height / 2 + margin[1];
-      outputNodes.push(els[j]);
+    for (let j = 0; j < levelNodes.length; j++) {
+      levelNodes[j].x = ox;
+      ey += levelNodes[j].height / 2;
+      levelNodes[j].y = ey;
+      ey += levelNodes[j].height / 2 + margin[1];
+
+      outputNodes.push(levelNodes[j]);
+
+      nodesData[levelNodes[j].id].x = ox;
+      nodesData[levelNodes[j].id].y = ey;
     }
   }
   return outputNodes;

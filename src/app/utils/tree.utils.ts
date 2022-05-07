@@ -5,7 +5,7 @@ import { Node, Relationship } from "../models/api/blueprint.model";
  * Get all rels to delete
  * Get all nodes to delete (if a node has no parent relationship)
  */
- export function removeNodeFromTree(id: number, nodes: number[], rels: Tuple[]): RemoveObj {
+export function removeNodeFromTree(id: number, nodes: number[], rels: Tuple[]): RemoveObj {
   const removeRels = _nodeIterate(id, rels);
   //add parent rels of the deleted node
   removeRels.push(...rels.filter(rel => rel[1] === id).map(el => el[2]));
@@ -85,18 +85,18 @@ export function _findNodesLevels(root: NodeLevelStruct, rels: Relationship[], no
   const nodesById = Object.fromEntries(nodes.map(node => [node.node.id, node]));
   if (root.levels.size === 0)
     root.levels.add(currentLevel);
-  
+
   const childs = _findChildNodesForLevel(root.node, rels, nodesById);
   for (let child of childs) {
     let keepGoing = maxLevel === -1;
     for (let level of root.levels) {
-      child.levels.add(level+1);
-      keepGoing ||= level+1 < maxLevel;
+      child.levels.add(level + 1);
+      keepGoing ||= level + 1 < maxLevel;
     }
-    if(keepGoing)
+    if (keepGoing)
       _findNodesLevels(child, rels, nodes, maxLevel);
   }
-  
+
   return nodes;
 }
 
@@ -105,7 +105,7 @@ export function findLevelByNode(node: Node, root: Node, nodes: Node[], rels: Rel
   const nodesLevelCache = _findNodesLevels(_createCustomNode(root), rels, nodes.map(node => _createCustomNode(node)), -1, 0);
   //@ts-ignore
   const nodeCache: NodeStruct = Object.fromEntries(nodes.map(el => [el.id, el]));
-  for (;i < findDepth(root, rels, nodeCache); i++) {
+  for (; i < findDepth(root, rels, nodeCache); i++) {
     const els = findNodesByLevel(root, rels, nodes, i, 0, nodesLevelCache);
     if (els.includes(node))
       break;
@@ -120,7 +120,7 @@ export function getTreeRect(rects: Rect[], cx: number, cy: number): Rect {
     rect.left = Math.min(rect.left, nodeRect.left);
     rect.top = Math.min(rect.top, nodeRect.top);
     rect.width = Math.max(rect.width, nodeRect.left + nodeRect.width - rect.left);
-    rect.height = Math.max(rect.height, nodeRect.top + nodeRect.height - rect.top); 
+    rect.height = Math.max(rect.height, nodeRect.top + nodeRect.height - rect.top);
   }
   return rect;
 }

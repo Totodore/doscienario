@@ -1,3 +1,4 @@
+import { ColorNodeOut } from './../out/blueprint.out';
 import { Node, Relationship } from "../../api/blueprint.model";
 import { EditSummaryOut, PlaceNodeOut, RemoveNodeOut } from "../out/blueprint.out";
 
@@ -26,3 +27,4 @@ export class RemoveRelationIn {
 export type PlaceNodeIn = PlaceNodeOut;
 export type RemoveNodeIn = RemoveNodeOut;
 export type EditSummaryIn = EditSummaryOut;
+export type ColorNodeIn = ColorNodeOut;

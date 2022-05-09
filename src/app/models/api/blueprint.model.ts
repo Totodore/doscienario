@@ -12,6 +12,7 @@ export class Blueprint extends Element {
 export class BlueprintSock extends Blueprint {
   public readonly nodesMap = new Map<number, Node>();
   public readonly relsMap = new Map<number, Relationship>();
+  public readonly loopbackRelsMap = new Map<number, Relationship>();
 
   public nodes: never;
   public relationships: never;
@@ -22,7 +23,10 @@ export class BlueprintSock extends Blueprint {
       this.nodesMap.set(node.id, new Node(node));
     }
     for (const rel of this.relationships as Relationship[]) {
-      this.relsMap.set(rel.id, new Relationship(rel));
+      if (rel.type == RelationshipType.Direct)
+        this.relsMap.set(rel.id, new Relationship(rel));
+      else if (rel.type == RelationshipType.Loopback)
+        this.loopbackRelsMap.set(rel.id, new Relationship(rel));
     }
     this.nodes = undefined as never;
     this.relationships = undefined as never;
@@ -47,6 +51,7 @@ export class Node extends DataModel<Node> {
   public title: string;
   public blueprintId: number;
   public blueprint: Blueprint;
+  public color?: string;
   public tags: Tag[];
   public locked: boolean;
   public height?: number;
@@ -71,6 +76,7 @@ export class Relationship extends DataModel<Relationship> {
   public blueprint: Blueprint;
   public parentPole: Pole;
   public childPole: Pole;
+  public type: RelationshipType;
 
   public getOrigin(nodeBounds: Bounds): Vector {
     return this.computePositions(this.parentPole, nodeBounds);
@@ -99,6 +105,10 @@ export enum Pole {
   South = "S",
   East = "E",
   West = "W"
+}
+export enum RelationshipType {
+  Direct = "direct",
+  Loopback = "loopback",
 }
 export interface Bounds {
   x: number;

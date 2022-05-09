@@ -96,6 +96,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   public loadedTab() {
     super.loadedTab();
     this.autoSizeViewport();
+    this.anchorMap.set(201, new Relationship({ id: 201, parentId: 495, childId: 8 }));
   }
 
   /**
@@ -536,6 +537,12 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   }
   get relIds(): number[] {
     return [...this.blueprint.relsMap.keys()];
+  }
+  get anchorIds(): number[] {
+    return [...this.blueprint.loopbackRelsMap.keys()];
+  }
+  get anchorMap(): Map<number, Relationship> {
+    return this.blueprint.loopbackRelsMap;
   }
   get nodeIds(): number[] {
     return [...this.blueprint.nodesMap.keys()];

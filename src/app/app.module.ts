@@ -74,6 +74,7 @@ import { DbService } from './services/database/db.service';
 import { MapperLoggerService } from './services/logger/mapper-logger.service';
 import { WriterLoggerService } from './services/logger/writer-logger.service';
 import { appearance } from './style/default';
+import { AnchorComponent } from './components/tabs/blueprint/anchor/anchor.component';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -117,6 +118,7 @@ import { appearance } from './style/default';
     InfoComponent,
     AskTextareaComponent,
     ContextMenuComponent,
+    AnchorComponent,
   ],
   imports: [
     LoggerModule.forRoot(loggerConfig),

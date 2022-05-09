@@ -4,6 +4,8 @@
 * Rework Document local storage system
 * Hard test blueprint
 * Blueprint magnet mode
+
+* Bug blueprint node South North relations
 ## List of current editor plugins
 * Autoformat
 * Block quote

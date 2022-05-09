@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { EventHandler, registerHandler } from 'src/app/decorators/subscribe-event.decorator';
 import { Relationship } from 'src/app/models/api/blueprint.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
-import { CreateNodeIn, CreateRelationIn, EditSummaryIn, PlaceNodeIn, RemoveNodeIn, RemoveRelationIn } from 'src/app/models/sockets/in/blueprint.in';
+import { ColorNodeIn, CreateNodeIn, CreateRelationIn, EditSummaryIn, PlaceNodeIn, RemoveNodeIn, RemoveRelationIn } from 'src/app/models/sockets/in/blueprint.in';
 import { CloseElementIn, ColorElementIn, OpenElementIn, SendElementIn } from 'src/app/models/sockets/in/element.in';
 import { AddTagElementIn, RemoveTagElementIn } from 'src/app/models/sockets/in/tag.in';
 import { SocketService } from 'src/app/services/sockets/socket.service';
@@ -44,6 +44,11 @@ export class TreeIoHandler {
     this.project.blueprints.find(el => el.id === packet.elementId).color = packet.color;
   }
 
+  @EventHandler(Flags.COLOR_NODE)
+  onColorNode(packet: ColorNodeIn) {
+    this.project.getBlueprint(packet.blueprintId).nodesMap.get(packet.elementId).color = packet.color;
+  }
+
   @EventHandler(Flags.REMOVE_BLUEPRINT)
   onRemoveBlueprint(id: number) {
     this.tabs.removeBlueprintTab(id);
@@ -77,10 +82,6 @@ export class TreeIoHandler {
   @EventHandler(Flags.PLACE_NODE)
   onPlaceNode(packet: PlaceNodeIn) {
     this.project.placeBlueprintNode(packet);
-  }
-  @EventHandler(Flags.PLACE_RELATIONSHIP)
-  onPlaceRel(packet: Relationship) {
-    this.project.placeBlueprintRel(packet);
   }
   @EventHandler(Flags.REMOVE_NODE)
   onRemoveNode(packet: RemoveNodeIn) {

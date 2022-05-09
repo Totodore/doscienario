@@ -482,9 +482,8 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   public async autoPos(node?: Node) {
     console.time("auto-pos");
     this.progress.show();
-    let nodes = this.allNodes;
+    const nodes = this.allNodes;
     const margin: Vector = [100, 50];
-
     // We add width and height DOM values;
     for (const node of nodes) {
       const el = this.getNodeEl(node.id).wrapper.nativeElement;
@@ -503,7 +502,8 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     this.progress.hide();
     for (const node of nodes)
       this.socket.emit(Flags.PLACE_NODE, new PlaceNodeOut(this.id, node.id, [node.x, node.y]));
-    this.autoSizeViewport();
+    if (this.viewportLocked)
+      this.autoSizeViewport();
   }
 
   /**

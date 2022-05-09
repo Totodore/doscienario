@@ -37,10 +37,8 @@ function autoPosBlueprint(nodes: Node[], rels: Relationship[], margin: Vector, n
   const parentCache: RelationshipCache = Object.fromEntries(nodes.map(node => [node.id.toString(), []]));
   for (let rel of rels)
     parentCache[rel.childId].push(new Relationship(rel));
-
-  //Foreach level we get all the nodes and their parents
-  for (let i = startNodeLevel || 1; i < depth + 1; i++) {
-
+    //Foreach level we get all the nodes and their parents
+    for (let i = startNodeLevel || 1; i < depth + 1; i++) {
     let levelNodes = findNodesByLevel(root, rels, nodes, i, 0, nodesLevelCache).map(node => new Node(node));
     const parents = i > 1 ? findNodesByLevel(root, rels, nodes, i - 1, 0, nodesLevelCache) : [root];
 

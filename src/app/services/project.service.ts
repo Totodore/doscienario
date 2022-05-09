@@ -231,7 +231,10 @@ export class ProjectService {
 
   @DataUpdater()
   public async addBlueprintNode(packet: CreateNodeIn) {
-    this.getBlueprint(packet.node.blueprint.id)!.nodesMap.set(packet.node.id, new Node(packet.node));
+    const blueprint = this.getBlueprint(packet.node.blueprint.id);
+    if (blueprint)
+      blueprint.nodesMap.set(packet.node.id, new Node(packet.node));
+    this.logger.log("Node created:", packet.node.id, "blueprint:", packet.node.blueprint.id, packet.node);
     if (this.tabs.displayedTab[1].type === TabTypes.BLUEPRINT && this.tabs.displayedTab[1].id === packet.node.blueprint.id && packet.user === packet.node.createdBy.id) {
       window.setTimeout(async () => {
         const component = this.tabs.displayedTab[1] as BlueprintComponent;
@@ -247,16 +250,6 @@ export class ProjectService {
     if (node) {
       node.x = packet.pos[0];
       node.y = packet.pos[1];
-    }
-  }
-  @DataUpdater()
-  public placeBlueprintRel(packet: Relationship) {
-    const rel = this.getBlueprint(packet.blueprint.id)!.relsMap.get(packet.id);
-    if (rel) {
-      // rel.ex = packet.ex;
-      // rel.ey = packet.ey;
-      // rel.ox = packet.ox;
-      // rel.oy = packet.oy;
     }
   }
   @DataUpdater()

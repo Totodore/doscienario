@@ -81,7 +81,7 @@ export function _createCustomNode(node: Node): NodeLevelStruct {
 }
 
 export function _findNodesLevels(root: NodeLevelStruct, rels: Relationship[], nodes: NodeLevelStruct[], maxLevel: number, currentLevel = 0) {
-  //@ts-ignore
+  // @ts-ignore: TS2339
   const nodesById = Object.fromEntries(nodes.map(node => [node.node.id, node]));
   if (root.levels.size === 0)
     root.levels.add(currentLevel);
@@ -101,16 +101,12 @@ export function _findNodesLevels(root: NodeLevelStruct, rels: Relationship[], no
 }
 
 export function findLevelByNode(node: Node, root: Node, nodes: Node[], rels: Relationship[]): number {
-  let i = 0;
   const nodesLevelCache = _findNodesLevels(_createCustomNode(root), rels, nodes.map(node => _createCustomNode(node)), -1, 0);
-  //@ts-ignore
-  const nodeCache: NodeStruct = Object.fromEntries(nodes.map(el => [el.id, el]));
-  for (; i < findDepth(root, rels, nodeCache); i++) {
-    const els = findNodesByLevel(root, rels, nodes, i, 0, nodesLevelCache);
-    if (els.includes(node))
-      break;
+  for (const entry of nodesLevelCache) {
+    if (entry.node.id == node.id) {
+      return [...entry.levels.values()][0];
+    }
   }
-  return i;
 }
 
 // left / top / right / bottom

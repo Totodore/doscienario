@@ -49,9 +49,10 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   public gridMode: boolean;
   public scrollPoles: Set<Pole> = new Set();
   public drawState: DrawStates = "none";
-
-  public readonly type = TabTypes.BLUEPRINT;
   public ghostNode?: TemporaryNode;
+
+  public readonly freeMode = false;
+  public readonly type = TabTypes.BLUEPRINT;
 
   private scrollIntervalId: number;
   private tresholdMousePole: Pole[];

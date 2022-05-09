@@ -22,7 +22,7 @@
 			(contextmenu)="onAddRelButton(icon, $event, true)"
 			>add</mat-icon>
   </span>
-  <mat-icon class="handle" (mousedown)="onDragStart($event)">open_with</mat-icon>
+  <mat-icon class="handle" *ngIf="freeMode" (mousedown)="onDragStart($event)">open_with</mat-icon>
   <!-- <mat-icon class="remove" (click)="onRemoveClick($event)">delete</mat-icon> -->
   <!-- <mat-icon class="notes" (click)="openDetailsView()">notes</mat-icon> -->
 </div>

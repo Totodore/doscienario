@@ -9,8 +9,11 @@
     </div>
   </div>
   <div class="blueprint-options">
-		<button mat-stroked-button class="toggle-btn" [class.on]="component.autoMode" (click)="toggleAutoMode()">
+		<!-- <button mat-stroked-button class="toggle-btn" [class.on]="component.autoMode" (click)="toggleAutoMode()">
 			<mat-icon color="accent">auto_fix_high</mat-icon>
+		</button> -->
+		<button mat-stroked-button class="toggle-btn" (click)="resetViewport()">
+			<mat-icon color="accent">filter_center_focus</mat-icon>
 		</button>
 		<button mat-stroked-button class="toggle-btn" [class.on]="component.gridMode" (click)="toggleGrid()">
 			<mat-icon color="accent">grid_4x4</mat-icon>
@@ -23,7 +26,7 @@
 			<input type="text" #zoom matInput (keydown)="onZoom($event, zoom.value)" [ngModel]="(component.overlayScale * 100).toFixed() + '%'">
 		</mat-form-field>
   </div>
-	<div class="blueprint-options">
+	<!-- <div class="blueprint-options">
 		<button mat-stroked-button class="toggle-btn" (click)="resetViewport()">
 			<mat-icon color="accent">filter_center_focus</mat-icon>
 		</button>
@@ -36,5 +39,5 @@
 		<button mat-stroked-button class="toggle-btn" (click)="resetViewport()">
 			<mat-icon color="accent">filter_center_focus</mat-icon>
 		</button>
-	</div>
+	</div> -->
 </div>

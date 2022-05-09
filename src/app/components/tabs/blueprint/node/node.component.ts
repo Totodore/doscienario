@@ -40,6 +40,9 @@ export class NodeComponent implements AfterViewInit, OnInit {
   @Input()
   public overlay: HTMLDivElement;
 
+  @Input()
+  public readonly freeMode = false;
+
   @Output()
   private readonly relationBegin = new EventEmitter<[number, number, Pole, boolean?]>();
 
@@ -71,7 +74,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
   @ViewChild("addRel", { static: false })
   public addRelBtn: ElementRef<HTMLSpanElement>;
 
-  public btnAnchor: Pole = Pole.North;
+  public btnAnchor: Pole = Pole.East;
   public mouseHoverButton = false;
   private initialized: boolean;
   private nodeUuid = v4();
@@ -194,7 +197,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
     setTimeout(() => this.displayProgress && this.progress.show(), 1000);
   }
 
-  @HostListener("mousemove", ['$event'])
+  // @HostListener("mousemove", ['$event'])
   public onMoveHover(e: MouseEvent) {
     if (this.mouseHoverButton) return;
     const [w, h] = [this.wrapper.nativeElement.parentElement.clientWidth, this.wrapper.nativeElement.parentElement.clientHeight];

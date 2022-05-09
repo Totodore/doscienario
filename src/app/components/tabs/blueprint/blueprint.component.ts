@@ -109,7 +109,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
       const zoom = this.overlayScale;
       this.transformMatrix = compose(
         this.transformMatrix,
-        translate(-e.deltaX / zoom, -e.deltaY / zoom),
+        translate(-e.deltaY / zoom, -e.deltaX / zoom),
       );
       if (this.drawState == "drawing")
         this.translateGhost([e.deltaX / zoom, e.deltaY / zoom]);

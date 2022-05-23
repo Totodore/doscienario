@@ -10,7 +10,7 @@
   },
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --disable-host-check -o",
+    "start": "ng serve --disable-host-check",
     "build": "ng build --prod --optimization=false --base-href ./",
     "format:imports": "tslint --config tslint-imports.json --fix --project .",
     "lint": "ng lint",

@@ -513,7 +513,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
    * @param id the id of the node
    * @returns the node component
    */
-  private getNodeEl(id: number): NodeComponent {
+  public getNodeEl(id: number): NodeComponent {
     return this.nodeEls.find(el => el.data.id === id) || (this.rootEl.data.id === id ? this.rootEl : null);
   }
 

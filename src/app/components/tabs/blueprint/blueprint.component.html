@@ -15,11 +15,12 @@
 				<!-- Loopback rels -->
 				<g *ngFor="let anchorId of anchorIds" [overlay]="overlayEl" [data]="anchorMap.get(anchorId)"
 					[parentNode]="blueprint.nodesMap.get(anchorMap.get(anchorId).parentId)"
-					[childNode]="blueprint.nodesMap.get(anchorMap.get(anchorId).childId)" anchor pointer-events="visibleStroke"></g>
+					[childNode]="blueprint.nodesMap.get(anchorMap.get(anchorId).childId)" 
+					[blueprintRef]="this" anchor pointer-events="visibleStroke"></g>
 			</svg>
-			<app-node [blueprintId]="id" [tabId]="tabId" class="root" #rootEl [data]="root"
+			<!-- <app-node [blueprintId]="id" [tabId]="tabId" class="root" #rootEl [data]="root"
 				(relationBegin)="beginRelation(rootEl, $event)">
-			</app-node>
+			</app-node> -->
 			<app-node #nodeEl *ngFor="let nodeId of nodeIds" [overlay]="overlayEl" [blueprintId]="id" [tabId]="tabId"
 				[data]="nodesMap.get(nodeId)" [style.left]="'calc(50% + ' + nodesMap.get(nodeId).x + 'px)'"
 				[style.top]="'calc(50% + ' + nodesMap.get(nodeId).y + 'px)'" (remove)="onRemove(nodeEl)"

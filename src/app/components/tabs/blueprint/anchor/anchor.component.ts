@@ -1,5 +1,5 @@
 import { Relationship } from './../../../../models/api/blueprint.model';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, HostListener, ElementRef } from '@angular/core';
 import { Node } from 'src/app/models/api/blueprint.model';
 
 @Component({

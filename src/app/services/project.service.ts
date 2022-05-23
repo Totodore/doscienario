@@ -8,7 +8,7 @@ import { removeNodeFromTree } from '../utils/tree.utils';
 import { BlueprintComponent } from '../components/tabs/blueprint/blueprint.component';
 import { WorkerManager, WorkerType } from '../utils/worker-manager.utils';
 import { Document, DocumentSock } from '../models/api/document.model';
-import { Blueprint, BlueprintSock, Node, Relationship } from '../models/api/blueprint.model';
+import { Blueprint, BlueprintSock, Node, Relationship, RelationshipType } from '../models/api/blueprint.model';
 import { Tag } from '../models/api/tag.model';
 import { SheetSock } from '../models/api/sheet.model';
 import { Change, OpenElementIn, SendElementIn, WriteElementIn } from '../models/sockets/in/element.in';
@@ -265,7 +265,10 @@ export class ProjectService {
 
   }
   public addBlueprintRelation(packet: CreateRelationIn) {
-    this.getBlueprint(packet.blueprint)!.relsMap.set(packet.relation.id, new Relationship(packet.relation));
+    if (packet.relation.type == RelationshipType.Direct)
+      this.getBlueprint(packet.blueprint)!.relsMap.set(packet.relation.id, new Relationship(packet.relation));
+    else
+      this.getBlueprint(packet.blueprint)!.loopbackRelsMap.set(packet.relation.id, new Relationship(packet.relation));
   }
   //Todo: Check potential issue
   public removeBlueprintRelation(packet: RemoveRelationIn) {

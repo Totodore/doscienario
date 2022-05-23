@@ -50,6 +50,6 @@ export class AnchorComponent {
   }
 
   public get color(): string {
-    return '#' + (this.parentNode.color || "FFF");
+    return '#' + (this.childNode.color || "FFF");
   }
 }

@@ -2,10 +2,10 @@ import { TreeIoHandler } from './../../../services/sockets/tree-io.handler.servi
 import { Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { NGXLogger } from 'ngx-logger';
-import { BlueprintSock, Node, Pole, Relationship } from 'src/app/models/api/blueprint.model';
+import { BlueprintSock, Node, Pole, Relationship, RelationshipType } from 'src/app/models/api/blueprint.model';
 import { Tag } from 'src/app/models/api/tag.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
-import { CreateNodeOut, PlaceNodeOut, RemoveNodeOut } from 'src/app/models/sockets/out/blueprint.out';
+import { ColorNodeOut, CreateNodeOut, PlaceNodeOut, RemoveNodeOut } from 'src/app/models/sockets/out/blueprint.out';
 import { AddTagElementOut } from 'src/app/models/sockets/out/tag.out';
 import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
 import { SocketService } from 'src/app/services/sockets/socket.service';
@@ -20,6 +20,7 @@ import { ConfirmComponent } from './../../utils/confirm/confirm.component';
 import { NodeComponent } from './node/node.component';
 import { scale, translate, compose, Matrix, toCSS, decomposeTSR, identity } from 'transformation-matrix';
 import { ESCAPE } from '@angular/cdk/keycodes';
+import { hslToHex } from 'src/app/utils/helpers';
 
 
 @Component({
@@ -60,6 +61,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   private movingNodeData: MovingNodeData;
   private viewportLocked = false;
   private mouseOut = false;
+  private anchorBindingNode?: Node;
   private readonly blueprintWorker: WorkerManager;
 
   constructor(
@@ -231,6 +233,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     if (e.keyCode === ESCAPE && this.drawState === "drawing") {
       this.drawState = "none";
       this.ghostNode = null;
+      this.anchorBindingNode = null;
     }
   }
 
@@ -278,18 +281,44 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
       ], pos[2], Pole.West, parent.data.id);
       this.logger.log("Creating node in auto mode");
     } else {
-      this.drawState = "drawing";
-      this.ghostNode = {
-        w: parent.wrapper.nativeElement.clientWidth,
-        h: parent.wrapper.nativeElement.clientHeight,
-        ox: pos[0],
-        oy: pos[1],
-        ex: pos[0],
-        ey: pos[1],
-        pole,
-        parent: parent.data,
+      // Hand free drawing feature
+      // this.drawState = "drawing";
+      // this.ghostNode = {
+      //   w: parent.wrapper.nativeElement.clientWidth,
+      //   h: parent.wrapper.nativeElement.clientHeight,
+      //   ox: pos[0],
+      //   oy: pos[1],
+      //   ex: pos[0],
+      //   ey: pos[1],
+      //   pole,
+      //   parent: parent.data,
+      // }
+      // this.logger.log("Starting drawing ghost node", this.ghostNode);
+      this.anchorBindingNode = parent.data;
+      this.drawState = "none";
+      this.logger.log("Starting binding with node from", parent.data);
+    }
+  }
+
+  public onNodeClick(node: Node, e: MouseEvent) {
+    if (this.anchorBindingNode) {
+      e.stopImmediatePropagation();
+      e.preventDefault();
+      this.logger.log("Binding node to", node);
+      if (!node.color) {
+        node.color = hslToHex(Math.floor(Math.random() * 19) * 20, 94, 47); // 360 colors / 20
+        this.logger.log("Generating color for node", node.color);
+        this.socket.emit(Flags.COLOR_NODE, new ColorNodeOut(this.blueprint.id, node.id, node.color));
       }
-      this.logger.log("Starting drawing ghost node", this.ghostNode);
+      this.socket.emit(Flags.CREATE_RELATION, new Relationship({
+        parentId: this.anchorBindingNode.id,
+        childId: node.id,
+        blueprint: this.blueprint,
+        parentPole: Pole.East,
+        childPole: Pole.East,
+        type: RelationshipType.Loopback
+      }));
+      this.anchorBindingNode = null;
     }
   }
 

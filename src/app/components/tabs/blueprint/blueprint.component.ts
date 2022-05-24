@@ -118,7 +118,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
       else if (this.drawState == "dragging")
         this.onDragTranslate([e.deltaX / zoom, e.deltaY / zoom]);
     }
-    this.logger.log("Updating transform matrix", this.cssTransformMatrix);
+    // this.logger.log("Updating transform matrix", this.cssTransformMatrix);
     this.viewportLocked = false;
   }
 
@@ -224,7 +224,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
       );
     }
     this.viewportLocked = true;
-    this.logger.log("Updating transform matrix", this.cssTransformMatrix);
+    // this.logger.log("Updating transform matrix", this.cssTransformMatrix);
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -394,7 +394,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
         this.transformMatrix,
         translate(e.movementX / zoom, e.movementY / zoom),
       );
-      this.logger.log("Updating transform matrix", this.cssTransformMatrix);
+      // this.logger.log("Updating transform matrix", this.cssTransformMatrix);
       this.viewportLocked = false;
     }
     else if (this.drawState === "drawing" || this.drawState === "dragging") {
@@ -514,7 +514,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     console.time("auto-pos");
     this.progress.show();
     const nodes = this.allNodes;
-    const margin: Vector = [100, 50];
+    const margin: Vector = [200, 50];
     // We add width and height DOM values;
     for (const node of nodes) {
       const el = this.getNodeEl(node.id).wrapper.nativeElement;

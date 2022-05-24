@@ -66,7 +66,7 @@ export class AnchorComponent {
   }
 
   public remove() {
-    this.logger.log("Removing relationship", this.data.id);
+    this.logger.log("Removing relationship", this.data);
     this.blueprint.loopbackRelsMap.delete(this.data.id);
     if (findParentRels(this.childNode, this.blueprint.loopbackRelsArr).length == 0) {
       this.childNode.color = null;

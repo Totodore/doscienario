@@ -45,6 +45,10 @@
 	&.linking {
 		app-node {
 			transform: translateY(-50%) skew(-10deg) !important;
+			cursor: pointer !important;
+		}
+		g[anchor] {
+			transform: translateX(4px) skew(-10deg);
 		}
 	}
 
@@ -130,6 +134,10 @@
 			&:hover:not(.skeleton) ~ .skeleton {
 				opacity: 0 !important;
 			}
+		}
+		g[anchor] {
+			transition: transform 200ms;
+			transform-box: fill-box;
 		}
 	}
 }

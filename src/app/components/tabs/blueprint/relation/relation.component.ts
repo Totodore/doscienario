@@ -1,7 +1,7 @@
 import { TemporaryNode } from './../blueprint.component';
 import { Vector } from 'src/types/global';
-import { AfterViewChecked, Component, Input } from '@angular/core';
-import { Node, Pole, Relationship, BlueprintSock } from 'src/app/models/api/blueprint.model';
+import { Component, Input } from '@angular/core';
+import { Node, Relationship } from 'src/app/models/api/blueprint.model';
 
 @Component({
   selector: 'g[relation]',

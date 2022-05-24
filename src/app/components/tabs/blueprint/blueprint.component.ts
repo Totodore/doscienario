@@ -269,7 +269,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
 
   public beginRelation(parent: NodeComponent, pos: [number, number, Pole, boolean?]) {
     const rightClick = pos[3] || false;
-    const pole = pos[2];
+    // const pole = pos[2];
     if (this.autoMode && !rightClick) {
       this.createNewNode([
         pos[0],

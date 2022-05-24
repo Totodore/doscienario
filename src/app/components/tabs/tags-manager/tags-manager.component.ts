@@ -1,5 +1,4 @@
 import { ITabElement } from 'src/app/models/sys/tab.model';
-import { IoHandler } from '../../../services/sockets/io.handler.service';
 import { AddTagComponent } from './add-tag/add-tag.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ProjectService } from './../../../services/project.service';

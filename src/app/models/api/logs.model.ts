@@ -1,4 +1,4 @@
-import { DbColumn, DbPrimaryColumn, DbPrimaryGeneratedColumn, DbTable } from "src/app/decorators/database-column.decorator";
+import { DbColumn, DbPrimaryGeneratedColumn, DbTable } from "src/app/decorators/database-column.decorator";
 
 @DbTable()
 export class Logs {

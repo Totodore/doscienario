@@ -6,7 +6,6 @@ import { Tag } from 'src/app/models/api/tag.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { RenameTagOut } from 'src/app/models/sockets/out/tag.out';
 import { ProjectService } from 'src/app/services/project.service';
-import { IoHandler } from 'src/app/services/sockets/io.handler.service';
 import { ConfirmComponent } from '../../utils/confirm/confirm.component';
 import { SocketService } from 'src/app/services/sockets/socket.service';
 

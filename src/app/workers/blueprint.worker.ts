@@ -2,7 +2,7 @@ import { findLevelByNode } from 'src/app/utils/tree.utils';
 import { NodeStruct } from './../utils/tree.utils';
 import { findDepth, findNodesByLevel, _findNodesLevels, _createCustomNode } from '../utils/tree.utils';
 import { Vector } from './../../types/global.d';
-import { Bounds, Node, Relationship } from '../models/api/blueprint.model';
+import { Node, Relationship } from '../models/api/blueprint.model';
 
 /// <reference lib="webworker" />
 

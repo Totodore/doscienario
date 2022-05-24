@@ -4,7 +4,7 @@ import { TabService } from 'src/app/services/tab.service';
 import { ContextMenuService } from './../../../../services/ui/context-menu.service';
 import { BlueprintComponent } from 'src/app/components/tabs/blueprint/blueprint.component';
 import { Relationship } from './../../../../models/api/blueprint.model';
-import { Component, Input, OnInit, HostListener, ElementRef } from '@angular/core';
+import { Component, Input, HostListener } from '@angular/core';
 import { Node } from 'src/app/models/api/blueprint.model';
 import { ProjectService } from 'src/app/services/project.service';
 import { SocketService } from 'src/app/services/sockets/socket.service';

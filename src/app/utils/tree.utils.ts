@@ -172,7 +172,7 @@ interface RemoveObj {
   rels: Relationship[];
 }
 // 0: parent, 1: child, 2: id
-type Tuple = [number, number, number?];
+// type Tuple = [number, number, number?];
 export type NodeStruct = { [id: number]: Node };
 export type RelationshipStruct = { [id: number]: Relationship };
 type NodeLevelStruct = { levels: Set<number>, node: Node };

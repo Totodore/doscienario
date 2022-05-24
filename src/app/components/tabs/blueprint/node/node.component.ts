@@ -1,11 +1,11 @@
 import { ContextMenuService } from './../../../../services/ui/context-menu.service';
-import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { Bounds, Node, Pole } from 'src/app/models/api/blueprint.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { Change } from 'src/app/models/sockets/in/element.in';
-import { ColorNodeOut, EditSummaryOut } from 'src/app/models/sockets/out/blueprint.out';
+import { EditSummaryOut } from 'src/app/models/sockets/out/blueprint.out';
 import { EditorWorkerService } from 'src/app/services/document-worker.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { SocketService } from 'src/app/services/sockets/socket.service';

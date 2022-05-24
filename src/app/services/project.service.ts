@@ -257,10 +257,10 @@ export class ProjectService {
   public removeBlueprintNode(packet: RemoveNodeIn) {
     const blueprint = this.getBlueprint(packet.blueprintId);
     if (!blueprint) return;
-    const data = removeNodeFromTree(packet.nodeId, blueprint.nodesArr.map(el => el.id), blueprint.relsArr.map(el => [el.parentId, el.childId, el.id]));
-    for (const node of blueprint.nodesArr.filter(el => !data.nodes.includes(el.id)))
+    const data = removeNodeFromTree(packet.nodeId, blueprint.nodesArr, blueprint.relsArr);
+    for (const node of blueprint.nodesArr.filter(el => !data.nodes.includes(el)))
       blueprint.nodesMap.delete(node.id);
-    for (const rel of blueprint.relsArr.filter(el => !data.rels.includes(el.id)))
+    for (const rel of blueprint.relsArr.filter(el => !data.rels.includes(el)))
       blueprint.relsMap.delete(rel.id);
 
   }

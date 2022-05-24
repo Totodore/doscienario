@@ -51,6 +51,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   public scrollPoles: Set<Pole> = new Set();
   public drawState: DrawStates = "none";
   public ghostNode?: TemporaryNode;
+  public anchorBindingNode?: Node;
 
   public readonly freeMode = false;
   public readonly type = TabTypes.BLUEPRINT;
@@ -61,7 +62,6 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   private movingNodeData: MovingNodeData;
   private viewportLocked = false;
   private mouseOut = false;
-  private anchorBindingNode?: Node;
   private readonly blueprintWorker: WorkerManager;
 
   constructor(
@@ -98,7 +98,6 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   public loadedTab() {
     super.loadedTab();
     this.autoSizeViewport();
-    this.anchorMap.set(201, new Relationship({ id: 201, parentId: 495, childId: 8 }));
   }
 
   /**
@@ -230,7 +229,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
 
   @HostListener('document:keydown', ['$event'])
   public onKeypress(e: KeyboardEvent) {
-    if (e.keyCode === ESCAPE && this.drawState === "drawing") {
+    if (e.keyCode === ESCAPE && (this.drawState === "drawing" || this.anchorBindingNode)) {
       this.drawState = "none";
       this.ghostNode = null;
       this.anchorBindingNode = null;
@@ -306,7 +305,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
       e.preventDefault();
       this.logger.log("Binding node to", node);
       if (!node.color) {
-        node.color = hslToHex(Math.floor(Math.random() * 19) * 20, 94, 47); // 360 colors / 20
+        node.color = hslToHex(Math.floor(Math.random() * 19) * 20, 94, 26); // 360 colors / 20
         this.logger.log("Generating color for node", node.color);
         this.socket.emit(Flags.COLOR_NODE, new ColorNodeOut(this.blueprint.id, node.id, node.color));
       }
@@ -341,14 +340,16 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer ce noeud et tous ses enfants orphelins ?" });
     dialog.componentInstance.confirm.subscribe(() => {
       dialog.close();
-      const data = removeNodeFromTree(el.data.id,
-        this.nodes.map(el => el.id),
-        this.rels.map(el => [el.parentId, el.childId, el.id])
-      );
+      const data = removeNodeFromTree(el.data.id, this.nodes, [...this.rels, ...this.anchors]);
+      this.logger.log("Removing nodes", data);
       for (const node of data.nodes)
-        this.blueprint.nodesMap.delete(node);
-      for (const rel of data.rels)
-        this.blueprint.relsMap.delete(rel);
+        this.blueprint.nodesMap.delete(node.id);
+      for (const rel of data.rels) {
+        if (rel.type == RelationshipType.Direct)
+          this.blueprint.relsMap.delete(rel.id);
+        else (rel.type == RelationshipType.Loopback)
+          this.blueprint.loopbackRelsMap.delete(rel.id);
+      }
       this.socket.emit(Flags.REMOVE_NODE, new RemoveNodeOut(el.data.id, this.id));
     });
   }
@@ -590,6 +591,9 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   }
   get rels(): Relationship[] {
     return this.blueprint.relsArr;
+  }
+  get anchors(): Relationship[] {
+    return this.blueprint.loopbackRelsArr;
   }
 
   get title(): string {

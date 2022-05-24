@@ -1,4 +1,4 @@
-<div class="wrapper" #wrapper [style.background-color]="'#' + data.color">
+<div class="wrapper" #wrapper [style.background-color]="data.color ? '#' + data.color : null">
   <mat-form-field color="accent" [appearance]="$any('none')">
     <textarea *ngIf="data" matInput
               cdkTextareaAutosize
@@ -15,7 +15,7 @@
               placeholder="Nouveau noeud"
     ></textarea>
   </mat-form-field>
-  <span #addRel>
+  <span #addRel *ngIf="!hasAnchor">
     <mat-icon 
 			#icon (click)="onAddRelButton(icon, $event)" 
 			[class]="'mat-18 add-relation ' + btnAnchor"

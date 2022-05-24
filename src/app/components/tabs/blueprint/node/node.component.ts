@@ -5,7 +5,7 @@ import { MatIcon } from '@angular/material/icon';
 import { Bounds, Node, Pole } from 'src/app/models/api/blueprint.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { Change } from 'src/app/models/sockets/in/element.in';
-import { EditSummaryOut } from 'src/app/models/sockets/out/blueprint.out';
+import { ColorNodeOut, EditSummaryOut } from 'src/app/models/sockets/out/blueprint.out';
 import { EditorWorkerService } from 'src/app/services/document-worker.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { SocketService } from 'src/app/services/sockets/socket.service';
@@ -15,6 +15,7 @@ import { Vector } from './../../../../../types/global.d';
 import { TabService } from './../../../../services/tab.service';
 import { DrawStates } from './../blueprint.component';
 import { NodeEditorComponent } from './node-editor/node-editor.component';
+import { findChildRels } from 'src/app/utils/tree.utils';
 @Component({
   selector: 'app-node',
   templateUrl: './node.component.html',
@@ -97,8 +98,8 @@ export class NodeComponent implements AfterViewInit, OnInit {
 
   public ngAfterViewInit(): void {
     if (!this.initialized) {
-      this.addRelBtn.nativeElement.addEventListener("mouseenter", () => this.mouseHoverButton = true);
-      this.addRelBtn.nativeElement.addEventListener("mouseleave", () => this.mouseHoverButton = false);
+      this.addRelBtn?.nativeElement.addEventListener("mouseenter", () => this.mouseHoverButton = true);
+      this.addRelBtn?.nativeElement.addEventListener("mouseleave", () => this.mouseHoverButton = false);
       this.wrapper.nativeElement.addEventListener("contextmenu", e => this.onContextMenu(e));
       this.initialized = true;
     }
@@ -126,7 +127,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
   public onAddRelButton(icon: MatIcon, e: Event, rightClick = false) {
     e.preventDefault();
     e.stopImmediatePropagation();
-    const rels = this.project.getBlueprint(this.tabs.displayedTab[1].id).relsArr.filter(el => el.childId === this.data.id);
+    const rels = this.project.getBlueprint(this.tabs.displayedTab[1].id).relsArr;
     let [x, y] = [this.data.x, this.data.y];
     const [w, h] = [this.wrapper.nativeElement.clientWidth, this.wrapper.nativeElement.clientHeight];
     switch (this.btnAnchor) {
@@ -145,9 +146,10 @@ export class NodeComponent implements AfterViewInit, OnInit {
         break;
     }
     if (this.drawState === "drawing" && this.parentGhost !== this && !rels.find(el => el.parentId === this.parentGhost.data.id)) {
-      this.relationBind.emit([x ,y]);
+      this.relationBind.emit([x, y]);
     } else {
-      this.relationBegin.emit([x, y, this.btnAnchor, rightClick]);
+      if (!rightClick || findChildRels(this.data, rels).length == 0)
+        this.relationBegin.emit([x, y, this.btnAnchor, rightClick]);
     }
   }
 
@@ -199,7 +201,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
 
   // @HostListener("mousemove", ['$event'])
   public onMoveHover(e: MouseEvent) {
-    if (this.mouseHoverButton) return;
+    if (this.mouseHoverButton || !this.addRelBtn) return;
     const [w, h] = [this.wrapper.nativeElement.parentElement.clientWidth, this.wrapper.nativeElement.parentElement.clientHeight];
     if (e.offsetX < w / 4 && !this.data?.isRoot)
       this.btnAnchor = Pole.West;
@@ -237,6 +239,9 @@ export class NodeComponent implements AfterViewInit, OnInit {
     this.moveEnd.emit();
   }
 
+  public get hasAnchor(): boolean {
+    return !!this.project.getBlueprint(this.tabs.displayedTab[1].id).loopbackRelsArr.find(el => el.parentId == this.data.id);
+  }
   public get bounds(): Bounds {
     return {
       x: this.data.x,

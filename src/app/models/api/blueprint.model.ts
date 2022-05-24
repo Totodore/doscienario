@@ -38,6 +38,9 @@ export class BlueprintSock extends Blueprint {
   public get relsArr(): Relationship[] {
     return Array.from(this.relsMap.values());
   }
+  public get loopbackRelsArr(): Relationship[] {
+    return Array.from(this.loopbackRelsMap.values());
+  }
 }
 
 

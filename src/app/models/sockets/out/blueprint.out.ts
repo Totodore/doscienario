@@ -41,6 +41,12 @@ export class RemoveNodeOut {
     public blueprintId: number
   ) { }
 }
+export class RemoveRelOut {
+  constructor(
+    public relId: number,
+    public blueprintId: number
+  ) { }
+}
 export class ColorNodeOut {
   constructor(
     public blueprintId: number,

@@ -42,6 +42,11 @@
 	&.grabbing {
 		cursor: grabbing;
 	}
+	&.linking {
+		app-node {
+			transform: translateY(-50%) skew(-10deg) !important;
+		}
+	}
 
 	canvas {
 		position: absolute;
@@ -105,6 +110,8 @@
 		app-node {
 			position: absolute;
 			transform: translateY(-50%);
+			transition: transform 200ms;
+			z-index: 1;
 
 			&.skeleton {
 				opacity: 0.3;

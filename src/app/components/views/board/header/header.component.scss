@@ -1,9 +1,10 @@
+@use '~@angular/material' as mat;
 @import '~@angular/material/theming';
 
 .mat-toolbar {
   background-color: #383838;
   color: white !important;
-  @include mat-elevation(1);
+  @include mat.elevation(1);
 
 }
 ::ng-deep .mat-tab-header {

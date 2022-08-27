@@ -1,3 +1,4 @@
+@use '~@angular/material' as mat;
 @import "@angular/material/prebuilt-themes/pink-bluegrey.css";
 @import "~@angular/material/theming";
 
@@ -52,7 +53,7 @@ app-menu {
 //Ck Styling
 .ck-balloon-panel {
 	border: none !important;
-	@include mat-elevation(1);
+	@include mat.elevation(1);
 }
 .ck-mentions {
 	background-color: $grey-dark-color !important;
@@ -164,7 +165,7 @@ ckeditor {
 			background-color : transparent !important;
 		}
 		.image {
-			@include mat-elevation(1);
+			@include mat.elevation(1);
 			overflow: hidden !important;
 			border-radius: 5px !important;
 			figcaption {

@@ -1,3 +1,4 @@
+@use '~@angular/material' as mat;
 @import "~@angular/material/theming";
 
 :host {
@@ -18,7 +19,7 @@
 	border-radius: 5px;
 	background-color: #323232;
 	// overflow: hidden;
-	@include mat-elevation(2);
+	@include mat.elevation(2);
 }
 
 button {

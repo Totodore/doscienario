@@ -181,19 +181,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular-material-components/color-picker@npm:^7.0.0":
-  version: 7.0.1
-  resolution: "@angular-material-components/color-picker@npm:7.0.1"
+"@angular-material-components/color-picker@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "@angular-material-components/color-picker@npm:8.0.0"
   dependencies:
     tslib: ^2.3.0
   peerDependencies:
-    "@angular/cdk": ^13.0.1
-    "@angular/common": ^13.0.1
-    "@angular/core": ^13.0.1
-    "@angular/forms": ^13.0.1
-    "@angular/material": ^13.0.1
-    "@angular/platform-browser": ^13.0.1
-  checksum: 2481b7cd3b794960b5b2bf6d5e14350c82b12278e4a96e736c6e093824fab96759d1d41c33bbd8bada8b62da703a06bda15c346ace8fd1747e972f34e4a384f9
+    "@angular/cdk": ^14.0.1
+    "@angular/common": ^14.0.1
+    "@angular/core": ^14.0.1
+    "@angular/forms": ^14.0.1
+    "@angular/material": ^14.0.1
+    "@angular/platform-browser": ^14.0.1
+  checksum: aea7575dd4721a90f2528724ceb027ada7b28ff6fcbf38a2e2d26c2250823c4dfe0901e73704b0346e9ca57cd28cae66605d12debbc46e3b07483e082c2a940f
   languageName: node
   linkType: hard
 
@@ -4071,7 +4071,7 @@ __metadata:
   dependencies:
     "@angular-builders/custom-webpack": ^8.4.1
     "@angular-devkit/build-angular": ~13.3.9
-    "@angular-material-components/color-picker": ^7.0.0
+    "@angular-material-components/color-picker": ^8.0.0
     "@angular/animations": ~13.3.11
     "@angular/cdk": ^13.3.9
     "@angular/cli": ~13.3.9

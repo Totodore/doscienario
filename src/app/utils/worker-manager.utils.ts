@@ -18,13 +18,13 @@ export class WorkerManager {
     else {
       switch (workerType) {
         case WorkerType.Blueprint:
-          this.worker = new Worker("../workers/blueprint.worker", { type: 'module' });          
+          this.worker = new Worker(new URL('../workers/blueprint.worker', import.meta.url), { type: 'module' });          
           break;
         case WorkerType.Editor:
-          this.worker = new Worker("../workers/editor.worker", { type: 'module' });
+          this.worker = new Worker(new URL('../workers/editor.worker', import.meta.url), { type: 'module' });
           break;
         case WorkerType.Search:
-          this.worker = new Worker("../workers/search.worker", { type: 'module' });
+          this.worker = new Worker(new URL('../workers/search.worker', import.meta.url), { type: 'module' });
           break;
       }
     }

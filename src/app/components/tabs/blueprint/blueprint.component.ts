@@ -100,9 +100,8 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
 
   public onFocus(): void {
     super.onFocus();
-    this.logger.log("Blueprint focus");
     // Wait for view to initialize
-    setTimeout(() => this.autoSizeViewport(), 200);
+    setTimeout(() => this.show && this.autoSizeViewport(), 200);
   }
 
   /**

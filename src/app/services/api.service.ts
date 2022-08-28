@@ -5,7 +5,7 @@ import { ProjectService } from 'src/app/services/project.service';
 import { Project } from './../models/api/project.model';
 import { HttpClient, HttpEvent, HttpEventType, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { version } from '../../../package.json';
+import packageVersion from '../../../package.json';
 import { ApiUtil } from '../utils/api.util';
 import { VersionCheckRes } from '../models/api/system.model';
 import { NGXLogger } from 'ngx-logger';
@@ -63,7 +63,7 @@ export class ApiService extends ApiUtil {
   }
 
   public async checkApiVersion() {
-    return await this.get<VersionCheckRes>(`system/check-version?version=${version}`);
+    return await this.get<VersionCheckRes>(`system/check-version?version=${packageVersion.version}`);
   }
 
   public get inProject(): boolean {

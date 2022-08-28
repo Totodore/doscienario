@@ -6,7 +6,7 @@ import { ProgressService } from './services/ui/progress.service';
 import { ApiService } from './services/api.service';
 import { MatDialog } from '@angular/material/dialog';
 import { InfoComponent } from './components/utils/info/info.component';
-import { version } from '../../package.json';
+import packageData from '../../package.json';
 import { ContextMenuService } from './services/ui/context-menu.service';
 @Component({
   selector: 'app-root',
@@ -37,7 +37,7 @@ export class AppComponent implements OnInit {
       this.dialog.open(InfoComponent, {
         data: {
           text: `Une mise à jour est requise pour continuer à utiliser Doscienario`,
-          content: `Vous devez posséder une des versions suivantes : ${res.versions.join(", ")}. Version actuelle : ${version}`,
+          content: `Vous devez posséder une des versions suivantes : ${res.versions.join(", ")}. Version actuelle : ${packageData.version}`,
           closable: false
         },
         closeOnNavigation: false,

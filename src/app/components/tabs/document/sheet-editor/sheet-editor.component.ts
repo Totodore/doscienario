@@ -6,7 +6,7 @@ import { Flags } from 'src/app/models/sockets/flags.enum';
 import { Change } from 'src/app/models/sockets/in/element.in';
 import { OpenSheetOut } from 'src/app/models/sockets/out/sheet.out';
 import { EditorWorkerService } from 'src/app/services/document-worker.service';
-import { SocketService } from 'src/app/services/sockets/socket.service.js';
+import { SocketService } from 'src/app/services/sockets/socket.service';
 import { ProgressService } from 'src/app/services/ui/progress.service';
 import { applyTabPlugin } from 'src/app/utils/doc.utils';
 import { v4 as uuid } from 'uuid';

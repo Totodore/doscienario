@@ -8,7 +8,7 @@ import { ProjectOptionsComponent } from '../project-options/project-options.comp
 import { TabService } from '../../../services/tab.service';
 import { ProjectService } from '../../../services/project.service';
 import { Component, Input, OnInit } from '@angular/core';
-import { version } from "../../../../../package.json";
+import packageData from "../../../../../package.json";
 import { NGXLogger } from 'ngx-logger';
 import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
 @Component({
@@ -37,7 +37,7 @@ export class WelcomeTabComponent implements ITabElement, OnInit {
 
   public async ngOnInit() {
     const res = await this.api.checkApiVersion();
-    this.hasUpdate = res.versions[res.versions.length - 1] !== version ? res.versions[res.versions.length - 1] : undefined;
+    this.hasUpdate = res.versions[res.versions.length - 1] !== this.version ? res.versions[res.versions.length - 1] : undefined;
     if (this.hasUpdate)
       this.logger.log("Update available : " + this.hasUpdate);
   }
@@ -82,6 +82,6 @@ export class WelcomeTabComponent implements ITabElement, OnInit {
   }
 
   public get version() {
-    return version;
+    return packageData.version;
   }
 }

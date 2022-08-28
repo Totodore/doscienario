@@ -75,6 +75,7 @@ import { MapperLoggerService } from './services/logger/mapper-logger.service';
 import { WriterLoggerService } from './services/logger/writer-logger.service';
 import { appearance } from './style/default';
 import { AnchorComponent } from './components/tabs/blueprint/anchor/anchor.component';
+import { DatePipe } from '@angular/common';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -154,6 +155,7 @@ import { AnchorComponent } from './components/tabs/blueprint/anchor/anchor.compo
     { provide: HTTP_INTERCEPTORS, useClass: DateHttpInterceptor, multi: true },
     { provide: TOKEN_LOGGER_MAPPER_SERVICE, useClass: MapperLoggerService },
     { provide: TOKEN_LOGGER_WRITER_SERVICE, useClass: WriterLoggerService },
+    DatePipe
   ],
   bootstrap: [AppComponent]
 })

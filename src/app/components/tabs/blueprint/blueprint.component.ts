@@ -1,5 +1,5 @@
 import { TreeIoHandler } from './../../../services/sockets/tree-io.handler.service';
-import { Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { NGXLogger } from 'ngx-logger';
 import { BlueprintSock, Node, Pole, Relationship, RelationshipType } from 'src/app/models/api/blueprint.model';
@@ -42,7 +42,6 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   @ViewChildren("nodeEl")
   public nodeEls: QueryList<NodeComponent>;
 
-  public initialized = false;
   public tabId: string;
   public show: boolean;
   public magnetMode = false;
@@ -97,7 +96,13 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
 
   public loadedTab() {
     super.loadedTab();
-    this.autoSizeViewport();
+  }
+
+  public onFocus(): void {
+    super.onFocus();
+    this.logger.log("Blueprint focus");
+    // Wait for view to initialize
+    setTimeout(() => this.autoSizeViewport(), 200);
   }
 
   /**

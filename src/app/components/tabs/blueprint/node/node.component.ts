@@ -62,6 +62,9 @@ export class NodeComponent implements AfterViewInit, OnInit {
   @Output()
   private readonly moveEnd = new EventEmitter<void>();
 
+  @Output()
+  private readonly resize = new EventEmitter<[number, number]>();
+
   /**
    * Named listeners in order to remove them and keep this inside function
    * @param e mouse event 
@@ -80,6 +83,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
   private initialized: boolean;
   private nodeUuid = v4();
   private displayProgress = false;
+  private previousBounds?: Bounds;
 
 
   constructor(
@@ -159,6 +163,10 @@ export class NodeComponent implements AfterViewInit, OnInit {
   }
   public onChange(val: string) {
     this.socket.emit(Flags.SUMARRY_NODE, new EditSummaryOut(this.data.id, val, this.blueprintId));
+    if (this.bounds.height != this.previousBounds?.height) {
+      this.resize.emit([this.bounds.width - this.previousBounds?.width || 0, this.bounds.height - this.previousBounds?.height || 0]);
+      this.previousBounds = this.bounds;
+    }
   }
 
   public openDetailsView() {

@@ -8,6 +8,7 @@
 							[(ngModel)]="data.summary"
 							(ngModelChange)="onChange($event)"
     ></textarea>
+		<!-- Ghost node textarea -->
 		<textarea *ngIf="!data" matInput
               cdkTextareaAutosize
               #autosize="cdkTextareaAutosize"

@@ -69,6 +69,9 @@ export function findChildRels(node: Node, rels: Relationship[]): Relationship[] 
 export function findParentRels(node: Node, rels: Relationship[]): Relationship[] {
   return rels.filter(el => el.childId === node.id);
 }
+export function findRoot(nodes: Node[], rels: Relationship[]): Node {
+  return nodes.find(el => findParentRels(el, rels).length === 0);
+}
 /** 
  * Find all nodes from a specified level 
  */
@@ -129,6 +132,31 @@ export function getTreeRect(rects: Rect[], cx: number, cy: number): Rect {
     rect.height = Math.max(rect.height, nodeRect.top + nodeRect.height - rect.top);
   }
   return rect;
+}
+
+/**
+ * Adjust the position of the nodes in a column if a node is expanded 
+ * @param nodes The list of nodes constituing the tree
+ * @param rels The list of rels constituing the tree
+ * @param root The root node of the tree
+ * @param node The node that is expanded
+ * @param cy The delta to apply to the nodes
+ * @returns A list of the modified nodes
+ */
+export function adjustTreeColumnNodes(nodes: Node[], rels: Relationship[], node: Node, cy: number): Node[] {
+  const root = findRoot(nodes, rels);
+  const level = findLevelByNode(node, root, nodes, rels);
+  const siblings = findNodesByLevel(root, rels, nodes, level);
+  console.log(cy);
+  for (const sibling of siblings) {
+    if (sibling.id == node.id)
+      continue;
+    if (sibling.bounds.y > node.bounds.y)
+      sibling.y += cy / 2;
+    else if (sibling.bounds.y < node.bounds.y)
+      sibling.y -= cy / 2;
+  }
+  return siblings;
 }
 // function findBestOrder(nodes: Node[], rels: Relationship[], o: Tuple, margin: Tuple) {
 //   const usedStates: number[][] = Array(nodes.length);

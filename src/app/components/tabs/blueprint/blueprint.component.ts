@@ -10,7 +10,7 @@ import { AddTagElementOut } from 'src/app/models/sockets/out/tag.out';
 import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
 import { SocketService } from 'src/app/services/sockets/socket.service';
 import { SnackbarService } from 'src/app/services/ui/snackbar.service';
-import { findLevelByNode, getTreeRect, removeNodeFromTree } from 'src/app/utils/tree.utils';
+import { adjustTreeColumnNodes, findLevelByNode, getTreeRect, removeNodeFromTree } from 'src/app/utils/tree.utils';
 import { WorkerManager, WorkerType } from 'src/app/utils/worker-manager.utils';
 import { ProgressService } from '../../../services/ui/progress.service';
 import { ElementComponent } from '../element.component';
@@ -301,6 +301,15 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
       this.drawState = "none";
       this.logger.log("Starting binding with node from", parent.data);
     }
+  }
+
+  public onNodeResize(node: Node, _cx: number, cy: number) {
+    console.time("resize");
+    const movedNodes = adjustTreeColumnNodes(this.allNodes, this.rels, node, cy);
+    for (const node of movedNodes) {
+      this.socket.emit(Flags.PLACE_NODE, new PlaceNodeOut(this.id, node.id, [node.x, node.y]));
+    }
+    console.timeEnd("resize");
   }
 
   public onNodeClick(node: Node, e: MouseEvent) {

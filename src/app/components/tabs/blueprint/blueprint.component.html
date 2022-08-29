@@ -26,7 +26,8 @@
 				[style.top]="'calc(50% + ' + nodesMap.get(nodeId).y + 'px)'" (remove)="onRemove(nodeEl)"
 				(relationBegin)="beginRelation(nodeEl, $event)" (relationBind)="bindRelation(nodeEl, $event)"
 				(moveStart)="onDragStart(nodesMap.get(nodeId), nodeEl)" (move)="onDragMove($event)"
-				(moveEnd)="onDragEnd(nodesMap.get(nodeId))" (click)="onNodeClick(nodesMap.get(nodeId), $event)">
+				(moveEnd)="onDragEnd(nodesMap.get(nodeId))" (click)="onNodeClick(nodesMap.get(nodeId), $event)"
+				(resize)="onNodeResize(nodesMap.get(nodeId), $event[0], $event[1])">
 			</app-node>
 			<app-node *ngIf="ghostNode" class="skeleton" id="ghostnode" [style.left]="'calc(50% + ' + ghostNode.ex + 'px)'"
 				[style.top]="'calc(50% + ' + ghostNode.ey + 'px)'">

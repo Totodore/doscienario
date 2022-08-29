@@ -241,7 +241,7 @@ export class ProjectService {
         const component = this.tabs.displayedTab[1] as BlueprintComponent;
         if (component.autoMode)
           await component.autoPos(packet.node);
-      }, 0);
+      }, 100);
     }
   }
 

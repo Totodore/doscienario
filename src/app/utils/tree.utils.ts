@@ -147,7 +147,6 @@ export function adjustTreeColumnNodes(nodes: Node[], rels: Relationship[], node:
   const root = findRoot(nodes, rels);
   const level = findLevelByNode(node, root, nodes, rels);
   const siblings = findNodesByLevel(root, rels, nodes, level);
-  console.log(cy);
   for (const sibling of siblings) {
     if (sibling.id == node.id)
       continue;

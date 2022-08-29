@@ -10,7 +10,7 @@
 * Autoformat
 * Block quote
 * Bold
-* CKFinder Upload Adapter
+* Simple Upload Adapter
 * Link
 * Image
 * Heading

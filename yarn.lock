@@ -3854,6 +3854,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"crc@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "crc@npm:4.1.1"
+  peerDependencies:
+    buffer: ">=6.0.3"
+  checksum: b2ab89547bd47ac8bdaadcd362d94aa9ddda2ddfe7267e0b449f62a83739bd8f99e9874e4933652d5653ab5f9703eebba9665d03206d600cef2ded9ff3c5c1e2
+  languageName: node
+  linkType: hard
+
 "create-require@npm:^1.1.0":
   version: 1.1.1
   resolution: "create-require@npm:1.1.1"
@@ -4222,6 +4231,7 @@ __metadata:
     angular-cli-ghpages: ^1.0.3
     axios: ^0.27.2
     codelyzer: ^6.0.2
+    crc: ^4.1.1
     diff: ^5.1.0
     fast-array-diff: ^1.0.1
     fast_array_intersect: ^1.1.0

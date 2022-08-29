@@ -14,3 +14,11 @@ export class CursorDocumentIn {
   }
 
 }
+
+export class CheckCRCIn {
+  constructor(
+    public elId: number,
+    public crc: number,
+    public isValid: boolean,
+  ) { }
+}

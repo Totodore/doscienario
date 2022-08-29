@@ -1,11 +1,16 @@
 import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { CKEditor5 } from '@ckeditor/ckeditor5-angular';
+import crc32 from 'crc/calculators/crc32';
+import { NGXLogger } from 'ngx-logger';
+import { find, Observable } from 'rxjs';
 import { DocumentSock } from 'src/app/models/api/document.model';
 import { Sheet } from 'src/app/models/api/sheet.model';
 import { Tag } from 'src/app/models/api/tag.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
+import { CheckCRCIn } from 'src/app/models/sockets/in/document.in';
 import { Change } from 'src/app/models/sockets/in/element.in';
+import { CheckCRCOut } from 'src/app/models/sockets/out/element.out';
 import { AddTagElementOut } from 'src/app/models/sockets/out/tag.out';
 import { ITabElement, TabTypes } from 'src/app/models/sys/tab.model';
 import { ApiService } from 'src/app/services/api.service';
@@ -83,6 +88,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
 
   private displayProgress: boolean = false;
   private hasEdited: boolean = false;
+  private checkCRCTimer?: number;
 
   constructor(
     private readonly docIo: DocIoHandler,
@@ -93,9 +99,10 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     private readonly api: ApiService,
     private readonly dialog: MatDialog,
     private readonly contextMenu: ContextMenuService,
+    logger: NGXLogger,
     progress: ProgressService,
   ) {
-    super(progress);
+    super(progress, logger);
   }
 
   public onClose() {
@@ -120,6 +127,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
 
   public ngOnDestroy() {
     this.docWorker.worker.removeEventListener(`diff-${this.tabId}`);
+    window.clearTimeout(this.checkCRCTimer);
   }
 
   /**
@@ -153,6 +161,15 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     this.project.openDocs[this.tabId!].content = this.doc.content;
   }
 
+  protected getCRC(): number | Promise<number> {
+    return crc32(new TextEncoder().encode(this.doc.content));
+  }
+  protected sendCRCRequest(crc: number): Observable<CheckCRCIn> {
+    this.socket.emit(Flags.CRC_DOC, new CheckCRCOut(this.id, crc));
+    return this.socket.fromEvent<CheckCRCIn>(Flags.CRC_DOC).pipe(find(data => data.elId === this.id && data.crc == crc));
+  }
+
+
   /**
    * Triggerred for each text edition
    * If the change is above 500 char (e.g copy/paste) we send the entire content
@@ -161,6 +178,8 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   public onChange() {
     const data = this.editorInstance.getData();
     this.hasEdited = true;
+    if (this.checkCRCTimer)
+      window.clearTimeout(this.checkCRCTimer);
     if (Math.abs(data.length - this.doc.content.length) > 500) {
       const change: Change = [2, null, data];
       this.docIo.updateDocument(this.id, this.tabId!, [change], this.doc.lastChangeId, ++this.doc.clientUpdateId!);
@@ -169,6 +188,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       this.progressWatcher();
     }
     this.project.openDocs[this.tabId!].content = data;
+    this.checkCRCTimer = window.setTimeout(() => this.checkCRC(), 5000);
   }
 
   /**

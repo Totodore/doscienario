@@ -21,6 +21,10 @@ import { NodeComponent } from './node/node.component';
 import { scale, translate, compose, Matrix, toCSS, decomposeTSR, identity } from 'transformation-matrix';
 import { ESCAPE } from '@angular/cdk/keycodes';
 import { hslToHex } from 'src/app/utils/helpers';
+import { Observable, find } from 'rxjs';
+import { CheckCRCIn } from 'src/app/models/sockets/in/document.in';
+import crc32 from 'crc/calculators/crc32';
+import { CheckCRCOut } from 'src/app/models/sockets/out/element.out';
 
 
 @Component({
@@ -69,10 +73,10 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     private readonly socket: SocketService,
     progress: ProgressService,
     private readonly snack: SnackbarService,
-    private readonly logger: NGXLogger,
+    protected readonly logger: NGXLogger,
     _: TreeIoHandler,   // Unused tree io handler in the current class but it should be declarated somewhere to be included in the bundle
   ) {
-    super(progress);
+    super(progress, logger);
     this.blueprintWorker = new WorkerManager(WorkerType.Blueprint, this.logger);
   }
 
@@ -102,6 +106,14 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     super.onFocus();
     // Wait for view to initialize
     setTimeout(() => this.show && this.autoSizeViewport(), 200);
+  }
+
+  protected getCRC(): number | Promise<number> {
+    return crc32(new TextEncoder().encode(JSON.stringify([this.allNodes, this.rels])));
+  }
+  protected sendCRCRequest(crc: number): Observable<CheckCRCIn> {
+    this.socket.emit(Flags.CRC_BLUEPRINT, new CheckCRCOut(this.id, crc));
+    return this.socket.fromEvent<CheckCRCIn>(Flags.CRC_DOC).pipe(find(data => data.elId === this.id && data.crc == crc));
   }
 
   /**

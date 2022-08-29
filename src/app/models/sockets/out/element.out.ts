@@ -24,3 +24,10 @@ export class RenameElementOut {
     public title: string
   ) { }
 }
+
+export class CheckCRCOut {
+  constructor(
+    public elId: number,
+    public crc: number,
+  ) { }
+}

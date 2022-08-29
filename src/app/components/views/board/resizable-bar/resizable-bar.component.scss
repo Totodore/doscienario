@@ -65,6 +65,9 @@
 			font-size: 22px;
 			margin: 0 4px;
 			transform: rotate(180deg);
+			flex-grow: 1;
+			flex-shrink: 0;
+			margin-left: 0;
 		}
 		span {
 			transition: all 100ms;

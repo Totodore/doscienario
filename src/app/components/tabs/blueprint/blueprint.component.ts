@@ -304,6 +304,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   }
 
   public onNodeResize(node: Node, _cx: number, cy: number) {
+    this.logger.log("Resizing node", node.id, _cx, cy);
     const movedNodes = adjustTreeColumnNodes(this.allNodes, this.rels, node, cy);
     for (const node of movedNodes) {
       this.socket.emit(Flags.PLACE_NODE, new PlaceNodeOut(this.id, node.id, [node.x, node.y]));

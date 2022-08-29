@@ -163,12 +163,14 @@ export class NodeComponent implements AfterViewInit, OnInit {
   }
   public onChange(val: string) {
     this.socket.emit(Flags.SUMARRY_NODE, new EditSummaryOut(this.data.id, val, this.blueprintId));
-    if (this.bounds.height != this.previousBounds?.height) {
-      this.resize.emit([this.bounds.width - this.previousBounds?.width || 0, this.bounds.height - this.previousBounds?.height || 0]);
-      this.previousBounds = this.bounds;
-    }
+    setTimeout(() => {
+      if (this.bounds.height != this.previousBounds?.height) {
+        this.resize.emit([this.bounds.width - this.previousBounds?.width || 0, this.bounds.height - this.previousBounds?.height || 0]);
+        this.previousBounds = this.bounds;
+      }
+    }, 0);
   }
-
+  
   public openDetailsView() {
     const dialog = this.dialog.open(NodeEditorComponent, {
       closeOnNavigation: false,

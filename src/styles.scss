@@ -53,6 +53,8 @@ app-menu {
 //Ck Styling
 .ck-balloon-panel {
 	border: none !important;
+	background-color: $grey-dark-color !important;
+	color: white !important;
 	@include mat.elevation(1);
 }
 .ck-mentions {
@@ -79,7 +81,7 @@ app-menu {
 		}
 	}
 }
-ckeditor {
+ckeditor, .ck-balloon-panel {
 	.ck.ck-editor__main {
     max-height: calc(100vh -  30px - 50px) !important;
     flex-direction: column !important;

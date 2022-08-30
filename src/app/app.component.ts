@@ -32,7 +32,6 @@ export class AppComponent implements OnInit {
     const res = await this.api.checkApiVersion();
     this.isCompatible = res.allowed;
     this.tauri.closeSplashscreen();
-    this.disableContextMenu();
     if (!res.allowed) {
       this.dialog.open(InfoComponent, {
         data: {
@@ -46,15 +45,16 @@ export class AppComponent implements OnInit {
     }
   }
 
-  private disableContextMenu() {
-    document.addEventListener('contextmenu', e => {
-      e.preventDefault();
-      return false;
-    }, { capture: true })
+  //TODO: find a more appropriate solution
+  // private disableContextMenu() {
+  //   document.addEventListener('contextmenu', e => {
+  //     e.preventDefault();
+  //     return false;
+  //   }, { capture: true })
 
-    document.addEventListener('selectstart', e => {
-      e.preventDefault();
-      return false;
-    }, { capture: true })
-  }
+  //   document.addEventListener('selectstart', e => {
+  //     e.preventDefault();
+  //     return false;
+  //   }, { capture: true })
+  // }
 }

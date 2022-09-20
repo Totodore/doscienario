@@ -126,6 +126,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   }
 
   public ngOnDestroy() {
+    super.ngOnDestroy();
     this.docWorker.worker.removeEventListener(`diff-${this.tabId}`);
     window.clearTimeout(this.checkCRCTimer);
   }

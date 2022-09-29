@@ -7,6 +7,8 @@
   name="edit"
   ngDefaultControl
   (ready)="editorLoaded($event)"
+	(wheel)="onWheel($event)"
+	[style.fontSize]="fontZoom + 'px'"
   ></ckeditor>
   <h1 *ngIf="doc == null">Chargement du document...</h1>
 </div>

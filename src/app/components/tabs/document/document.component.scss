@@ -8,3 +8,10 @@ h1 {
   line-height: 35px;
   color: whitesmoke;
 }
+:host ::ng-deep ckeditor {
+	line-height: 1.4;
+	font-size: 14px;
+	.ck-toolbar {
+		font-size: 14px !important;
+	}
+}

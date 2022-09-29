@@ -145,7 +145,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       editor.ui.getEditableElement()
     );
     applyTabPlugin(editor);
-    
+
     this.editorInstance = editor;
     this.contentElement = editor.ui.view.editable.element as HTMLElement;
     this.contentElement.scrollTo({ left: this.scroll?.[0], top: this.scroll?.[1], behavior: "auto" });
@@ -160,6 +160,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   public loadedTab() {
     super.loadedTab();
     this.project.openDocs[this.tabId!].content = this.doc.content;
+    this.logger.log("Document loaded");
   }
 
   protected getCRC(): number | Promise<number> {
@@ -202,7 +203,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     this.progress.hide();
     try {
       this.docIo.updateDocument(this.id, this.tabId!, changes, this.doc.lastChangeId, ++this.doc.clientUpdateId);
-    } catch (error) {   }
+    } catch (error) { }
   }
 
   /**
@@ -211,6 +212,18 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   private progressWatcher() {
     this.displayProgress = true;
     setTimeout(() => this.displayProgress && this.progress.show(), 1000);
+  }
+
+  /**
+  * Allow the user to zoom on the viewport (can be call from a wheel event or from another ui method)
+  * */
+  public onWheel(e: WheelEvent): void {
+    if (e.ctrlKey) {
+      e.preventDefault();
+      const delta = -Math.sign(e.deltaY);
+      if ((delta < 0 && this.fontZoom > 10) || (delta > 0 && this.fontZoom < 40))
+        this.fontZoom += delta;
+    }
   }
 
   /**
@@ -267,10 +280,10 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     const strSelectionData = findStrFromSelection(selection);
     const sheetTitle = selection.toString().trim() || strSelectionData.str;
     const mentions = Array.from(this.editorView.nativeElement.querySelectorAll(".mention"));
-    
+
     //We get the included mention in the selection
     const includedMention = mentions && mentions.reduce((prev, curr) => prev || selection.containsNode(curr, true) ? curr : null, null);
-    
+
     const selectWord = () => {
       if (selection.type != 'Range') {
         const range = selection.getRangeAt(0);
@@ -280,7 +293,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     }
 
     if (sheetTitle?.length > 0 && !sheetTitle.includes('\n') && !includedMention) {
-      
+
       this.contextMenu.show(e, [{
         label: "Ajouter une note", action: () => {
           selectWord();
@@ -298,7 +311,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
           setTimeout(() => this.removeSheet(sheet), 0);
         }, icon: "delete"
       }]);
-      
+
     }
   }
 
@@ -402,7 +415,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     });
     this.openedSheet = dial.componentInstance;
   }
-  
+
   /**
    * Get a list of all the sheets in the document
    * The first list is the sheets detected in the text
@@ -422,11 +435,11 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     return [Array.from(sheets), this.sheets.filter(el => !sheets.has(el))];
   }
 
-  
+
   /**
    * Add element tag and wait that doc is loaded before adding element tag if needed
    */
-   public async addTags(tags: Tag[]) {
+  public async addTags(tags: Tag[]) {
     if (!this.loaded)
       await new Promise<void>(resolve => setInterval(() => this.loaded && resolve(), 100));
     this.project.updateDocTags(this.tabId, tags);
@@ -452,6 +465,13 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
 
   get id(): number | undefined {
     return this.doc?.id;
+  }
+
+  get fontZoom(): number {
+    return +(localStorage.getItem("fontZoom") || 14);
+  }
+  set fontZoom(val: number) {
+    localStorage.setItem("fontZoom", val.toString());
   }
 
 }

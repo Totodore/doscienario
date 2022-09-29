@@ -60,6 +60,10 @@ export class WorkerManager {
     return promise;
   }
 
+  public terminate() {
+    this.worker.terminate();
+  }
+
   /**
    * On worker message
    */

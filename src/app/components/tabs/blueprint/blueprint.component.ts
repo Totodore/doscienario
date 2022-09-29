@@ -66,6 +66,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   private viewportLocked = false;
   private mouseOut = false;
   private readonly blueprintWorker: WorkerManager;
+  private isWorkerBusy = false;
 
   constructor(
     private readonly dialog: MatDialog,
@@ -100,12 +101,23 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
 
   public loadedTab() {
     super.loadedTab();
+    this.logger.log("Blueprint loaded");
+    
+    // Wait for view to initialize
+    setTimeout(() => this.show && this.autoSizeViewport(), 200);
   }
 
   public onFocus(): void {
     super.onFocus();
-    // Wait for view to initialize
-    setTimeout(() => this.show && this.autoSizeViewport(), 200);
+    this.logger.log("Blueprint focused");
+  }
+
+  public onUnFocus(): void {
+    super.onUnFocus();
+    if (this.isWorkerBusy) {
+      this.blueprintWorker.terminate();
+      this.isWorkerBusy = false;
+    }
   }
 
   protected getCRC(): number | Promise<number> {
@@ -545,7 +557,9 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
       node.width = el.clientWidth;
       node.height = el.clientHeight;
     }
+    this.isWorkerBusy = true;
     const results: Node[] = await this.blueprintWorker.postAsyncMessage(`autopos-${this.tabId}`, [nodes, this.rels, margin, node]);
+    this.isWorkerBusy = false;
     if (!results) {
       this.snack.snack("Ouups ! Impossible d'agencer cet arbre");
       console.timeEnd("auto-pos");

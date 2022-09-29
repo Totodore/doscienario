@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - v*
+    branches:
+      - master
 
 jobs:
   publish-tauri:
@@ -29,7 +31,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev webkit2gtk-4.0 libappindicator3-dev librsvg2-dev patchelf
       - name: install app dependencies and build it
-        run: yarn && yarn build
+        run: |
+          ENVIRONMENT=prod
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Use branch for dockerfile environment
+          [ "$VERSION" == "master" ] && ENVIRONMENT=int
+          echo ENVIRONMENT=$ENVIRONMENT
+          yarn && yarn build:$ENVIRONMENT
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

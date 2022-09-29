@@ -6,8 +6,8 @@
   "build": {
     "distDir": "../dist/app",
     "devPath": "http://localhost:4200",
-    "beforeDevCommand": "",
-    "beforeBuildCommand": "npm run build"
+    "beforeDevCommand": "yarn start",
+    "beforeBuildCommand": ""
   },
   "tauri": {
     "bundle": {

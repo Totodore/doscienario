@@ -12,6 +12,8 @@
     "ng": "ng",
     "start": "ng serve --disable-host-check",
     "build": "ng build --configuration production --optimization=false --base-href ./",
+    "build:prod": "yarn build",
+    "build:int": "ng build --configuration integration --optimization=false --base-href ./",
     "format:imports": "tslint --config tslint-imports.json --fix --project .",
     "lint": "ng lint",
     "tauri": "tauri"

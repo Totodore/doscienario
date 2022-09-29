@@ -1,12 +1,12 @@
-FROM node:14.2-alpine as build
+FROM node:16-alpine as build
 
 WORKDIR /app
 
 COPY . .
 
-RUN npm install
+RUN yarn
 
-RUN npm run build
+RUN yarn run build
 
 ### STAGE 2: Run ###
 FROM nginx:alpine

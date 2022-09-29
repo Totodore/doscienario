@@ -2,7 +2,9 @@
   <mat-form-field color="accent" [appearance]="$any('none')">
     <textarea *ngIf="data" matInput
               cdkTextareaAutosize
+							(keydown)="onTextInput($event)"
               #autosize="cdkTextareaAutosize"
+							#textarea
               cdkAutosizeMinRows="1"
               placeholder="Nouveau noeud"
 							[(ngModel)]="data.summary"

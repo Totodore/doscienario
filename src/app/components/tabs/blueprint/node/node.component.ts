@@ -78,6 +78,9 @@ export class NodeComponent implements AfterViewInit, OnInit {
   @ViewChild("addRel", { static: false })
   public addRelBtn: ElementRef<HTMLSpanElement>;
 
+  @ViewChild("textarea", { static: false })
+  public textarea: ElementRef<HTMLTextAreaElement>;
+
   public btnAnchor: Pole = Pole.East;
   public mouseHoverButton = false;
   private initialized: boolean;
@@ -170,7 +173,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
       }
     }, 0);
   }
-  
+
   public openDetailsView() {
     const dialog = this.dialog.open(NodeEditorComponent, {
       closeOnNavigation: false,
@@ -183,6 +186,15 @@ export class NodeComponent implements AfterViewInit, OnInit {
     dialog.componentInstance.onChange.subscribe((e: string) => {
       this.onContentData(e);
     }, null, () => dialog.close());
+  }
+
+  public onTextInput(e: KeyboardEvent) {
+    if (e.key === "Tab") {
+      const index = this.textarea.nativeElement.selectionStart;
+      this.textarea.nativeElement.value = this.textarea.nativeElement.value.substring(0, index) + "\t" + this.textarea.nativeElement.value.substring(index);
+      this.textarea.nativeElement.selectionStart = this.textarea.nativeElement.selectionEnd = index + 1;
+      e.preventDefault();
+    }
   }
 
   public async onContentData(val: string) {

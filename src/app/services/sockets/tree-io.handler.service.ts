@@ -1,5 +1,7 @@
+import { NGXLogger } from 'ngx-logger';
+import { AbstractIoHandler } from './abstract-handler.service';
 import { Injectable } from '@angular/core';
-import { EventHandler, registerHandler } from 'src/app/decorators/subscribe-event.decorator';
+import { EventHandler } from 'src/app/decorators/subscribe-event.decorator';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { ColorNodeIn, CreateNodeIn, CreateRelationIn, EditSummaryIn, PlaceNodeIn, RemoveNodeIn, RemoveRelationIn } from 'src/app/models/sockets/in/blueprint.in';
 import { CloseElementIn, ColorElementIn, OpenElementIn, SendElementIn } from 'src/app/models/sockets/in/element.in';
@@ -11,15 +13,14 @@ import { TabService } from '../tab.service';
 @Injectable({
   providedIn: 'root'
 })
-export class TreeIoHandler {
+export class TreeIoHandler extends AbstractIoHandler {
 
   constructor(
     private readonly project: ProjectService,
     private readonly tabs: TabService,
-    private readonly socket: SocketService,
-  ) { 
-    registerHandler(this, this.socket);
-  }
+    logger: NGXLogger,
+    socket: SocketService,
+  ) { super(socket, logger) }
 
 
   @EventHandler(Flags.SEND_BLUEPRINT)

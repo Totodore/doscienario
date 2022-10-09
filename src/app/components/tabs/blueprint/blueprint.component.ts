@@ -75,7 +75,6 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     progress: ProgressService,
     private readonly snack: SnackbarService,
     protected readonly logger: NGXLogger,
-    _: TreeIoHandler,   // Unused tree io handler in the current class but it should be declarated somewhere to be included in the bundle
   ) {
     super(progress, logger);
     this.blueprintWorker = new WorkerManager(WorkerType.Blueprint, this.logger);

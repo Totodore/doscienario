@@ -3,12 +3,14 @@ import { Injectable } from "@angular/core";
 import { Socket } from "ngx-socket-io";
 import { Observable } from "rxjs";
 import { environment } from "src/environments/environment";
+import { AbstractIoHandler } from './abstract-handler.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SocketService {
   private _socket: Socket;
+  private _handlers: AbstractIoHandler[] = [];
 
   constructor(
     private readonly api: ApiService
@@ -26,9 +28,18 @@ export class SocketService {
       }
     });
     this._socket.connect();
+    for (let handler of this._handlers)
+      handler.init();
+  }
+
+  public registerHandler(handler: AbstractIoHandler) {
+    this._handlers.push(handler);
   }
 
   public disconnect() {
+    for (let handler of this._handlers)
+      handler.destroy();
+    this._socket?.removeAllListeners();
     this._socket?.disconnect();
     this._socket = null;
   }

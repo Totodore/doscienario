@@ -4,11 +4,16 @@
 		{
 			"label": "tauri: build",
 			"type": "shell",
-			"command": "cargo",
+			"command": "yarn",
 			"args": [
+				"run",
 				"tauri",
 				"dev"
-			]
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
 		}
 	]
 }

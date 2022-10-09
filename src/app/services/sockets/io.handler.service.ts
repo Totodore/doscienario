@@ -1,7 +1,8 @@
+import { AbstractIoHandler } from './abstract-handler.service';
 import { Injectable } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { ProjectService } from 'src/app/services/project.service';
-import { EventHandler, registerHandler } from '../../decorators/subscribe-event.decorator';
+import { EventHandler } from '../../decorators/subscribe-event.decorator';
 import { User } from '../../models/api/project.model';
 import { Flags } from '../../models/sockets/flags.enum';
 import { SnackbarService } from '../ui/snackbar.service';
@@ -11,16 +12,14 @@ import { SocketService } from './socket.service';
 @Injectable({
   providedIn: 'root'
 })
-export class IoHandler {
+export class IoHandler extends AbstractIoHandler {
 
   constructor(
-    private readonly socket: SocketService,
     private readonly snackbar: SnackbarService,
     private readonly project: ProjectService,
-    private readonly logger: NGXLogger,
-  ) {
-    registerHandler(this, this.socket);
-  }
+    logger: NGXLogger,
+    socket: SocketService,
+  ) { super(socket, logger) }
 
   @EventHandler("connect")
   onConnect() {

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
-import { EventHandler, registerHandler } from 'src/app/decorators/subscribe-event.decorator';
+import { EventHandler } from 'src/app/decorators/subscribe-event.decorator';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { AddTagElementIn, RemoveTagElementIn } from 'src/app/models/sockets/in/tag.in';
 import { WriteElementOut } from 'src/app/models/sockets/out/element.out';
@@ -8,22 +8,22 @@ import { Change, ColorElementIn, OpenElementIn, RenameElementIn, SendElementIn, 
 import { ApiService } from '../api.service';
 import { ProjectService } from '../project.service';
 import { TabService } from '../tab.service';
+import { AbstractIoHandler } from './abstract-handler.service';
 import { SocketService } from './socket.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class DocIoHandler {
+export class DocIoHandler extends AbstractIoHandler {
 
+  
   constructor(
     private readonly api: ApiService,
     private readonly project: ProjectService,
     private readonly tabs: TabService,
-    private readonly logger: NGXLogger,
-    private readonly socket: SocketService
-  ) { 
-    registerHandler(this, this.socket);
-  }
+    logger: NGXLogger,
+    socket: SocketService
+  ) { super(socket, logger) }
 
 
   @EventHandler(Flags.OPEN_DOC)

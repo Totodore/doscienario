@@ -1,7 +1,8 @@
+import { AbstractIoHandler } from './abstract-handler.service';
 import { Injectable } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { DocumentComponent } from 'src/app/components/tabs/document/document.component';
-import { EventHandler, registerHandler } from 'src/app/decorators/subscribe-event.decorator';
+import { EventHandler } from 'src/app/decorators/subscribe-event.decorator';
 import { Sheet } from 'src/app/models/api/sheet.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { Change, OpenElementIn, SendElementIn } from 'src/app/models/sockets/in/element.in';
@@ -16,17 +17,15 @@ import { SocketService } from './socket.service';
 @Injectable({
   providedIn: 'root'
 })
-export class SheetIoHandler {
+export class SheetIoHandler extends AbstractIoHandler {
 
   constructor(
     private readonly api: ApiService,
     private readonly project: ProjectService,
     private readonly tabs: TabService,
-    private readonly logger: NGXLogger,
-    private readonly socket: SocketService,
-  ) { 
-    registerHandler(this, this.socket);
-  }
+    logger: NGXLogger,
+    socket: SocketService,
+  ) { super(socket, logger) }
 
 
   @EventHandler(Flags.OPEN_SHEET)

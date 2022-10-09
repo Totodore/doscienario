@@ -1,6 +1,8 @@
+import { NGXLogger } from 'ngx-logger';
+import { AbstractIoHandler } from './abstract-handler.service';
 import { SocketService } from 'src/app/services/sockets/socket.service';
 import { Injectable } from '@angular/core';
-import { EventHandler, registerHandler } from 'src/app/decorators/subscribe-event.decorator';
+import { EventHandler } from 'src/app/decorators/subscribe-event.decorator';
 import { Tag } from 'src/app/models/api/tag.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { ColorTagIn, RenameTagIn } from 'src/app/models/sockets/in/tag.in';
@@ -9,14 +11,13 @@ import { ProjectService } from '../project.service';
 @Injectable({
   providedIn: 'root'
 })
-export class TagIoHandler {
+export class TagIoHandler extends AbstractIoHandler {
 
   constructor(
     private readonly project: ProjectService,
-    private readonly socket: SocketService,
-  ) {
-    registerHandler(this, this.socket);
-  }
+    logger: NGXLogger,
+    socket: SocketService,
+  ) { super(socket, logger) }
 
   @EventHandler(Flags.CREATE_TAG)
   onCreateTag(tag: Tag) {

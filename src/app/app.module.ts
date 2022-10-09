@@ -1,7 +1,10 @@
+import { TreeIoHandler } from './services/sockets/tree-io.handler.service';
+import { IoHandler } from './services/sockets/io.handler.service';
+import { SheetIoHandler } from './services/sockets/sheet-io.handler.service';
 import { MAT_COLOR_FORMATS, NgxMatColorPickerModule, NGX_MAT_COLOR_FORMATS } from '@angular-material-components/color-picker';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -24,7 +27,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { NgxIndexedDBModule } from 'ngx-indexed-db';
-import { LoggerModule, TOKEN_LOGGER_MAPPER_SERVICE, TOKEN_LOGGER_WRITER_SERVICE } from "ngx-logger";
+import { LoggerModule, NGXLogger, TOKEN_LOGGER_MAPPER_SERVICE, TOKEN_LOGGER_WRITER_SERVICE } from "ngx-logger";
 import { Logs } from 'src/app/models/api/logs.model';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -76,6 +79,9 @@ import { WriterLoggerService } from './services/logger/writer-logger.service';
 import { appearance } from './style/default';
 import { AnchorComponent } from './components/tabs/blueprint/anchor/anchor.component';
 import { DatePipe } from '@angular/common';
+import { SocketService } from './services/sockets/socket.service';
+import { DocIoHandler } from './services/sockets/doc-io.handler.service';
+import { TagIoHandler } from './services/sockets/tag-io.handler.service';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -155,6 +161,11 @@ import { DatePipe } from '@angular/common';
     { provide: HTTP_INTERCEPTORS, useClass: DateHttpInterceptor, multi: true },
     { provide: TOKEN_LOGGER_MAPPER_SERVICE, useClass: MapperLoggerService },
     { provide: TOKEN_LOGGER_WRITER_SERVICE, useClass: WriterLoggerService },
+    {
+      provide: APP_INITIALIZER,
+      deps: [NGXLogger, SocketService, DocIoHandler, SheetIoHandler, IoHandler, TagIoHandler, TreeIoHandler], 
+      useFactory: (logger: NGXLogger) => logger.log("Initializing socket IO"),
+    },
     DatePipe
   ],
   bootstrap: [AppComponent]

@@ -9,6 +9,9 @@ import { AddTagElementIn, RemoveTagElementIn } from 'src/app/models/sockets/in/t
 import { SocketService } from 'src/app/services/sockets/socket.service';
 import { ProjectService } from '../project.service';
 import { TabService } from '../tab.service';
+import { Relationship } from 'src/app/models/api/blueprint.model';
+import { TabTypes } from 'src/app/models/sys/tab.model';
+import { BlueprintComponent } from 'src/app/components/tabs/blueprint/blueprint.component';
 
 @Injectable({
   providedIn: 'root'
@@ -95,6 +98,26 @@ export class TreeIoHandler extends AbstractIoHandler {
   @EventHandler(Flags.REMOVE_RELATION)
   onRemoveRelation(packet: RemoveRelationIn) {
     this.project.removeBlueprintRelation(packet);
+  }
+
+  @EventHandler(Flags.PATCH_RELATIONSHIP)
+  onPatchRelationship(packet: Relationship) {
+    this.logger.log("PATCH RELATIONSHIP", packet);
+    const blueprint = this.project.getBlueprint(packet.blueprintId);
+    const rel = blueprint.relsMap.get(packet.id);
+    rel.childId = packet.childId;
+    rel.parentId = packet.parentId;
+    rel.childPole = packet.childPole;
+    rel.parentPole = packet.parentPole;
+    if (this.tabs.displayedTab[1].type === TabTypes.BLUEPRINT && this.tabs.displayedTab[1].id === packet.blueprintId) {
+      window.setTimeout(async () => {
+        const component = this.tabs.displayedTab[1] as BlueprintComponent;
+        if (component.autoMode) {
+          await component.autoPos();
+        }
+      }, 100);
+    }
+
   }
 
   @EventHandler(Flags.SUMARRY_NODE)

@@ -1,18 +1,17 @@
-import { Pole } from "../../api/blueprint.model";
+import { Pole, Relationship } from "../../api/blueprint.model";
 
-export class CreateNodeOut {
-  constructor(
-    public parentNode: number,
-    public blueprint: number,
-    public x: number,
-    public y: number,
-    public ox: number,
-    public oy: number,
-    public relYOffset: number,
-    public parentPole: Pole,
-    public childPole: Pole,
-    public locked?: boolean
-  ) { }
+export interface CreateNodeOut {
+  parentNode: number,
+  blueprint: number,
+  x: number,
+  y: number,
+  ox: number,
+  oy: number,
+  relYOffset: number,
+  parentPole: Pole,
+  childPole: Pole,
+  locked?: boolean,
+  childRel?: number;
 }
 export class RemoveRelationOut {
   constructor(

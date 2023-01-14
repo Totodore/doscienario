@@ -37,4 +37,18 @@ export class RelationComponent {
     return `M${ox},${oy} C${ox + w / 2},${oy} ${ox + w / 2},${ey} ${ex},${ey}`;
   }
 
+  public get center(): Vector {
+    let o: Vector, e: Vector;
+    if (this.data instanceof Relationship) {
+      o = this.data.getOrigin(this.parentNode.bounds);
+      e = this.data.getDestination(this.childNode.bounds);
+    } else {
+      o = [this.data.ox, this.data.oy];
+      e = [this.data.ex, this.data.ey];
+    }
+    const half = this.overlay.clientHeight / 2;
+    const [ox, oy, ex, ey] = [o[0] + half, o[1] + half, e[0] + half, e[1] + half];
+    return [(ox + ex) / 2, (oy + ey) / 2];
+  }
+
 }

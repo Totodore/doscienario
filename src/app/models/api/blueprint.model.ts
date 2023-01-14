@@ -77,6 +77,7 @@ export class Relationship extends DataModel<Relationship> {
   public parentId: number;
   public childId: number;
   public blueprint: Blueprint;
+  public blueprintId: number;
   public parentPole: Pole;
   public childPole: Pole;
   public type: RelationshipType;

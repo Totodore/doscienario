@@ -139,6 +139,26 @@
 			transition: transform 200ms;
 			transform-box: fill-box;
 		}
+
+		.insert-node-btn {
+			z-index: 100;
+			opacity: 0.6;
+			visibility: hidden;
+			cursor: pointer;
+			color: #b0bec5;
+			padding: 4px;
+			border-radius: 25px;
+			background-color: #323232;
+			transition: all 100ms;
+			position: absolute;
+			box-shadow: 0 0 8px -3px rgb(0 0 0 / 50%);
+			transform: translate(-50%, -50%) scale(.4);
+			&.visible, &:hover {
+				opacity: 1;
+				visibility: visible;
+				transform: translate(-50%, -50%) scale(1);
+			}
+		}
 	}
 }
 

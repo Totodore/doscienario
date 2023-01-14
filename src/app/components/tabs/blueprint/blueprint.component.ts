@@ -1,5 +1,4 @@
-import { TreeIoHandler } from './../../../services/sockets/tree-io.handler.service';
-import { AfterViewInit, Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { NGXLogger } from 'ngx-logger';
 import { BlueprintSock, Node, Pole, Relationship, RelationshipType } from 'src/app/models/api/blueprint.model';
@@ -14,7 +13,7 @@ import { adjustTreeColumnNodes, findLevelByNode, getTreeRect, removeNodeFromTree
 import { WorkerManager, WorkerType } from 'src/app/utils/worker-manager.utils';
 import { ProgressService } from '../../../services/ui/progress.service';
 import { ElementComponent } from '../element.component';
-import { Vector } from './../../../../types/global.d';
+import { Vector, Vector2 } from './../../../../types/global.d';
 import { ProjectService } from './../../../services/project.service';
 import { ConfirmComponent } from './../../utils/confirm/confirm.component';
 import { NodeComponent } from './node/node.component';
@@ -25,6 +24,7 @@ import { Observable, find } from 'rxjs';
 import { CheckCRCIn } from 'src/app/models/sockets/in/document.in';
 import crc32 from 'crc/calculators/crc32';
 import { CheckCRCOut } from 'src/app/models/sockets/out/element.out';
+import { RelationComponent } from './relation/relation.component';
 
 
 @Component({
@@ -42,6 +42,12 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
 
   @ViewChild("rootEl", { static: false })
   public rootEl: NodeComponent;
+
+  @ViewChild("insertOnRel", { static: false })
+  public insertOnRelEl: ElementRef<HTMLSpanElement>;
+
+  @ViewChildren("directRelRef")
+  public directRelRefEls: QueryList<RelationComponent>;
 
   @ViewChildren("nodeEl")
   public nodeEls: QueryList<NodeComponent>;
@@ -67,6 +73,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   private mouseOut = false;
   private readonly blueprintWorker: WorkerManager;
   private isWorkerBusy = false;
+  private relationHover: Relationship;
 
   constructor(
     private readonly dialog: MatDialog,
@@ -101,7 +108,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   public loadedTab() {
     super.loadedTab();
     this.logger.log("Blueprint loaded");
-    
+
     // Wait for view to initialize
     setTimeout(() => this.show && this.autoSizeViewport(), 200);
   }
@@ -125,6 +132,35 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   protected sendCRCRequest(crc: number): Observable<CheckCRCIn> {
     this.socket.emit(Flags.CRC_BLUEPRINT, new CheckCRCOut(this.id, crc));
     return this.socket.fromEvent<CheckCRCIn>(Flags.CRC_DOC).pipe(find(data => data.elId === this.id && data.crc == crc));
+  }
+
+  public onRelationHover(rel: Relationship, relCenter: Vector2) {
+    if (rel.type == RelationshipType.Direct) {
+      const el = this.insertOnRelEl.nativeElement.children[0] as HTMLElement;
+      el.style.left = relCenter[0] + "px";
+      el.style.top = relCenter[1] + "px";
+      el.classList.add("visible");
+      this.relationHover = rel;
+    }
+  }
+  public onRelationHoverOut(rel: Relationship) {
+    if (rel.type == RelationshipType.Direct) {
+      const el = this.insertOnRelEl.nativeElement.children[0] as HTMLElement;
+      el.classList.remove("visible");
+    }
+  }
+  public insertNodeInRelation() {
+    this.logger.log(this.relationHover);
+    const center = this.directRelRefEls.find(el => el.data == this.relationHover)?.center;
+    const parent = this.nodesMap.get(this.relsMap.get(this.relationHover.id).parentId);
+    this.createNewNode(
+      [parent.x, parent.y],
+      center,
+      Pole.East,
+      Pole.West,
+      parent.id,
+      this.relationHover
+    );
   }
 
   /**
@@ -194,18 +230,21 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
     }
   }
 
-  private createNewNode([ox, oy]: Vector, [ex, ey]: Vector, parentPole: Pole, childPole: Pole, parentId: number) {
-    this.socket.emit(Flags.CREATE_NODE, new CreateNodeOut(
-      parentId,
-      this.id,
-      ex,
-      ey,
+  private createNewNode([ox, oy]: Vector, [ex, ey]: Vector, parentPole: Pole, childPole: Pole, parentId: number, insertRel?: Relationship) {
+    const packet: CreateNodeOut = {
+      parentNode: parentId,
+      blueprint: this.id,
+      x: ex,
+      y: ey,
       ox,
       oy,
-      0,
+      relYOffset: 0,
       parentPole,
       childPole,
-    ));
+      locked: true,
+      childRel: insertRel?.id,
+    };
+    this.socket.emit(Flags.CREATE_NODE, packet);
   }
 
   /**
@@ -372,6 +411,31 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   }
 
   public onRemove(el: NodeComponent) {
+    const parentRel =
+      this.blueprint.relsArr.find(rel => rel.childId == el.data.id) ??
+      this.blueprint.loopbackRelsArr.find(rel => rel.childId == el.data.id);
+
+    const childRels = [
+      ...this.blueprint.relsArr.filter(rel => rel.parentId == el.data.id),
+      ...this.blueprint.loopbackRelsArr.filter(rel => rel.parentId == el.data.id)
+    ];
+    if (parentRel && childRels) {
+      for (const childRel of childRels) {
+        if (this.relsMap.has(childRel.id))
+          this.relsMap.get(childRel.id).parentId = parentRel.parentId;
+        else if (this.blueprint.loopbackRelsMap.has(childRel.id))
+          this.blueprint.loopbackRelsMap.get(childRel.id).parentId = parentRel.parentId;
+      }
+    }
+    this.blueprint.nodesMap.delete(el.data.id);
+    this.blueprint.relsMap.delete(parentRel.id);
+    this.socket.emit(Flags.REMOVE_NODE, new RemoveNodeOut(el.data.id, this.id, false));
+  }
+
+  /**
+   * Recursive function to remove a node from the tree and all its descendants
+   */
+  public onCut(el: NodeComponent) {
     const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer ce noeud et tous ses enfants orphelins ?" });
     dialog.componentInstance.confirm.subscribe(() => {
       dialog.close();
@@ -383,9 +447,9 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
         if (rel.type == RelationshipType.Direct)
           this.blueprint.relsMap.delete(rel.id);
         else (rel.type == RelationshipType.Loopback)
-          this.blueprint.loopbackRelsMap.delete(rel.id);
+        this.blueprint.loopbackRelsMap.delete(rel.id);
       }
-      this.socket.emit(Flags.REMOVE_NODE, new RemoveNodeOut(el.data.id, this.id));
+      this.socket.emit(Flags.REMOVE_NODE, new RemoveNodeOut(el.data.id, this.id, true));
     });
   }
 

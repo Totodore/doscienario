@@ -9,21 +9,29 @@
 				<!-- Direct rels -->
 				<g *ngFor="let relId of relIds" [overlay]="overlayEl" [data]="relsMap.get(relId)"
 					[parentNode]="blueprint.nodesMap.get(relsMap.get(relId).parentId)"
-					[childNode]="blueprint.nodesMap.get(relsMap.get(relId).childId)" relation></g>
+					[childNode]="blueprint.nodesMap.get(relsMap.get(relId).childId)"
+					(mouseover)="onRelationHover(relsMap.get(relId), directRelRef.center)"
+					(mouseout)="onRelationHoverOut(relsMap.get(relId))" 
+					pointer-events="visibleStroke" relation #directRelRef></g>
 				<g *ngIf="ghostNode" [overlay]="overlayEl" [data]="ghostNode" relation class="ghost"></g>
 
 				<!-- Loopback rels -->
 				<g *ngFor="let anchorId of anchorIds" [overlay]="overlayEl" [data]="anchorMap.get(anchorId)"
 					[parentNode]="blueprint.nodesMap.get(anchorMap.get(anchorId).parentId)"
-					[childNode]="blueprint.nodesMap.get(anchorMap.get(anchorId).childId)" 
-					[blueprintRef]="this" anchor pointer-events="visibleStroke"></g>
+					[childNode]="blueprint.nodesMap.get(anchorMap.get(anchorId).childId)" [blueprintRef]="this" anchor
+					pointer-events="visibleStroke"></g>
 			</svg>
+
+			<!-- Insert node on relationship button (between to existing node) -->
+			<span #insertOnRel>
+				<mat-icon class="insert-node-btn" (click)="insertNodeInRelation()">add</mat-icon>
+			</span>
 			<!-- <app-node [blueprintId]="id" [tabId]="tabId" class="root" #rootEl [data]="root"
 				(relationBegin)="beginRelation(rootEl, $event)">
 			</app-node> -->
 			<app-node #nodeEl *ngFor="let nodeId of nodeIds" [overlay]="overlayEl" [blueprintId]="id" [tabId]="tabId"
 				[data]="nodesMap.get(nodeId)" [style.left]="'calc(50% + ' + nodesMap.get(nodeId).x + 'px)'"
-				[style.top]="'calc(50% + ' + nodesMap.get(nodeId).y + 'px)'" (remove)="onRemove(nodeEl)"
+				[style.top]="'calc(50% + ' + nodesMap.get(nodeId).y + 'px)'" (cut)="onCut(nodeEl)" (remove)="onRemove(nodeEl)"
 				(relationBegin)="beginRelation(nodeEl, $event)" (relationBind)="bindRelation(nodeEl, $event)"
 				(moveStart)="onDragStart(nodesMap.get(nodeId), nodeEl)" (move)="onDragMove($event)"
 				(moveEnd)="onDragEnd(nodesMap.get(nodeId))" (click)="onNodeClick(nodesMap.get(nodeId), $event)"

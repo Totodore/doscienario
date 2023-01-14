@@ -31,7 +31,7 @@
 			</app-node> -->
 			<app-node #nodeEl *ngFor="let nodeId of nodeIds" [overlay]="overlayEl" [blueprintId]="id" [tabId]="tabId"
 				[data]="nodesMap.get(nodeId)" [style.left]="'calc(50% + ' + nodesMap.get(nodeId).x + 'px)'"
-				[style.top]="'calc(50% + ' + nodesMap.get(nodeId).y + 'px)'" (remove)="onRemove(nodeEl)"
+				[style.top]="'calc(50% + ' + nodesMap.get(nodeId).y + 'px)'" (cut)="onCut(nodeEl)" (remove)="onRemove(nodeEl)"
 				(relationBegin)="beginRelation(nodeEl, $event)" (relationBind)="bindRelation(nodeEl, $event)"
 				(moveStart)="onDragStart(nodesMap.get(nodeId), nodeEl)" (move)="onDragMove($event)"
 				(moveEnd)="onDragEnd(nodesMap.get(nodeId))" (click)="onNodeClick(nodesMap.get(nodeId), $event)"

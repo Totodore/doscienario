@@ -16,6 +16,7 @@ import { TabService } from './../../../../services/tab.service';
 import { DrawStates } from './../blueprint.component';
 import { NodeEditorComponent } from './node-editor/node-editor.component';
 import { findChildRels } from 'src/app/utils/tree.utils';
+import { ContextMenuItem } from 'src/app/components/utils/context-menu/context-menu.component';
 @Component({
   selector: 'app-node',
   templateUrl: './node.component.html',
@@ -52,6 +53,9 @@ export class NodeComponent implements AfterViewInit, OnInit {
 
   @Output()
   private readonly remove = new EventEmitter<void>();
+
+  @Output()
+  private readonly cut = new EventEmitter<void>();
 
   @Output()
   private readonly moveStart = new EventEmitter<void>();
@@ -118,14 +122,22 @@ export class NodeComponent implements AfterViewInit, OnInit {
 
   public onContextMenu(e: MouseEvent) {
     e.preventDefault();
-    this.contextMenu.show(e, [
+    const commands: ContextMenuItem[] = [
       {
-        icon: "delete",
+        icon: "content_cut",
         color: "red",
+        label: "Couper",
+        action: () => this.onCutClick(e)
+      }
+    ];
+    if (!this.data.isRoot) {
+      commands.unshift({
+        icon: "delete",
         label: "Supprimer",
         action: () => this.onRemoveClick(e)
-      }
-    ]);
+      });
+    }
+    this.contextMenu.show(e, commands);
   }
 
   /**
@@ -164,6 +176,11 @@ export class NodeComponent implements AfterViewInit, OnInit {
     e.stopImmediatePropagation();
     this.remove.emit();
   }
+  public onCutClick(e: Event) {
+    e.stopImmediatePropagation();
+    this.cut.emit();
+  }
+
   public onChange(val: string) {
     this.socket.emit(Flags.SUMARRY_NODE, new EditSummaryOut(this.data.id, val, this.blueprintId));
     setTimeout(() => {

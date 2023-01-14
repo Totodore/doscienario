@@ -37,7 +37,8 @@ export class PlaceNodeOut {
 export class RemoveNodeOut {
   constructor(
     public nodeId: number,
-    public blueprintId: number
+    public blueprintId: number,
+    public recursive: boolean
   ) { }
 }
 export class RemoveRelOut {

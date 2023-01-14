@@ -58,7 +58,6 @@ export class AnchorComponent {
     this.contextMenu.show(e, [
       {
         icon: "delete",
-        color: "red",
         label: "Supprimer",
         action: () => this.remove()
       }

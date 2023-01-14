@@ -411,6 +411,31 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
   }
 
   public onRemove(el: NodeComponent) {
+    const parentRel =
+      this.blueprint.relsArr.find(rel => rel.childId == el.data.id) ??
+      this.blueprint.loopbackRelsArr.find(rel => rel.childId == el.data.id);
+
+    const childRels = [
+      ...this.blueprint.relsArr.filter(rel => rel.parentId == el.data.id),
+      ...this.blueprint.loopbackRelsArr.filter(rel => rel.parentId == el.data.id)
+    ];
+    if (parentRel && childRels) {
+      for (const childRel of childRels) {
+        if (this.relsMap.has(childRel.id))
+          this.relsMap.get(childRel.id).parentId = parentRel.parentId;
+        else if (this.blueprint.loopbackRelsMap.has(childRel.id))
+          this.blueprint.loopbackRelsMap.get(childRel.id).parentId = parentRel.parentId;
+      }
+    }
+    this.blueprint.nodesMap.delete(el.data.id);
+    this.blueprint.relsMap.delete(parentRel.id);
+    this.socket.emit(Flags.REMOVE_NODE, new RemoveNodeOut(el.data.id, this.id, false));
+  }
+
+  /**
+   * Recursive function to remove a node from the tree and all its descendants
+   */
+  public onCut(el: NodeComponent) {
     const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer ce noeud et tous ses enfants orphelins ?" });
     dialog.componentInstance.confirm.subscribe(() => {
       dialog.close();
@@ -424,7 +449,7 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
         else (rel.type == RelationshipType.Loopback)
         this.blueprint.loopbackRelsMap.delete(rel.id);
       }
-      this.socket.emit(Flags.REMOVE_NODE, new RemoveNodeOut(el.data.id, this.id));
+      this.socket.emit(Flags.REMOVE_NODE, new RemoveNodeOut(el.data.id, this.id, true));
     });
   }
 

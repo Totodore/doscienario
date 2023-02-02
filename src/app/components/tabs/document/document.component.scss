@@ -1,16 +1,16 @@
 .wrapper {
 	position: relative;
 }
+
 h1 {
-  font-size: 35px;
-  text-align: center;
-  margin: 50px 30px;
-  line-height: 35px;
-  color: whitesmoke;
+	font-size: 35px;
+	text-align: center;
+	margin: 50px 30px;
+	line-height: 35px;
+	color: whitesmoke;
 }
+
 :host ::ng-deep ckeditor {
-	line-height: 1.4;
-	font-size: 14px;
 	.ck-toolbar {
 		font-size: 14px !important;
 	}

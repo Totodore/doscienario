@@ -10,11 +10,14 @@ $grey-dark-color: #212121;
 	[contenteditable] {
 		outline: 0px solid transparent;
 	}
+
 	scrollbar-width: thin !important;
+
 	&::-webkit-scrollbar {
 		height: 2px !important;
 		width: 2px !important;
 	}
+
 	&::-webkit-scrollbar-thumb {
 		background-color: rgba(255, 255, 255, 0.35) !important;
 		border-radius: 30px !important;
@@ -57,6 +60,7 @@ app-menu {
 	color: white !important;
 	@include mat.elevation(1);
 }
+
 .ck-mentions {
 	background-color: $grey-dark-color !important;
 	color: #b0bec5 !important;
@@ -68,25 +72,86 @@ app-menu {
 		.ck-button {
 			cursor: pointer !important;
 			transition: background-color 250ms !important;
+
 			.ck-button__label {
 				color: #b0bec5 !important;
 			}
+
 			&.ck-on {
 				background-color: $grey-light-color !important;
 				color: $grey-dark-color !important;
 			}
+
 			&:hover {
 				background-color: $grey-medium-color !important;
 			}
 		}
 	}
 }
-ckeditor, .ck-balloon-panel {
-	.ck.ck-editor__main {
-    max-height: calc(100vh -  30px - 50px) !important;
-    flex-direction: column !important;
-    display: flex !important;
+
+.ck-zoomable {
+	.ck-content {
+		$zoom: calc(var(--font-zoom, 1) * 10px);
+		$line-offset: 10px;
+		line-height: calc($zoom + $line-offset) !important;
+		font-size: $zoom !important;
+
+		h1 {
+			$zoom: calc(var(--font-zoom, 1) * 24px);
+			line-height: calc($zoom + $line-offset) !important;
+			font-size: $zoom !important;
+		}
+
+		h2 {
+			$zoom: calc(var(--font-zoom, 1) * 20px);
+			line-height: calc($zoom + $line-offset) !important;
+			font-size: $zoom !important;
+		}
+
+		h3 {
+			$zoom: calc(var(--font-zoom, 1) * 18px);
+			line-height: calc($zoom + $line-offset) !important;
+			font-size: $zoom !important;
+		}
+
+		h4 {
+			$zoom: calc(var(--font-zoom, 1) * 16px);
+			line-height: calc($zoom + $line-offset) !important;
+			font-size: $zoom !important;
+		}
+
+		h5 {
+			$zoom: calc(var(--font-zoom, 1) * 14px);
+			line-height: calc($zoom + $line-offset) !important;
+			font-size: $zoom !important;
+		}
+
+		h6 {
+			$zoom: calc(var(--font-zoom, 1) * 12px);
+			line-height: calc($zoom + $line-offset) !important;
+			font-size: $zoom !important;
+		}
+
+		p {
+			$zoom: calc(var(--font-zoom, 1) * 10px);
+			line-height: calc($zoom + $line-offset) !important;
+			font-size: $zoom !important;
+		}
 	}
+}
+
+ckeditor {
+	@extend .ck-zoomable;
+}
+
+ckeditor,
+.ck-balloon-panel {
+	.ck.ck-editor__main {
+		max-height: calc(100vh - 30px - 50px) !important;
+		flex-direction: column !important;
+		display: flex !important;
+	}
+
 	.ck-editor__editable_inline {
 		height: calc(99vh - 48px - 43px);
 		background-color: $grey-dark-color !important;
@@ -97,12 +162,14 @@ ckeditor, .ck-balloon-panel {
 		transition: all 200ms !important;
 		border: none !important;
 	}
+
 	.ck.ck-toolbar {
 		background-color: $grey-dark-color !important;
 		border: none !important;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
 		color: #b0bec5 !important;
 	}
+
 	button:not(.ck-color-grid__tile),
 	.ck.ck-button.ck-on:not(.ck-color-grid__tile) {
 		background-color: $grey-dark-color !important;
@@ -110,87 +177,110 @@ ckeditor, .ck-balloon-panel {
 		cursor: pointer !important;
 		transition: all 250ms !important;
 		box-shadow: none !important;
+
 		&:hover {
 			background-color: $grey-medium-color !important;
 			box-shadow: none !important;
 		}
 	}
+
 	.ck.ck-button.ck-on:not(.ck-color-grid__tile) {
 		background-color: $grey-light-color !important;
+
 		&:hover {
 			background-color: $grey-light-color !important;
 		}
 	}
+
 	.ck-input {
 		background-color: $grey-dark-color !important;
 		border: 1px solid rgba(255, 255, 255, 0.12) !important;
 		color: whitesmoke !important;
+
 		&:focus {
 			label {
 				background-color: $grey-dark-color !important;
 			}
 		}
 	}
+
 	.ck-dropdown__panel {
 		box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%) !important;
 		border: none !important;
 		border-radius: 5px !important;
 		background-color: $grey-dark-color !important;
 		transition: all 200ms !important;
+
 		button:not(.ck-color-grid__tile) {
 			background-color: $grey-dark-color !important;
 			cursor: pointer !important;
 			transition: all 250ms !important;
+
 			&:hover {
 				background-color: $grey-medium-color !important;
 			}
 		}
 	}
+
 	.ck-reset.ck-list {
 		border-radius: 0 !important;
 	}
+
 	.ck-input-text:focus {
 		box-shadow: 0 0 0px 2px #818181 !important;
 	}
-	label.ck-label, .ck-splitbutton, .ck-file-dialog-button {
+
+	label.ck-label,
+	.ck-splitbutton,
+	.ck-file-dialog-button {
 		background-color: $grey-dark-color !important;
 	}
+
 	.ck-button__label {
 		color: #b0bec5 !important;
 	}
+
 	.ck-content {
 		overflow-y: auto !important;
+
 		.mention {
 			cursor: pointer !important;
 			display: inline-block !important;
-			color : #6495ed !important;
-			background-color : transparent !important;
+			color: #6495ed !important;
+			background-color: transparent !important;
 		}
+
 		.image {
 			@include mat.elevation(1);
 			overflow: hidden !important;
 			border-radius: 5px !important;
+
 			figcaption {
 				background-color: $grey-medium-color !important;
 				color: #b0bec5 !important;
+
 				&::before {
 					color: #b0bec5 !important;
 				}
 			}
 		}
+
 		hr {
 			height: 1px !important;
 		}
+
 		p {
 			margin-top: 0 !important;
 			margin-right: 0 !important;
 			margin-bottom: 0 !important;
 		}
+
 		a {
 			color: #b0bec5 !important;
 		}
 	}
 }
+
 //CK dialog editor styling
 #editor-dialog {
 	padding: 0;
@@ -225,6 +315,7 @@ button:focus {
 	background-color: $grey-medium-color !important;
 	color: whitesmoke !important;
 }
+
 .toggle-btn.on {
 	border: solid 2px #b0bec5 !important;
 }
@@ -232,9 +323,11 @@ button:focus {
 .mat-chip.mat-standard-chip.mat-chip-selected {
 	background-color: #b5b5b5cf !important;
 }
+
 .mat-standard-chip {
 	padding: 4px 9px;
 	height: initial;
+
 	&.mat-chip-with-trailing-icon {
 		padding-top: 4px;
 		padding-bottom: 4px;

@@ -221,8 +221,8 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     if (e.ctrlKey) {
       e.preventDefault();
       const delta = -Math.sign(e.deltaY);
-      if ((delta < 0 && this.fontZoom > 10) || (delta > 0 && this.fontZoom < 40))
-        this.fontZoom += delta;
+      if ((delta < 0 && this.fontZoom > 1) || (delta > 0 && this.fontZoom < 4))
+        this.fontZoom += delta / 10;
     }
   }
 

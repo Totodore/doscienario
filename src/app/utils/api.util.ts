@@ -3,7 +3,7 @@ import { NGXLogger } from "ngx-logger";
 import { environment } from "src/environments/environment";
 import { User } from "../models/api/project.model";
 import { UserLoginReq } from "../models/api/user.model";
-
+import { lastValueFrom } from "rxjs";
 export class ApiUtil {
 
   constructor(
@@ -16,7 +16,7 @@ export class ApiUtil {
   
   public async login(body: UserLoginReq): Promise<boolean> {
     try {
-      const res = await this.http.post(`${this.root}/user/auth`, body, { responseType: "text" }).toPromise();
+      const res = await lastValueFrom(this.http.post(`${this.root}/user/auth`, body, { responseType: "text" }));
       localStorage.setItem("jwt", res);
       return true;
     } catch (error) {
@@ -27,7 +27,7 @@ export class ApiUtil {
 
   public async register(body: UserLoginReq): Promise<boolean> {
     try {
-      const res = await this.http.post(`${this.root}/user/register`, body, { responseType: "text" }).toPromise();
+      const res = await lastValueFrom(this.http.post(`${this.root}/user/register`, body, { responseType: "text" }));
       localStorage.setItem("jwt", res);
       return true;
     } catch (err) {
@@ -48,47 +48,47 @@ export class ApiUtil {
 
 
   public post<Q, R>(path: string, payload?: Q): Promise<R> {
-    return this.http.post<R>(`${this.root}/${path}`, payload, {
+    return lastValueFrom(this.http.post<R>(`${this.root}/${path}`, payload, {
       headers: {
         "Authorization": this.jwt ?? "",
       }
-    }).toPromise();
+    }));
   }
 
   public get<R>(path: string): Promise<R> {
-    return this.http.get<R>(`${this.root}/${path}`, {
+    return lastValueFrom(this.http.get<R>(`${this.root}/${path}`, {
       headers: {
         "Authorization": this.jwt ?? "",
       },
       reportProgress: true,
       observe: "body"
-    }).toPromise();
+    }));
   }
 
   public put<R>(path: string): Promise<R> {
-    return this.http.put<R>(`${this.root}/${path}`, {}, {
+    return lastValueFrom(this.http.put<R>(`${this.root}/${path}`, {}, {
       headers: {
         "Authorization": this.jwt ?? "",
       },
       reportProgress: true,
       observe: "body"
-    }).toPromise();
+    }));
   }
 
   public delete(path: string): Promise<void> {
-    return this.http.delete<void>(`${this.root}/${path}`, {
+    return lastValueFrom(this.http.delete<void>(`${this.root}/${path}`, {
       headers: {
         "Authorization": this.jwt ?? "",
       }
-    }).toPromise();
+    }));
   }
 
   public patch<Q, R>(path: string, payload?: Q): Promise<R> {
-    return this.http.patch<R>(`${this.root}/${path}`, payload, {
+    return lastValueFrom(this.http.patch<R>(`${this.root}/${path}`, payload, {
       headers: {
         "Authorization": this.jwt ?? "",
       }
-    }).toPromise();
+    }));
   }
 
   

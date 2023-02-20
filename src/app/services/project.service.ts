@@ -26,7 +26,6 @@ import { DocumentComponent } from '../components/tabs/document/document.componen
 })
 export class ProjectService {
 
-  // public openDocs: { [k: string]: DocumentSock } = {};
   public openBlueprints: { [k: string]: BlueprintSock } = {};
   public openSheets: { [k: string]: SheetSock } = {};
 

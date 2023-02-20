@@ -151,7 +151,7 @@ export class TabService {
     newTab.show = true;
     newTab.onFocus?.();
     if (save)
-      this.displayedTabId = tabId;
+      this.displayedTabId = newTab.tabId;
     return newTab.tabId;
   }
 

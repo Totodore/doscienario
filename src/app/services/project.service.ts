@@ -19,13 +19,14 @@ import { applyTextChanges } from '../utils/element.utils';
 import { SearchOptionsComponent } from '../components/views/board/nav-bar/search-options/search-options.component';
 import { NGXLogger } from 'ngx-logger';
 import { TabTypes } from '../models/sys/tab.model';
+import { DocumentComponent } from '../components/tabs/document/document.component';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProjectService {
 
-  public openDocs: { [k: string]: DocumentSock } = {};
+  // public openDocs: { [k: string]: DocumentSock } = {};
   public openBlueprints: { [k: string]: BlueprintSock } = {};
   public openSheets: { [k: string]: SheetSock } = {};
 
@@ -44,7 +45,7 @@ export class ProjectService {
   public async loadData(data: Project) {
     this.data = data;
     localStorage.setItem("project-data", JSON.stringify(data));
-    this.openDocs = {};
+    // this.openDocs = {};
     this.openBlueprints = {};
   }
 
@@ -91,7 +92,9 @@ export class ProjectService {
     document.changes = new Map<number, Change[]>();
     document.clientUpdateId = 0;
     this.logger.log("Document received:", packet.element.id, "tab:", packet.reqId);
-    this.openDocs[packet.reqId] = document;
+    const docTab: DocumentComponent = this.tabs.getTabFromId(packet.reqId);
+    docTab.doc = document;
+    docTab.loadedTab();
     if (!this.data.documents.find(el => el.id == packet.element.id)) {
       this.data.documents.push(document);
     }
@@ -106,59 +109,45 @@ export class ProjectService {
   }
 
   public updateDoc(incomingDoc: WriteElementIn) {
-    const doc = this.getDoc(incomingDoc.elementId);
-    if (doc)
-      doc.content = applyTextChanges(doc, incomingDoc);
-  }
-
-  public removeOpenDoc(docId: number) {
-    const index = Object.values(this.openDocs).findIndex(el => el.id == docId);
-    delete this.openDocs[index];
+    const tab = this.getDocComponent(incomingDoc.elementId);
+    if (tab)
+      tab.doc.content = applyTextChanges(tab.doc, incomingDoc);
   }
 
   @DataUpdater()
   public renameDocFromSocket(title: string, docId: number) {
     this.data.documents.find(el => el.id == docId)!.title = title;
-    const doc = this.getDoc(docId);
-    if (doc)
-      doc.title = title;
+    const tab = this.getDocComponent(docId);
+    if (tab)
+      tab.doc.title = title;
   }
   @DataUpdater()
   public renameDoc(tabId: string, title: string) {
-    this.openDocs[tabId].title = title;
-    const docId = this.openDocs[tabId].id;
+    const tab: DocumentComponent = this.tabs.getTabFromId(tabId)
+    tab.doc.title = title;
+    const docId = tab.id;
     this.data.documents.find(el => el.id == docId)!.title = title;
   }
   @DataUpdater()
   public colorDoc(tabId: string, color: string) {
-    this.openDocs[tabId].color = color;
-    const docId = this.openDocs[tabId].id;
+    const tab: DocumentComponent = this.tabs.getTabFromId(tabId)
+    tab.doc.color = color;
+    const docId = tab.id;
     this.data.documents.find(el => el.id == docId)!.color = color;
   }
   /**
-   * Remove a doc from its tab id or docId
+   * Remove a doc from its docId
    * If it is tab id it means that the doc should be opened
    */
   @DataUpdater()
-  public removeDoc(id: string | number) {
-    if (typeof id === 'string') {
-      const docId = this.openDocs[id].id;
-      delete this.openDocs[id];
-      this.data.documents.splice(this.docs.findIndex(el => el.id == docId), 1);
-    } else if (typeof id === 'number') {
-      for (const tabId in this.openDocs) {
-        if (this.openDocs[tabId].id === id) {
-          delete this.openDocs[tabId];
-          break;
-        }
-      }
-      this.data.documents.splice(this.docs.findIndex(el => el.id == id), 1);
-    }
+  public removeDoc(id: number) {
+    this.data.documents.splice(this.docs.findIndex(el => el.id == id), 1);
   }
   @DataUpdater()
   public updateDocTags(tabId: string, tags: Tag[]) {
-    this.openDocs[tabId].tags = tags;
-    const docId = this.openDocs[tabId].id;
+    const tab: DocumentComponent = this.tabs.getTabFromId(tabId)
+    tab.doc.tags = tags;
+    const docId = tab.id;
     this.data.documents.find(el => el.id == docId)!.tags = tags;
     for (const tag of tags) {
       if (!this.data.tags.find(el => el.title.toLowerCase() === tag.title.toLowerCase()))
@@ -191,9 +180,9 @@ export class ProjectService {
   @DataUpdater()
   public renameBlueprintFromSocket(title: string, blueprintId: number) {
     this.data.blueprints.find(el => el.id == blueprintId)!.title = title;
-    const doc = Object.values(this.openDocs).find(el => el.id == blueprintId);
-    if (doc)
-      doc.title = title;
+    const blueprint = Object.values(this.openBlueprints).find(el => el.id == blueprintId);
+    if (blueprint)
+      blueprint.title = title;
   }
 
   @DataUpdater()
@@ -236,9 +225,9 @@ export class ProjectService {
     if (blueprint)
       blueprint.nodesMap.set(packet.node.id, new Node(packet.node));
     this.logger.log("Node created:", packet.node.id, "blueprint:", packet.node.blueprint.id, packet.node);
-    if (this.tabs.displayedTab[1].type === TabTypes.BLUEPRINT && this.tabs.displayedTab[1].id === packet.node.blueprint.id && packet.user === packet.node.createdBy.id) {
+    if (this.tabs.focusedTab.type === TabTypes.BLUEPRINT && this.tabs.focusedTab.id === packet.node.blueprint.id && packet.user === packet.node.createdBy.id) {
       window.setTimeout(async () => {
-        const component = this.tabs.displayedTab[1] as BlueprintComponent;
+        const component = this.tabs.focusedTab as BlueprintComponent;
         if (component.autoMode)
           await component.autoPos(packet.node);
       }, 100);
@@ -306,52 +295,43 @@ export class ProjectService {
       (parentDoc.sheets ??= []).push(sheet);
     }
     this.logger.log("Sheet received:", packet.element.id, "doc:", parentDoc.id, "tab:", packet.reqId);
-    // const doc = this.getDoc(sheet.documentId);
-    // if (doc) {
-    //   const sheetIndex = doc.sheets.findIndex(el => el.id === sheet.id);
-    //   if (sheetIndex >= 0)
-    //     doc.sheets[sheetIndex] = sheet;
-    //   else
-    //     doc.sheets.push(sheet);
-    // }
   }
-   @DataUpdater()
-   public addOpenSheet(sheet: Sheet) {
-     const doc = this.data.documents.find(el => el.id == sheet.documentId);
-     if (doc && !doc.sheets.find(el => el.id == sheet.id))
-       doc.sheets.push(sheet);
-   }
- 
-   public updateSheet(incomingSheet: WriteElementIn) {
-     const sheet = this.getSheet(incomingSheet.elementId);
-     if (sheet)
+  @DataUpdater()
+  public addOpenSheet(sheet: Sheet) {
+    const doc = this.data.documents.find(el => el.id == sheet.documentId);
+    if (doc && !doc.sheets.find(el => el.id == sheet.id))
+      doc.sheets.push(sheet);
+  }
+
+  public updateSheet(incomingSheet: WriteElementIn) {
+    const sheet = this.getSheet(incomingSheet.elementId);
+    if (sheet)
       sheet.content = applyTextChanges(sheet, incomingSheet);
-   }
- 
-   /**
-    * Remove a sheet from its tab id or docId
-    * If it is tab id it means that the doc should be opened
-    */
-   @DataUpdater()
-   public removeSheet(id: string | number, docId: number) {
-     if (typeof id === 'string') {
-       const doc = this.data.documents.find(el => el.id == docId);
-       const sheetId = this.openSheets[id].id;
-       doc!.sheets.splice(doc!.sheets.findIndex(el => el.id == sheetId), 1);
-       delete this.openSheets[id];
-       this.getDoc(docId)!.sheets.splice(this.getDoc(docId)!.sheets.findIndex(el => el.id == sheetId), 1);
-     } else if (typeof id === 'number') {
-       for (const tabId in this.openDocs) {
-         if (this.openDocs[tabId].id === docId) {
-           const sheets = this.data.documents.find(el => this.openDocs[tabId].id === el.id)!.sheets;
-           sheets.splice(sheets.findIndex(el => el.id == id), 1);
-           delete this.openSheets[tabId];
-          this.getDoc(docId)!.sheets.splice(this.getDoc(docId)!.sheets.findIndex(el => el.id == id), 1);
-           break;
-         }
-       }
-     }
-   }
+  }
+
+  /**
+   * Remove a sheet from its ID
+   * @param id the ID of the sheet
+   * @param docId the ID of the document
+   */
+  @DataUpdater()
+  public removeSheet(id: number, docId: number) {
+    const tab = this.getDocComponent(docId);
+    if (!tab) {
+      this.logger.error("Sheet removal failed: Document not found:", docId, "sheet:", id);
+      return;
+    }
+    const sheetIndex = tab.sheets.findIndex(el => el.id === id);
+    if (sheetIndex === -1) {
+      this.logger.error("Sheet removal failed: Sheet not found:", id, "doc:", docId);
+      return;
+    }
+    tab.sheets.splice(sheetIndex, 1);
+    delete this.openSheets[tab.tabId];
+    const sheets = this.data.documents.find(el => tab.id === el.id)!.sheets;
+    sheets.splice(sheets.findIndex(el => el.id == id), 1);
+    this.logger.log("Sheet removed:", id, "doc:", docId);
+  }
 
   public async searchFromTags(tags: Tag[], needle?: string, selectNoTags = false) {
     return await this.searchWorker.postAsyncMessage<Element[]>('searchFromTags', [tags, needle, [...this.docs, ...this.blueprints], selectNoTags]);
@@ -408,8 +388,8 @@ export class ProjectService {
   public set zoomScroll(opt: boolean) {
     localStorage.setItem("zoom-scroll", String(opt));
   }
-  public getDoc(docId: number) {
-    return Object.values(this.openDocs).find(el => el.id == docId);
+  public getDocComponent(docId: number): DocumentComponent {
+    return this.tabs.getTab(TabTypes.DOCUMENT, docId);
   }
   public getBlueprint(blueprintId: number) {
     return Object.values(this.openBlueprints).find(el => el.id == blueprintId);

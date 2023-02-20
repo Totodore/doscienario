@@ -34,7 +34,7 @@ export class ProjectOptionsComponent implements ITabElement {
   public name: string = this.project.name;
 
   public readonly type = TabTypes.STANDALONE;
-
+  public readonly tabId = "project-options";
   public updateName() {
     this.socket.updateProject(this.name);
   }
@@ -76,6 +76,11 @@ export class ProjectOptionsComponent implements ITabElement {
         this.snackbar.snack("Erreur lors de la suppression du projet");
       }
     });
+  }
+
+  
+  public generateUid() {
+    return "project-options";
   }
 
 }

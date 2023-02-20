@@ -42,8 +42,6 @@ import { DocumentComponent } from './components/tabs/document/document.component
 import { SheetEditorComponent } from './components/tabs/document/sheet-editor/sheet-editor.component';
 import { ProjectOptionsComponent } from './components/tabs/project-options/project-options.component';
 import { UserAddComponent } from './components/tabs/project-options/user-add/user-add.component';
-import { AddTagComponent } from './components/tabs/tags-manager/add-tag/add-tag.component';
-import { TagsManagerComponent } from './components/tabs/tags-manager/tags-manager.component';
 import { WelcomeTabComponent } from './components/tabs/welcome-tab/welcome-tab.component';
 import { AskInputComponent } from './components/utils/ask-input/ask-input.component';
 import { AskTextareaComponent } from './components/utils/ask-textarea/ask-textarea.component';
@@ -103,8 +101,6 @@ import { TagIoHandler } from './services/sockets/tag-io.handler.service';
     SearchBarComponent,
     OptionsSeparatorComponent,
     EditTagsComponent,
-    TagsManagerComponent,
-    AddTagComponent,
     ConfirmComponent,
     SearchOptionsComponent,
     BlueprintComponent,

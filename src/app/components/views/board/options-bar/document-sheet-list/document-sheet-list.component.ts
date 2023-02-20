@@ -31,7 +31,7 @@ export class DocumentSheetListComponent {
     return this.project.docs.find(el => el.id === this.docId);
   }
   public get docComponent(): DocumentComponent {
-    return this.tabs.displayedTab[1] as DocumentComponent;
+    return this.tabs.focusedTab as DocumentComponent;
   }
   public get docId(): number {
     return this.docComponent.id;

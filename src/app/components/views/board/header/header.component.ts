@@ -31,12 +31,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
 
-  public tabChanged(index: number) {
-    this.tabService.showTab(index);
+  public tabChanged(tabId?: string) {
+    if (!tabId)
+      return;
+    this.tabService.showTab(tabId);
   }
 
-  public tabClosed(index: number) {
-    this.tabService.removeTab(index);
+  public tabClosed(tabId: string) {
+    this.tabService.removeTab(tabId);
   }
 
   public tabRightClick(e: MouseEvent) {

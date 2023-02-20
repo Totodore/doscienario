@@ -91,16 +91,16 @@ export class BlueprintOptionsComponent {
     return this.project.openBlueprints[this.tabId];
   }
   get blueprintId(): number {
-    return this.tabs.displayedTab[1].id;
+    return this.tabs.focusedTab.id;
   }
   get docTags(): Tag[] {
     const tagIds = this.blueprint.tags?.map(el => el.id);
     return this.project.tags.filter(el => tagIds?.includes(el.id));
   }
   get tabId(): string {
-    return this.tabs.displayedTab[1].tabId;
+    return this.tabs.focusedTab.tabId;
   }
   get component(): BlueprintComponent {
-    return this.tabs.displayedTab[1] as BlueprintComponent;
+    return this.tabs.focusedTab as BlueprintComponent;
   }
 }

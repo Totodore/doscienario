@@ -2,10 +2,12 @@ import { Component, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { EditMainTagComponent } from 'src/app/components/modals/edit-main-tag/edit-main-tag.component';
 import { EditTagsComponent } from 'src/app/components/modals/edit-tags/edit-tags.component';
+import { DocumentComponent } from 'src/app/components/tabs/document/document.component';
 import { Tag } from 'src/app/models/api/tag.model';
 import { Element } from 'src/app/models/default.model';
 import { TabTypes } from 'src/app/models/sys/tab.model';
 import { ProjectService } from 'src/app/services/project.service';
+import { TabService } from 'src/app/services/tab.service';
 
 @Component({
   selector: 'app-element-tags',
@@ -23,6 +25,7 @@ export class ElementTagsComponent {
   constructor(
     private readonly project: ProjectService,
     private readonly dialog: MatDialog,
+    private readonly tabs: TabService,
   ) { }
 
   public onTagClick(tag: Tag) {
@@ -43,7 +46,10 @@ export class ElementTagsComponent {
   }
 
   get doc(): Element {
-    return {...this.project.openDocs, ...this.project.openBlueprints}[this.tabId];
+    if (this.tabType === TabTypes.BLUEPRINT)
+      return this.project.openBlueprints[this.tabId];
+    else if (this.tabType === TabTypes.DOCUMENT)
+      return this.tabs.getTabFromId<DocumentComponent>(this.tabId).doc;
   }
 
   get docTags(): Tag[] {

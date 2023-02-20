@@ -10,7 +10,7 @@ import { NGXLogger } from 'ngx-logger';
 
 @Component({ template: '' })
 export abstract class ElementComponent implements ITabElement, OnDestroy {
-  public tabId?: string;
+  public tabId: string;
   public show = false;
   public type: TabTypes;
   public loaded = false;
@@ -31,8 +31,8 @@ export abstract class ElementComponent implements ITabElement, OnDestroy {
     window.clearTimeout(this.checkCRCErrorTimer);
   }
 
-  public openTab(id: string | number): string {
-    this.tabId = uuid4();
+  public openTab(tabId: string, _id?: number): string {
+    this.tabId = tabId;
     this.progress.show();
     return this.tabId;
   }
@@ -76,6 +76,9 @@ export abstract class ElementComponent implements ITabElement, OnDestroy {
     }
   }
 
+  public generateUid() {
+    return this.type + '-' + uuid4();
+  }
   public abstract addTags(tags: Tag[]): Promise<void> | void;
   protected abstract getCRC(): Promise<number> | number;
   protected abstract sendCRCRequest(crc: number): Observable<CheckCRCIn>

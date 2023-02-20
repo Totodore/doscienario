@@ -3,7 +3,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { SnackbarService } from '../../../services/ui/snackbar.service';
 import { ApiService } from './../../../services/api.service';
 import { ProgressService } from '../../../services/ui/progress.service';
-import { TagsManagerComponent } from './../tags-manager/tags-manager.component';
 import { ProjectOptionsComponent } from '../project-options/project-options.component';
 import { TabService } from '../../../services/tab.service';
 import { ProjectService } from '../../../services/project.service';
@@ -20,6 +19,7 @@ export class WelcomeTabComponent implements ITabElement, OnInit {
 
   public readonly title = "Menu";
   public readonly type = TabTypes.STANDALONE;
+  public readonly tabId = "welcome-tab";
 
   public hasUpdate?: string;
 
@@ -45,9 +45,6 @@ export class WelcomeTabComponent implements ITabElement, OnInit {
     this.tabService.pushTab(ProjectOptionsComponent);
   }
 
-  public openTags() {
-    this.tabService.pushTab(TagsManagerComponent);
-  }
   public async reSync() {
     this.tabService.closeAllTab();
     try {
@@ -74,6 +71,10 @@ export class WelcomeTabComponent implements ITabElement, OnInit {
         this.logger.error("Impossible to send bug report", e);
       }
     });
+  }
+
+  public generateUid() {
+    return "welcome-tab";
   }
 
   public async exit() {

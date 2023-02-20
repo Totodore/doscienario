@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { EditTagsComponent } from 'src/app/components/modals/edit-tags/edit-tags.component';
+import { DocumentComponent } from 'src/app/components/tabs/document/document.component';
 import { DocumentSock } from 'src/app/models/api/document.model';
 import { Tag } from 'src/app/models/api/tag.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
@@ -45,7 +46,7 @@ export class DocumentOptionsComponent {
     dialog.componentInstance.confirm.subscribe(() => {
       dialog.close();
       this.socket.emit(Flags.REMOVE_DOC, this.docId);
-      this.project.removeDoc(this.tabId);
+      this.project.removeDoc(this.docId);
       this.tabs.removeTab();
     });
   }
@@ -60,16 +61,16 @@ export class DocumentOptionsComponent {
   }
 
   get doc(): DocumentSock {
-    return this.project.openDocs[this.tabId];
+    return this.tabs.getTabFromId<DocumentComponent>(this.tabId).doc;
   }
   get docId(): number {
-    return this.tabs.displayedTab[1].id;
+    return this.tabs.focusedTab.id;
   }
   get docTags(): Tag[] {
     const tagIds = this.doc.tags.map(el => el.id);
     return this.project.tags.filter(el => tagIds.includes(el.id));
   }
   get tabId(): string {
-    return this.tabs.displayedTab[1].tabId;
+    return this.tabs.focusedTab.tabId;
   }
 }

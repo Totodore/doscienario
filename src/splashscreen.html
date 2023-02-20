@@ -64,6 +64,13 @@
 			animation-iteration-count: infinite;
 			animation-fill-mode: both;
 		}
+		.close-btn {
+			position: absolute;
+			top: 5px;
+			right: 15px;
+			cursor: pointer;
+			font-size: 1.5rem;
+		}
 
 		@keyframes progress-anim {
 			0% {
@@ -82,10 +89,17 @@
 			}
 		}
 	</style>
+
+	<script>
+		async function onExit() {
+			await window.__TAURI_INVOKE__('exit_app');
+		}
+	</script>
 </head>
 
 <body>
 	<div class="wrapper">
+		<span class="close-btn" onclick="onExit()">X</span>
 		<img src="./favicon.ico" />
 		<h1>Doscienario</h1>
 		<div class="progress-wrapper">

@@ -17,11 +17,11 @@ export class NavBarComponent {
   ) { }
 
   get hasOpenedDoc(): boolean {
-    return this.tabs.displayedTab?.[1]?.type === TabTypes.DOCUMENT;
+    return this.tabs.focusedTab?.type === TabTypes.DOCUMENT;
   }
 
   get hasOpenedBlueprint(): boolean {
-    return this.tabs.displayedTab?.[1]?.type === TabTypes.BLUEPRINT;
+    return this.tabs.focusedTab?.type === TabTypes.BLUEPRINT;
   }
 
 }

@@ -35,6 +35,7 @@ import { SheetEditorComponent } from './sheet-editor/sheet-editor.component';
 export class DocumentComponent extends ElementComponent implements ITabElement, OnDestroy {
 
   public lastChangeId: number;
+  public doc?: DocumentSock;
 
   @ViewChild("editorView", { static: false })
   private editorView?: ElementRef<HTMLElement>;
@@ -113,11 +114,11 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   /**
    * Triggered when we create a new tab
    * @description Send document request and then add event listener for changes computation in worker
-   * @param id can be a tab id (string) or a document id
+   * @param id a document ID
    * @returns the tab id
    */
-  public openTab(id: string | number): string {
-    super.openTab(id);
+  public openTab(tabId: string, id: number): string {
+    super.openTab(tabId, id);
     this.socket.emit(Flags.OPEN_DOC, [this.tabId, id]);
     this.docWorker.worker.addEventListener<Change[]>(`diff-${this.tabId}`, (data) => this.onDocParsed(data));
     if (!this.tabId)
@@ -159,7 +160,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
    */
   public loadedTab() {
     super.loadedTab();
-    this.project.openDocs[this.tabId!].content = this.doc.content;
+    this.doc.content = this.doc.content;
     this.logger.log("Document loaded");
   }
 
@@ -189,7 +190,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       this.docWorker.worker.postMessage<[string, string]>(`diff-${this.tabId}`, [this.doc.content, data]);
       this.progressWatcher();
     }
-    this.project.openDocs[this.tabId!].content = data;
+    this.doc.content = data;
     this.checkCRCTimer = window.setTimeout(() => this.checkCRC(), 5000);
   }
 
@@ -445,10 +446,6 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     this.project.updateDocTags(this.tabId, tags);
     for (const tag of tags)
       this.socket.emit(Flags.TAG_ADD_DOC, new AddTagElementOut(this.id, tag.title));
-  }
-
-  get doc(): DocumentSock {
-    return this.project.openDocs[this.tabId!]!;
   }
 
   get sheets(): Sheet[] {

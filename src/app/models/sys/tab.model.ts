@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import { DbColumn, DbPrimaryGeneratedColumn, DbTable } from 'src/app/decorators/database-column.decorator';
+import { DbColumn, DbPrimaryColumn, DbPrimaryGeneratedColumn, DbTable, DbUniqueColumn } from 'src/app/decorators/database-column.decorator';
 
 @DbTable()
 export class Tab {
 
-  @DbPrimaryGeneratedColumn()
-  public id: number;
+  @DbPrimaryColumn()
+  public id: string;
 
   @DbColumn()
   public projectId: number;
@@ -14,14 +14,13 @@ export class Tab {
   public tabType: number;
 
   @DbColumn()
-  public elId?: number | string = null;
+  public elId?: number = null;
 
-  public tabId?: string;
-
-  constructor(projectId: number, tabType: number, elId?: number | string) {
+  constructor(projectId: number, tabType: number, tabId: string, elId?: number) {
     this.projectId = projectId;
     this.tabType = tabType;
     this.elId = elId;
+    this.id = tabId;
   }
 }
 
@@ -35,12 +34,17 @@ export enum TabTypes {
 
 export interface ITabElement extends Component {
   title: string;
-  tabId?: string;
+  tabId: string;
   id?: number;
   show: boolean;
   type: TabTypes;
   onClose?: () => void;
-  openTab?: (id: number | string) => string;
+  generateUid: () => string;
+  /**
+   * Called when the tab is opened
+   * @param id the element id to open
+   */
+  openTab?: (tabId?: string, id?: number) => void;
   loadedTab?: () => void;
   onFocus?: () => void;
   onUnFocus?: () => void;

@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
+import { DocumentComponent } from 'src/app/components/tabs/document/document.component';
 import { EventHandler } from 'src/app/decorators/subscribe-event.decorator';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { AddTagElementIn, RemoveTagElementIn } from 'src/app/models/sockets/in/tag.in';
 import { WriteElementOut } from 'src/app/models/sockets/out/element.out';
+import { TabTypes } from 'src/app/models/sys/tab.model';
 import { Change, ColorElementIn, OpenElementIn, RenameElementIn, SendElementIn, WriteElementIn } from '../../models/sockets/in/element.in';
 import { ApiService } from '../api.service';
 import { ProjectService } from '../project.service';
@@ -16,7 +18,7 @@ import { SocketService } from './socket.service';
 })
 export class DocIoHandler extends AbstractIoHandler {
 
-  
+
   constructor(
     private readonly api: ApiService,
     private readonly project: ProjectService,
@@ -32,18 +34,17 @@ export class DocIoHandler extends AbstractIoHandler {
   }
 
   @EventHandler(Flags.SEND_DOC)
-  onSendDocument(packet: SendElementIn) {
+  async onSendDocument(packet: SendElementIn) {
     this.project.addSendDoc(packet);
-    this.tabs.updateDocTab(packet.reqId, packet.element.id);
   }
 
   @EventHandler(Flags.CLOSE_DOC)
   onCloseDocument(docId: number) {
-    this.project.removeOpenDoc(docId);
+    // this.project.removeOpenDoc(docId);
   }
 
   updateDocument(docId: number, tabId: string, changes: Change[], lastChangeId: number, clientUpdateId: number) {
-    const doc = this.project.openDocs[tabId];
+    const doc = this.tabs.getTabFromId<DocumentComponent>(tabId).doc;
     this.logger.log("Updating doc", docId, "tab", tabId);
     doc.changes.set(clientUpdateId, changes);
     this.socket.emit(Flags.WRITE_DOC, new WriteElementOut(docId, lastChangeId, changes, this.api.user.id, clientUpdateId));
@@ -51,7 +52,7 @@ export class DocIoHandler extends AbstractIoHandler {
 
   @EventHandler(Flags.WRITE_DOC)
   onUpdateDocument(doc: WriteElementIn) {
-    this.project.getDoc(doc.elementId).lastChangeId = doc.updateId;
+    this.project.getDocComponent(doc.elementId).lastChangeId = doc.updateId;
     if (doc.userId != this.api.user.id)
       this.project.updateDoc(doc);
   }
@@ -68,7 +69,8 @@ export class DocIoHandler extends AbstractIoHandler {
 
   @EventHandler(Flags.REMOVE_DOC)
   onRemoveDoc(docId: number) {
-    this.tabs.removeDocTab(docId);
+    const tab = this.tabs.getTab(TabTypes.DOCUMENT, docId);
+    this.tabs.removeTab(tab.tabId);
     this.project.removeDoc(docId);
   }
 
@@ -79,7 +81,7 @@ export class DocIoHandler extends AbstractIoHandler {
       this.project.updateProjectTag(packet.tag);
     else if (!projectTag)
       this.project.addProjectTag(packet.tag);
-    const doc = this.project.getDoc(packet.docId);
+    const doc = this.project.getDocComponent(packet.docId).doc;
     const tag = doc.tags.find(el => el.title == packet.tag.title);
     if (tag)
       doc.tags[doc.tags.indexOf(tag)] = packet.tag;
@@ -89,7 +91,7 @@ export class DocIoHandler extends AbstractIoHandler {
 
   @EventHandler(Flags.TAG_REMOVE_DOC)
   onRemoveTagDoc(packet: RemoveTagElementIn) {
-    const tags = this.project.getDoc(packet.elementId).tags;
+    const tags = this.project.getDocComponent(packet.elementId).doc.tags;
     tags.splice(tags.findIndex(el => el.title == packet.title.toLowerCase()), 1);
   }
 

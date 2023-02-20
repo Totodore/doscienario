@@ -119,8 +119,8 @@ export class SheetEditorComponent implements OnInit {
     const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer cette note ?" });
     dialog.componentInstance.confirm.subscribe(() => {
       this.socket.emit(Flags.REMOVE_SHEET, [this.id, this.docId]);
-      (this.tabs.displayedTab[1] as DocumentComponent)?.onRemoveSheet?.(this.sheet);
-      this.project.removeSheet(this.tabId, this.docId);
+      (this.tabs.focusedTab as DocumentComponent)?.onRemoveSheet?.(this.sheet);
+      this.project.removeSheet(this.id, this.docId);
       this.onSheetClose();
       dialog.close();
     });

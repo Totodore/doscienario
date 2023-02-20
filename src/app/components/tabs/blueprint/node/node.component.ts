@@ -146,7 +146,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
   public onAddRelButton(icon: MatIcon, e: Event, rightClick = false) {
     e.preventDefault();
     e.stopImmediatePropagation();
-    const rels = this.project.getBlueprint(this.tabs.displayedTab[1].id).relsArr;
+    const rels = this.project.getBlueprint(this.tabs.focusedTab.id).relsArr;
     let [x, y] = [this.data.x, this.data.y];
     const [w, h] = [this.wrapper.nativeElement.clientWidth, this.wrapper.nativeElement.clientHeight];
     switch (this.btnAnchor) {
@@ -279,7 +279,7 @@ export class NodeComponent implements AfterViewInit, OnInit {
   }
 
   public get hasAnchor(): boolean {
-    return !!this.project.getBlueprint(this.tabs.displayedTab[1].id).loopbackRelsArr.find(el => el.parentId == this.data.id);
+    return !!this.project.getBlueprint(this.tabs.focusedTab.id)?.loopbackRelsArr.find(el => el.parentId == this.data.id);
   }
   public get bounds(): Bounds {
     return {

@@ -26,3 +26,8 @@ export function hslToHex(h: number, s: number, l: number): string {
   };
   return `${f(0)}${f(8)}${f(4)}`;
 }
+
+
+export function camelToSnakeCase(str: string) {
+  return str.replace(/([A-Z])/g, (g) => `${g[0].toLowerCase()}`);
+}

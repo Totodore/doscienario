@@ -6,7 +6,7 @@ import 'reflect-metadata';
  */
 export function DbTable() {
   return function (constructor: Function): void {
-    constructor.prototype.__tableName = camelToSnakeCase(constructor.name);
+    constructor.prototype.__tableName = constructor.name;
     const keyColumn = constructor.prototype.__columns.find(c => c.primary);
     constructor.prototype.__dbDefinition = {
       store: constructor.prototype.__tableName,
@@ -22,7 +22,7 @@ export function DbTable() {
 export function DbColumn() {
   return function (target: any, key: any): void {
     (target.constructor.prototype.__columns ??= []).push({
-      key: camelToSnakeCase(key),
+      key,
       type: Reflect.getMetadata("design:type", target, key),
       unique: false,
       primary: false,
@@ -38,7 +38,7 @@ export function DbColumn() {
 export function DbPrimaryGeneratedColumn() {
   return function (target: any, key: any): void {
     (target.constructor.prototype.__columns ??= []).push({
-      key: camelToSnakeCase(key),
+      key,
       type: Reflect.getMetadata("design:type", target, key),
       primary: true,
       unique: true,
@@ -54,7 +54,7 @@ export function DbPrimaryGeneratedColumn() {
 export function DbPrimaryColumn() {
   return function (target: any, key: any): void {
     (target.constructor.prototype.__columns ??= []).push({
-      key: camelToSnakeCase(key),
+      key,
       type: Reflect.getMetadata("design:type", target, key),
       primary: true,
       unique: true,
@@ -70,7 +70,7 @@ export function DbPrimaryColumn() {
 export function DbUniqueColumn() {
   return function (target: any, key: any): void {
     (target.constructor.prototype.__columns ??= []).push({
-      key: camelToSnakeCase(key),
+      key,
       type: Reflect.getMetadata("design:type", target, key),
       unique: true,
       primary: false,
@@ -85,8 +85,4 @@ export type ColumnMetadata = {
   unique: boolean;
   primary: boolean;
   generated: boolean;
-}
-
-function camelToSnakeCase(str: string) {
-  return str.replace(/([A-Z])/g, (g) => `_${g[0].toLowerCase()}`);
 }

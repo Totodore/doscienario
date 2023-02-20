@@ -1,6 +1,7 @@
 import { Injectable, Type } from '@angular/core';
 import { NgxIndexedDBService } from 'ngx-indexed-db';
 import { lastValueFrom } from "rxjs";
+import { dbConfig } from 'src/app/configs';
 
 /**
  * @class Wrapper service for ngx-indexed-db
@@ -8,13 +9,22 @@ import { lastValueFrom } from "rxjs";
  */
 @Injectable({ providedIn: 'root' })
 export class DbService {
-  
+
   constructor(
-    private readonly dbcore: NgxIndexedDBService
-  ) { }
+    private readonly dbcore: NgxIndexedDBService,
+  ) { 
+    console.log("Current DB config", dbConfig);
+  }
 
   public add<T>(table: Type<T>, value: Partial<T>, key?: string): Promise<T> {
     return lastValueFrom(this.db.add(table.prototype.__tableName, value as T, key));
+  }
+  public async upsert<T>(table: Type<T>, value: Partial<T>, key: string): Promise<T> {
+    const exists = await lastValueFrom(this.db.getByKey(table.prototype.__tableName, key));
+    if (exists)
+      return lastValueFrom(this.db.update(table.prototype.__tableName, value as T));
+    else
+      return lastValueFrom(this.db.add(table.prototype.__tableName, value as T));
   }
 
   public clear<T>(table: Type<T>) {
@@ -26,6 +36,10 @@ export class DbService {
   }
   public removeMany<T>(table: Type<T>, obj: T[]) {
     return lastValueFrom(this.db.bulkDelete(table.prototype.__tableName, obj.map(el => el[table.prototype.__dbDefinition.storeConfig.keyPath])));
+  }
+
+  public async getOne<T>(table: Type<T>, key: string): Promise<T> {
+    return lastValueFrom(this.db.getByKey(table.prototype.__tableName, key));
   }
   public async getManyWhere<T>(table: Type<T>, key: keyof T, val: IDBKeyRange | string | number, select?: (keyof T)[]): Promise<T[]> {
     const res = await lastValueFrom(this.db.getAllByIndex<T>(table.prototype.__tableName, key as string, typeof val != "object" ? IDBKeyRange.only(val) : val));

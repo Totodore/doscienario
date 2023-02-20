@@ -87,6 +87,6 @@ export class AnchorComponent {
   }
 
   public get blueprint() {
-    return this.project.getBlueprint(this.tabs.displayedTab[1].id);
+    return this.project.getBlueprint(this.tabs.focusedTab.id);
   }
 }

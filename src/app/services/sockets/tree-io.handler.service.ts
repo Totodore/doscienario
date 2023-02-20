@@ -29,7 +29,6 @@ export class TreeIoHandler extends AbstractIoHandler {
   @EventHandler(Flags.SEND_BLUEPRINT)
   onSendBlueprint(packet: SendElementIn) {
     this.project.addSendBlueprint(packet);
-    this.tabs.updateBlueprintTab(packet.reqId, packet.element.id);
   }
 
   @EventHandler(Flags.OPEN_BLUEPRINT)
@@ -54,7 +53,11 @@ export class TreeIoHandler extends AbstractIoHandler {
 
   @EventHandler(Flags.REMOVE_BLUEPRINT)
   onRemoveBlueprint(id: number) {
-    this.tabs.removeBlueprintTab(id);
+    const tab = this.tabs.getTab(TabTypes.BLUEPRINT, id);
+    if (tab)
+      this.tabs.removeTab(tab.tabId);
+    else
+      this.logger.warn("Blueprint tab not found", id);
     this.project.removeBlueprint(id);
   }
   @EventHandler(Flags.TAG_ADD_BLUEPRINT)
@@ -109,9 +112,9 @@ export class TreeIoHandler extends AbstractIoHandler {
     rel.parentId = packet.parentId;
     rel.childPole = packet.childPole;
     rel.parentPole = packet.parentPole;
-    if (this.tabs.displayedTab[1].type === TabTypes.BLUEPRINT && this.tabs.displayedTab[1].id === packet.blueprintId) {
+    if (this.tabs.focusedTab.type === TabTypes.BLUEPRINT && this.tabs.focusedTab.id === packet.blueprintId) {
       window.setTimeout(async () => {
-        const component = this.tabs.displayedTab[1] as BlueprintComponent;
+        const component = this.tabs.focusedTab as BlueprintComponent;
         if (component.autoMode) {
           await component.autoPos();
         }

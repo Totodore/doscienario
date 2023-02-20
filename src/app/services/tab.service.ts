@@ -3,27 +3,27 @@ import { DbService } from './database/db.service';
 
 import { BlueprintComponent } from './../components/tabs/blueprint/blueprint.component';
 import { WelcomeTabComponent } from './../components/tabs/welcome-tab/welcome-tab.component';
-import { TagsManagerComponent } from './../components/tabs/tags-manager/tags-manager.component';
 import { DocumentComponent } from './../components/tabs/document/document.component';
 import { ProjectOptionsComponent } from '../components/tabs/project-options/project-options.component';
 import { ComponentFactoryResolver, Inject, Injectable, Type, ViewContainerRef } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { ITabElement, TabTypes } from '../models/sys/tab.model';
+import { KeyStore } from '../models/sys/keystore.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TabService {
 
-  private _tabs: [Type<ITabElement>, ITabElement][] = [];
+  private _tabs: Map<string, ITabElement> = new Map();
   private rootViewContainer: ViewContainerRef;
   private projectId: number;
+  private _displayedTabId: string | undefined;
 
   private readonly availableTabs: Type<ITabElement>[] = [
     ProjectOptionsComponent,
     DocumentComponent,
     BlueprintComponent,
-    TagsManagerComponent,
     WelcomeTabComponent
   ];
 
@@ -37,121 +37,124 @@ export class TabService {
   public setRootViewContainerRef(viewContainerRef: ViewContainerRef) {
     this.rootViewContainer = viewContainerRef
   }
-  private addDynamicComponent(el: Type<ITabElement>, id?: number): string {
-    const factory = this.factoryResolver.resolveComponentFactory(el)
+
+  /**
+   * Add a new tab to the tab list
+   * @param el The tab component to add
+   * @param id An element id for the tab
+   * @param tabId An existing tab id to sync comming from the db
+   * @returns a tab uuid
+   */
+  private addDynamicComponent(el: Type<ITabElement>, id?: number, tabId?: string, show = true): string {
+    const factory = this.factoryResolver.resolveComponentFactory(el);
     const component = factory.create(this.rootViewContainer.injector);
-    this._tabs.push([el, component.instance]);
+    tabId ??= component.instance.generateUid();
+
+    if (this._tabs.has(tabId)) {
+      this.logger.warn("Trying to add a tab with an already existing id :", tabId);
+    }
+    this._tabs.set(tabId, component.instance);
     this.rootViewContainer.insert(component.hostView);
-    component.instance.show = true;
-    return component.instance.openTab?.(id);
+    component.instance.show = show;
+    component.instance.openTab?.(tabId, id);
+    return tabId;
   }
 
+  /**
+   * Load the saved tabs from the database
+   */
   public async loadSavedTabs(projectId: number) {
     this.projectId = projectId;
     const savedTabs = await this.getSavedTabs();
     this.logger.log("Starting to load", savedTabs.length, "saved tabs");
     for (const tab of savedTabs) {
-      await this.pushTab(this.availableTabs[tab.tabType], false, tab.elId as number);
+      const element = this.availableTabs[tab.tabType];
+      this.addDynamicComponent(element, tab.elId, tab.id, false);
       this.logger.log("Loading saved tab :", this.availableTabs[tab.tabType].name);
     }
     this.logger.log("Finished loading saved tabs");
-    this.showTab(this.focusedTabIndex);
+    const previousTabId = (await this.db.getOne(KeyStore, "tab-index-" + this.projectId))?.value;
+    if (this._tabs.has(previousTabId)) {
+      this.logger.log("Previous tab found :", previousTabId);
+      this.showTab(previousTabId);
+    }
   }
 
+
   /**
-   * Take an id, it can be a document id (number)
-   * or a tab id
+   * Create a new tab and push it to the view. If the tab already exists, it will be displayed
+   * @param tab The tab component to add or a tab object
+   * @param save If the tab should be saved in the database
+   * @param id An optional element id for the tab
+   * @returns The tab uuid
    */
   public async pushTab(tab: Type<ITabElement>, save = true, id?: number): Promise<string> {
-    if (this.displayedTab?.[1])
-      this.displayedTab[1].show = false;
-    let displayedIndex: number;
-    const componentIndex = this._tabs.findIndex(el => id && el[1].id === id && el[0] === tab);
-    if (id && componentIndex >= 0)
-      displayedIndex = componentIndex;
-    else if (this._tabs.find(el => el[0] === tab && el[1].type === TabTypes.STANDALONE))
-      displayedIndex = this._tabs.findIndex(el => el[0].name === tab.name);
-    this.logger.log(displayedIndex >= 0 ? `Tab already exists : ${displayedIndex}` : `Creating new tab for ${tab.name}`);
-    if (displayedIndex >= 0)
-      return this.showTab(displayedIndex);
+    if (this.focusedTab)
+      this.focusedTab.show = false;
+    let tabId: string | undefined;
+    for (const [uid, tabEl] of this._tabs.entries()) {
+      if (
+        (tabEl.type !== TabTypes.STANDALONE && id && tabEl.id === id) ||
+        (tabEl.type === TabTypes.STANDALONE && tab.name === tabEl.constructor.name))
+        tabId = uid;
+    }
+    this.logger.log(tabId ? `Tab already exists : ${tabId}` : `Creating new tab for ${tab.name}`);
+    if (tabId)
+      return this.showTab(tabId);
     else {
       const tabId = this.addDynamicComponent(tab, id);
       if (save)
-        await this.addTabToStorage(tab, id);
+        await this.addTabToStorage(tab, tabId, id);
       return tabId;
     }
   }
 
   /**
-   * If index is not given, it remove the current tab
+   * If index is not given, it removes the current tab
    */
-  public removeTab(index = this.displayedTab[0], storage = true) {
-    this.tabs[index].onClose?.();
-    if (this.tabs[index].show && this.tabs.length > 1) {
-      (this.tabs[index - 1] ?? this.tabs[this.tabs.length - 1]).show = true;
-      (this.tabs[index - 1] ?? this.tabs[this.tabs.length - 1]).onFocus?.();
+  public removeTab(tabId = this.displayedTabId, storage = true) {
+    if (!this._tabs.has(tabId)) {
+      this.logger.warn("Trying to remove a tab that doesn't exist :", tabId);
+      return;
+    }
+    this.logger.log("Removing tab :", tabId);
+    const tab = this._tabs.get(tabId);
+    const tabIndex = this.getTabIndex(tabId);
+    tab.onClose?.();
+    if (tab.show && this.tabs.length > 1) {
+      (this.tabs[tabIndex - 1] ?? this.tabs[tabIndex + 1]).show = true;
+      (this.tabs[tabIndex - 1] ?? this.tabs[tabIndex + 1]).onFocus?.();
     }
     if (storage)
-      this.removeTabToStorage(this._tabs[index][0], this._tabs[index][1]?.id);
-    this.rootViewContainer.remove(index);
-    this._tabs.splice(index, 1);
-  }
-  public async updateDocTab(tabId: string, docId: number) {
-    this.getTabFromId<DocumentComponent>(tabId).loadedTab?.();
-    const savedTabs = await this.getSavedTabs();
-    if (!savedTabs.find(el => el.tabType === this.availableTabs.indexOf(DocumentComponent) && el?.elId === docId))
-      await this.addTabToStorage(DocumentComponent, docId);
+      this.removeTabToStorage(tabId);
+    this.rootViewContainer.remove(tabIndex);
+    this._tabs.delete(tabId);
   }
 
   /**
-   * Remove a document tab from its id
-   */
-  public removeDocTab(docId: number) {
-    const index = this.tabs.findIndex(el => el.id === docId && el.type === TabTypes.DOCUMENT);
-    if (index >= 0)
-      this.removeTab(index);
-  }
-
-  /**
-   * Add a tab to the storage if it's not already there
-   * @param tabId the uuid of the tab
-   * @param blueprintId the element id we need to save the current tab
-   */
-  public async updateBlueprintTab(tabId: string, blueprintId: number) {
-    this.getTabFromId<BlueprintComponent>(tabId).loadedTab?.();
-    const savedTabs = await this.getSavedTabs();
-    if (!savedTabs.find(el => el.tabType === this.availableTabs.indexOf(DocumentComponent) && el?.elId === blueprintId))
-      await this.addTabToStorage(BlueprintComponent, blueprintId);
-  }
-
-  /**
-   * Remove a blueprint tab from its id
-   */
-  public removeBlueprintTab(docId: number) {
-    const index = this.tabs.findIndex(el => el.id === docId && el.type === TabTypes.BLUEPRINT);
-    if (index >= 0)
-      this.removeTab(index);
-  }
-
-  /**
-   * Show a tab by its index
-   * @param index the index of the tab to show
-   * @param save if set tu true the tab index is saved
+   * Show a tab by its index or tabId
+   * @param index the index or tabId of the tab to show
+   * @param save if set to true the tab index is saved
    * @returns return the new tab uuid
    */
-  public showTab(index: number, save = true) {
-    if (this.displayedTab?.[1]) {
-      this.displayedTab[1].onUnFocus?.();
-      this.displayedTab[1].show = false;
+  public showTab(tabId: string, save = true) {
+    const displayedTab = this._tabs.get(this.displayedTabId);
+    const newTab = this._tabs.get(tabId);
+    if (!newTab) {
+      this.logger.warn("Trying to show a tab that doesn't exist :", tabId);
+      return;
     }
-    if (this.tabs[index]) {
-      this.tabs[index].show = true;
-      this.tabs[index].onFocus?.();
+    if (displayedTab) {
+      displayedTab.onUnFocus?.();
+      displayedTab.show = false;
     }
+    newTab.show = true;
+    newTab.onFocus?.();
     if (save)
-      this.focusedTabIndex = index;
-    return this.displayedTab?.[1]?.tabId;
+      this.displayedTabId = tabId;
+    return newTab.tabId;
   }
+
 
   /**
    * Show the next tab after the current one
@@ -159,8 +162,8 @@ export class TabService {
   public showNextTab() {
     if (this.tabs.length <= 1)
       return;
-    const index = this.focusedTabIndex >= this.tabs.length ? 0 : this.focusedTabIndex + 1;
-    return this.showTab(index);
+    const index = this.getTabIndex(this.displayedTabId) + 1;
+    return this.showTab(this.tabs[index >= this.tabs.length ? 0 : index].tabId);
   }
 
   /**
@@ -168,9 +171,9 @@ export class TabService {
    * @param removeFromStorage Specify if the tabs should be removed from storage
    */
   public async closeAllTab(removeFromStorage = false) {
-    const tabLength = this._tabs.length;
+    const tabLength = this._tabs.size;
     for (let i = 0; i < tabLength; i++)
-      this.removeTab(0);
+      this.removeTab(this._tabs[0]);
     if (removeFromStorage) {
       await this.db.removeMany(Tab, await this.getSavedTabs());
     }
@@ -191,7 +194,11 @@ export class TabService {
    * @param tabId the tab uuid to get
    */
   public getTabFromId<T extends ITabElement>(tabId: string): T {
-    return this.tabs.find(el => el.tabId === tabId) as T;
+    return this._tabs.get(tabId) as T;
+  }
+
+  public async isTabSaved(tabId: string) {
+    return !!await this.db.getOne(Tab, tabId);
   }
 
   /**
@@ -200,11 +207,11 @@ export class TabService {
    * @param type the type of the tab
    * @param id the optional element id of the tab
    */
-  private async addTabToStorage(type: Type<ITabElement>, id?: number | string) {
+  private async addTabToStorage(type: Type<ITabElement>, tabId: string, id?: number) {
     const index = this.availableTabs.indexOf(type);
-    const tab = new Tab(this.projectId, index, id);
+    const tab = new Tab(this.projectId, index, tabId, id);
     const savedTabs = await this.getSavedTabs();
-    if (savedTabs.find(el => el.tabType === index && (el?.elId || id) === id)) {
+    if (savedTabs.find(el => el.id === tab.id && el.projectId === this.projectId)) {
       this.logger.warn("Tab already exists");
       return;
     }
@@ -220,32 +227,40 @@ export class TabService {
    * @param tabType the type of the tab
    * @param id the optional element id of the tab
    */
-  private async removeTabToStorage(tabType: Type<ITabElement>, id?: number) {
-    const index = this.availableTabs.indexOf(tabType);
-    const tab = (await this.getSavedTabs()).find(el => (id && el.elId === id && el.tabType == index) || el.tabType === index);
+  private async removeTabToStorage(tabId: string) {
+    const tab = await this.db.getOne(Tab, tabId);
     if (tab)
       await this.db.remove(Tab, tab);
-    else this.logger.warn("Could not find tab to remove with", tabType.name, id);
+    else
+      this.logger.warn("Could not find tab to remove:", tabId);
   }
 
   private async getSavedTabs() {
     return await this.db.getManyWhere(Tab, 'projectId', this.projectId);
   }
-
-  public get tabs(): ITabElement[] {
-    return this._tabs.map(el => el[1]) ?? [];
+  public getTabIndex(tabId: string) {
+    return this.tabs.findIndex(el => el.tabId === tabId);
   }
-  public get displayedTab(): [number, ITabElement] {
-    const index = this._tabs.findIndex(el => el[1].show == true);
-    return index > -1 ? [index, this._tabs[index][1]] : null;
+  public get tabs(): ITabElement[] {
+    return [...this._tabs.values()] ?? [];
+  }
+  public get focusedTab(): ITabElement {
+    return this._tabs.get(this.displayedTabId);
   }
   public get hasTabs(): boolean {
-    return this._tabs.length > 0;
+    return this._tabs.size > 0;
   }
-  public get focusedTabIndex(): number {
-    return parseInt(localStorage.getItem("tab-index"));
+  public get displayedTabId(): string {
+    return this._displayedTabId;
   }
-  public set focusedTabIndex(opt: number) {
-    localStorage.setItem("tab-index", opt.toString());
+  public set displayedTabId(tabId: string | null) {
+    this._displayedTabId = tabId;
+    if (tabId) {
+      this.db.upsert(KeyStore, { key: "tab-index-" + this.projectId, value: tabId }, "tab-index-" + this.projectId)
+        .catch(e => this.logger.error("Could not save tab index", e));
+    } else {
+      this.db.remove(KeyStore, "tab-index-" + this.projectId)
+        .catch(e => this.logger.error("Could not remove tab index", e));
+    }
   }
 }

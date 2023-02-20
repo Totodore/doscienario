@@ -14,7 +14,7 @@ export class OptionsBarComponent {
   ) { }
 
   public get openedTab(): TabTypes | undefined {
-    return this.tabs.displayedTab?.[1]?.type;
+    return this.tabs.focusedTab?.type;
   }
 
 }

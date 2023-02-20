@@ -97,6 +97,6 @@ export class BoardComponent implements OnInit, OnDestroy {
   }
 
   public get showOptions() {
-    return this.tabs.displayedTab?.[1]?.type === TabTypes.BLUEPRINT || this.tabs.displayedTab?.[1]?.type === TabTypes.DOCUMENT;
+    return this.tabs.focusedTab?.type === TabTypes.BLUEPRINT || this.tabs.focusedTab?.type === TabTypes.DOCUMENT;
   }
 }

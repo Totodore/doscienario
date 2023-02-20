@@ -99,8 +99,8 @@ export class BlueprintComponent extends ElementComponent implements ITabElement,
    * When the tab is opened with an optional blueprint id we request the blueprint loading 
    * We also generate a tabId
    */
-  public openTab(id?: string | number): string {
-    super.openTab(id);
+  public openTab(tabId: string, id?: number): string {
+    super.openTab(tabId, id);
     this.socket.emit(Flags.OPEN_BLUEPRINT, [this.tabId, id]);
     return this.tabId;
   }

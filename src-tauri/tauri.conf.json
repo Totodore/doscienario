@@ -62,7 +62,7 @@
         "center": true,
         "resizable": true,
         "fullscreen": false,
-        "visible": false,
+        "visible": true,
         "label": "main"
       },
       {

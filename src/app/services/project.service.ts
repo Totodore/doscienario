@@ -160,6 +160,7 @@ export class ProjectService {
     if (!this.data.blueprints.find(el => el.id == blueprint.id)) {
       this.data.blueprints.push(blueprint);
     }
+    this.tabs.getTabFromId(packet.reqId).loadedTab();
   }
   /**
    * Add a doc to the local data if the doc has been created

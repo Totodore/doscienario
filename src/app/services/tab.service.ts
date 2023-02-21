@@ -57,6 +57,7 @@ export class TabService {
     this.rootViewContainer.insert(component.hostView);
     component.instance.show = show;
     component.instance.openTab?.(tabId, id);
+    this.displayedTabId = tabId;
     return tabId;
   }
 

@@ -111,7 +111,9 @@ export class TabService {
   }
 
   /**
+   * Remove a tab from the tab list
    * If index is not given, it removes the current tab
+   * If the tab is the current tab displayed the previous tab will be displayed
    */
   public removeTab(tabId = this.displayedTabId, storage = true) {
     if (!this._tabs.has(tabId)) {
@@ -121,11 +123,11 @@ export class TabService {
     this.logger.log("Removing tab :", tabId);
     const tab = this._tabs.get(tabId);
     const tabIndex = this.getTabIndex(tabId);
-    tab.onClose?.();
-    if (tab.show && this.tabs.length > 1) {
-      (this.tabs[tabIndex - 1] ?? this.tabs[tabIndex + 1]).show = true;
-      (this.tabs[tabIndex - 1] ?? this.tabs[tabIndex + 1]).onFocus?.();
+    if (tab.show && this._tabs.size > 1) {
+      const newVisibleTab = this.tabs[tabIndex - 1] ?? this.tabs[tabIndex + 1];
+      this.showTab(newVisibleTab.tabId);
     }
+    tab.onClose?.();
     if (storage)
       this.removeTabToStorage(tabId);
     this.rootViewContainer.remove(tabIndex);
@@ -161,10 +163,10 @@ export class TabService {
    * Show the next tab after the current one
    */
   public showNextTab() {
-    if (this.tabs.length <= 1)
+    if (this._tabs.size <= 1)
       return;
     const index = this.getTabIndex(this.displayedTabId) + 1;
-    return this.showTab(this.tabs[index >= this.tabs.length ? 0 : index].tabId);
+    return this.showTab(this.tabs[index >= this._tabs.size ? 0 : index].tabId);
   }
 
   /**

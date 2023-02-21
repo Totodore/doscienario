@@ -27,7 +27,6 @@ import { DocumentComponent } from '../components/tabs/document/document.componen
 export class ProjectService {
 
   public openBlueprints: { [k: string]: BlueprintSock } = {};
-  public openSheets: { [k: string]: SheetSock } = {};
 
   public searchComponent!: SearchOptionsComponent;
 
@@ -44,7 +43,6 @@ export class ProjectService {
   public async loadData(data: Project) {
     this.data = data;
     localStorage.setItem("project-data", JSON.stringify(data));
-    // this.openDocs = {};
     this.openBlueprints = {};
   }
 
@@ -136,7 +134,6 @@ export class ProjectService {
   }
   /**
    * Remove a doc from its docId
-   * If it is tab id it means that the doc should be opened
    */
   @DataUpdater()
   public removeDoc(id: number) {
@@ -200,7 +197,6 @@ export class ProjectService {
   }
   /**
    * Remove a blueprint from its tab id or docId
-   * If it is tab id it means that the doc should be opened
    */
   @DataUpdater()
   public removeBlueprint(id: string | number) {
@@ -259,12 +255,6 @@ export class ProjectService {
     else
       this.getBlueprint(packet.blueprint)!.loopbackRelsMap.set(packet.relation.id, new Relationship(packet.relation));
   }
-  //Todo: Check potential issue
-  public removeBlueprintRelation(packet: RemoveRelationIn) {
-    // const index = this.getBlueprint(packet.blueprint)!.relationships.findIndex(el => el.id === packet.blueprint);
-    this.getBlueprint(packet.blueprint)!.relsMap.delete(packet.blueprint);
-
-  }
 
   @DataUpdater()
   public updateBlueprintTags(tabId: string, tags: Tag[]) {
@@ -276,37 +266,21 @@ export class ProjectService {
         this.data.tags.push(tag);
     }
   }
-  public setSumarryNode(packet: EditSummaryIn) {
-    this.getBlueprint(packet.blueprint).nodesMap.get(packet.node)!.summary = packet.content;
-    // this.getBlueprint(packet.blueprint)!.nodes.find(el => el.id === packet.node)!.summary = packet.content;
-  }
-
 
   @DataUpdater()
-  public addSendSheet(packet: SendElementIn) {
-    const id = packet.lastUpdate;
-    const sheet = new SheetSock(packet.element);
-    sheet.lastChangeId = id;
-    sheet.changes = new Map<number, Change[]>();
-    sheet.clientUpdateId = 0;
-    this.openSheets[packet.reqId] = sheet;
+  public addSendSheet(sheet: Sheet, tabId: string) {
     const parentDoc = this.data.documents.find(el => el.id === sheet.documentId);
     if (!parentDoc.sheets?.find(el => el.id === sheet.id)) {
       (parentDoc.sheets ??= []).push(sheet);
     }
-    this.logger.log("Sheet received:", packet.element.id, "doc:", parentDoc.id, "tab:", packet.reqId);
+    this.logger.log("Sheet received:", sheet.id, "doc:", parentDoc.id, "tab:", tabId);
   }
+
   @DataUpdater()
   public addOpenSheet(sheet: Sheet) {
     const doc = this.data.documents.find(el => el.id == sheet.documentId);
     if (doc && !doc.sheets.find(el => el.id == sheet.id))
       doc.sheets.push(sheet);
-  }
-
-  public updateSheet(incomingSheet: WriteElementIn) {
-    const sheet = this.getSheet(incomingSheet.elementId);
-    if (sheet)
-      sheet.content = applyTextChanges(sheet, incomingSheet);
   }
 
   /**
@@ -327,7 +301,6 @@ export class ProjectService {
       return;
     }
     tab.sheets.splice(sheetIndex, 1);
-    delete this.openSheets[tab.tabId];
     const sheets = this.data.documents.find(el => tab.id === el.id)!.sheets;
     sheets.splice(sheets.findIndex(el => el.id == id), 1);
     this.logger.log("Sheet removed:", id, "doc:", docId);
@@ -393,8 +366,5 @@ export class ProjectService {
   }
   public getBlueprint(blueprintId: number) {
     return Object.values(this.openBlueprints).find(el => el.id == blueprintId);
-  }
-  public getSheet(sheetId: number) {
-    return Object.values(this.openSheets).find(el => el.id == sheetId);
   }
 }

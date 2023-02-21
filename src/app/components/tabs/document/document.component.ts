@@ -5,7 +5,7 @@ import crc32 from 'crc/calculators/crc32';
 import { NGXLogger } from 'ngx-logger';
 import { find, Observable } from 'rxjs';
 import { DocumentSock } from 'src/app/models/api/document.model';
-import { Sheet } from 'src/app/models/api/sheet.model';
+import { Sheet, SheetSock } from 'src/app/models/api/sheet.model';
 import { Tag } from 'src/app/models/api/tag.model';
 import { Flags } from 'src/app/models/sockets/flags.enum';
 import { CheckCRCIn } from 'src/app/models/sockets/in/document.in';
@@ -40,7 +40,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   @ViewChild("editorView", { static: false })
   private editorView?: ElementRef<HTMLElement>;
   private editorInstance?: CKEditor5.Editor;
-  public openedSheet?: SheetEditorComponent;
+  public sheetEditor?: SheetEditorComponent;
 
   public readonly type = TabTypes.DOCUMENT;
 
@@ -414,7 +414,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       maxWidth: "100%",
       id: "editor-dialog",
     });
-    this.openedSheet = dial.componentInstance;
+    this.sheetEditor = dial.componentInstance;
   }
 
   /**
@@ -448,6 +448,9 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
       this.socket.emit(Flags.TAG_ADD_DOC, new AddTagElementOut(this.id, tag.title));
   }
 
+  get openedSheet() {
+    return this.sheetEditor?.sheet;
+  }
   get sheets(): Sheet[] {
     return this.project.docs.find(el => el.id == this.id).sheets || [];
   }

@@ -100,7 +100,9 @@ export class TreeIoHandler extends AbstractIoHandler {
 
   @EventHandler(Flags.REMOVE_RELATION)
   onRemoveRelation(packet: RemoveRelationIn) {
-    this.project.removeBlueprintRelation(packet);
+    const tab = this.tabs.getTab(TabTypes.BLUEPRINT, packet.blueprint);
+    if (tab)
+      this.project.blueprints[tab.tabId].delete(packet.blueprint);
   }
 
   @EventHandler(Flags.PATCH_RELATIONSHIP)
@@ -125,6 +127,8 @@ export class TreeIoHandler extends AbstractIoHandler {
 
   @EventHandler(Flags.SUMARRY_NODE)
   onSumarryNode(packet: EditSummaryIn) {
-    this.project.setSumarryNode(packet);
+    const tab = this.tabs.getTab(TabTypes.BLUEPRINT, packet.blueprint);
+    if (tab)
+      this.project.blueprints[tab.tabId].nodesMap.get(packet.node)!.summary = packet.content;
   }
 }

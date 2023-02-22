@@ -8,6 +8,8 @@
 		name="edit"
 		ngDefaultControl
 		(ready)="editorLoaded($event)"
+		(wheel)="onWheel($event)"
+		[style]="'--font-zoom:' + fontZoom"
 		#editorEl
 	></ckeditor>
 	<h1 *ngIf="!sheet">Chargement...</h1>

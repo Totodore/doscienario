@@ -137,6 +137,20 @@ export class SheetEditorComponent implements OnInit, AfterViewInit {
     });
   }
 
+  
+  /**
+  * Allow the user to zoom on the viewport (can be call from a wheel event or from another ui method)
+  * */
+  public onWheel(e: WheelEvent): void {
+    if (e.ctrlKey) {
+      e.preventDefault();
+      const delta = -Math.sign(e.deltaY);
+      if ((delta < 0 && this.fontZoom > 1) || (delta > 0 && this.fontZoom < 4))
+        this.fontZoom += delta / 10;
+    }
+  }
+
+
   private updateSheetContent(changes: Change[]) {
     this.logger.log("Updating sheet", this.id, "tab", this.tabId);
     this.sheet.changes.set(this.sheet.clientUpdateId, changes);
@@ -170,6 +184,13 @@ export class SheetEditorComponent implements OnInit, AfterViewInit {
   public get content() { return this.sheet?.content; }
   public get id() {
     return this._id ??= this.sheet?.id;
+  }
+
+  get fontZoom(): number {
+    return +(localStorage.getItem("fontZoom") || 14);
+  }
+  set fontZoom(val: number) {
+    localStorage.setItem("fontZoom", val.toString());
   }
 
 }

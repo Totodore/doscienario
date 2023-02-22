@@ -69,7 +69,7 @@ import { ResizableBarComponent } from './components/views/board/resizable-bar/re
 import { TabViewComponent } from './components/views/board/tab-view/tab-view.component';
 import { LoginComponent } from './components/views/login/login.component';
 import { MenuComponent } from './components/views/menu/menu.component';
-import { dbConfig, loggerConfig } from './configs';
+import { dbConfig, grpcConfig, loggerConfig } from './configs';
 import { DateHttpInterceptor } from './interceptors/date.interceptor';
 import { DbService } from './services/database/db.service';
 import { MapperLoggerService } from './services/logger/mapper-logger.service';
@@ -80,6 +80,9 @@ import { DatePipe } from '@angular/common';
 import { SocketService } from './services/sockets/socket.service';
 import { DocIoHandler } from './services/sockets/doc-io.handler.service';
 import { TagIoHandler } from './services/sockets/tag-io.handler.service';
+import { GrpcCoreModule, GrpcLoggerModule, GRPC_INTERCEPTORS } from '@ngx-grpc/core';
+import { ImprobableEngGrpcWebClientModule } from '@ngx-grpc/improbable-eng-grpc-web-client';
+import { GrpcAuthInterceptor } from './interceptors/grpc.interceptor';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -126,6 +129,9 @@ import { TagIoHandler } from './services/sockets/tag-io.handler.service';
   imports: [
     LoggerModule.forRoot(loggerConfig),
     NgxIndexedDBModule.forRoot(dbConfig),
+    GrpcCoreModule.forRoot(),
+    ImprobableEngGrpcWebClientModule.forRoot(grpcConfig),
+    GrpcLoggerModule.forRoot({ settings: { enabled: true } }),
     ReactiveFormsModule,
     BrowserModule,
     AppRoutingModule,
@@ -155,6 +161,7 @@ import { TagIoHandler } from './services/sockets/tag-io.handler.service';
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: appearance },
     { provide: MAT_COLOR_FORMATS, useValue: NGX_MAT_COLOR_FORMATS },
     { provide: HTTP_INTERCEPTORS, useClass: DateHttpInterceptor, multi: true },
+    { provide: GRPC_INTERCEPTORS, useClass: GrpcAuthInterceptor, multi: true },
     { provide: TOKEN_LOGGER_MAPPER_SERVICE, useClass: MapperLoggerService },
     { provide: TOKEN_LOGGER_WRITER_SERVICE, useClass: WriterLoggerService },
     {

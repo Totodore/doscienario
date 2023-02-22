@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { CKEditor5 } from '@ckeditor/ckeditor5-angular';
 import crc32 from 'crc/calculators/crc32';
 import { NGXLogger } from 'ngx-logger';
-import { find, Observable } from 'rxjs';
+import { find, lastValueFrom, Observable } from 'rxjs';
 import { DocumentSock } from 'src/app/models/api/document.model';
 import { Sheet, SheetSock } from 'src/app/models/api/sheet.model';
 import { Tag } from 'src/app/models/api/tag.model';
@@ -19,6 +19,8 @@ import { DocIoHandler } from 'src/app/services/sockets/doc-io.handler.service';
 import { SocketService } from 'src/app/services/sockets/socket.service';
 import { ProgressService } from 'src/app/services/ui/progress.service';
 import { applyTabPlugin, findStrFromSelection } from 'src/app/utils/doc.utils';
+import { OpenDocRequest } from 'src/proto/docs.pb';
+import { DocsClient } from 'src/proto/docs.pbsc';
 import * as CKEditor from "../../../../lib/ckeditor";
 import { ConfirmComponent } from '../../utils/confirm/confirm.component';
 import { ElementComponent } from '../element.component';
@@ -100,6 +102,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
     private readonly api: ApiService,
     private readonly dialog: MatDialog,
     private readonly contextMenu: ContextMenuService,
+    private readonly grpcDoc: DocsClient,
     logger: NGXLogger,
     progress: ProgressService,
   ) {
@@ -120,6 +123,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
   public openTab(tabId: string, id: number): string {
     super.openTab(tabId, id);
     this.socket.emit(Flags.OPEN_DOC, [this.tabId, id]);
+    lastValueFrom(this.grpcDoc.openDoc(new OpenDocRequest({ id, userId: this.api.user.id }))).then(console.log).catch(console.log);
     this.docWorker.worker.addEventListener<Change[]>(`diff-${this.tabId}`, (data) => this.onDocParsed(data));
     if (!this.tabId)
       throw new Error("No tabId for document");

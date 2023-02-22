@@ -80,7 +80,7 @@ export class MenuComponent implements OnInit {
     }
   }
   public logout() {
-    const user = this.api.user.name;
+    const user = this.api.user?.name;
     if (this.api.logout()) {
       this.router.navigateByUrl("/auth");
       this.snackbar.snack(`Au revoir ${user} !`);

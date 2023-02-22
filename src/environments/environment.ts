@@ -7,6 +7,7 @@ export const environment = {
   // apiUrl: "doscenario.scriptis.fr",
   secured: false,
   apiUrl: "localhost:3000",
+  grpcUrl: "http://localhost:8080"
 };
 
 /*

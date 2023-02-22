@@ -295,12 +295,6 @@ export class ProjectService {
       this.logger.error("Sheet removal failed: Document not found:", docId, "sheet:", id);
       return;
     }
-    const sheetIndex = tab.sheets.findIndex(el => el.id === id);
-    if (sheetIndex === -1) {
-      this.logger.error("Sheet removal failed: Sheet not found:", id, "doc:", docId);
-      return;
-    }
-    tab.sheets.splice(sheetIndex, 1);
     const sheets = this.data.documents.find(el => tab.id === el.id)!.sheets;
     sheets.splice(sheets.findIndex(el => el.id == id), 1);
     this.logger.log("Sheet removed:", id, "doc:", docId);

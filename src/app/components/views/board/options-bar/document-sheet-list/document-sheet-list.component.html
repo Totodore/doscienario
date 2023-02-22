@@ -1,10 +1,10 @@
 <div class="wrapper" *ngIf="doc">
-	<div class="sheet" *ngFor="let sheet of sheets" mat-ripple (click)="onClick(sheet)" (contextmenu)="onRightClick($event, sheet)">
+	<div class="sheet" *ngFor="let sheet of sheets" mat-ripple (click)="onClick(sheet)" (contextmenu)="onRightClick($event, sheet, true)">
 		<mat-icon>note</mat-icon>
 		<span class="name">{{ sheet.title }}</span>
 	</div>
 	<mat-divider *ngIf="sheets.length > 0 && notFoundSheets.length > 0"></mat-divider>
-	<div class="sheet" *ngFor="let sheet of notFoundSheets" mat-ripple (click)="onClick(sheet)" (contextmenu)="onRightClick($event, sheet)">
+	<div class="sheet" *ngFor="let sheet of notFoundSheets" mat-ripple (click)="onClick(sheet)" (contextmenu)="onRightClick($event, sheet, false)">
 		<mat-icon>note</mat-icon>
 		<span class="name">{{ sheet.title }}</span>
 	</div>

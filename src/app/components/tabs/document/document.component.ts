@@ -320,7 +320,7 @@ export class DocumentComponent extends ElementComponent implements ITabElement, 
    * Remove a given sheet from the document and from the editor
    * @param sheet The sheet to remove
    */
-  private removeSheet(sheet: Sheet) {
+  public removeSheet(sheet: Sheet) {
     const dialog = this.dialog.open(ConfirmComponent, { data: "Supprimer cette note ?" });
     dialog.componentInstance.confirm.subscribe(() => {
       this.socket.emit(Flags.REMOVE_SHEET, [sheet.id, this.id]);

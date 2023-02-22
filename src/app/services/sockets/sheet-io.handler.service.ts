@@ -43,7 +43,11 @@ export class SheetIoHandler extends AbstractIoHandler {
     sheet.lastChangeId = id;
     sheet.changes = new Map<number, Change[]>();
     sheet.clientUpdateId = 0;
-    const sheetEditor = this.getCurrentSheetComponent(packet.element.id);
+    const sheetEditor = this.getCurrentSheetComponent(packet.reqId);
+    if (!sheetEditor) {
+      this.logger.warn("Cannot found sheet editor with id:", packet.element.id);
+      return;
+    }
     this.logger.log("Adding sheet content to opened sheet", sheet.id, sheetEditor?.tabId, sheetEditor?.docId);
     sheetEditor.sheet = sheet;
     this.project.addSendSheet(sheet, sheetEditor.tabId);
@@ -56,7 +60,7 @@ export class SheetIoHandler extends AbstractIoHandler {
     const sheet = this.getCurrentSheetComponent(packet.elementId).sheet;
     sheet.lastChangeId = packet.updateId;
     if (packet.userId != this.api.user.id) {
-        sheet.content = applyTextChanges(sheet, packet);
+      sheet.content = applyTextChanges(sheet, packet);
     }
   }
 
@@ -71,15 +75,34 @@ export class SheetIoHandler extends AbstractIoHandler {
 
   /**
    * Find the current sheet component and put the doc tab id in cache
+   * @param id A sheet element ID or a reqId / tabid of the sheet
    */
-  private getCurrentSheetComponent(id: number) {
+  private getCurrentSheetComponent(id: number | string) {
     const doc = this.tabs.getTabFromId<DocumentComponent>(this.openedSheetDocId);
-    if (doc && doc.sheetEditor?.id == id) {
+    if (doc && (typeof id == "number" && doc.sheetEditor?.id == id || typeof id == "string" && doc.sheetEditor?.tabId == id)) {
       return doc.sheetEditor;
     }
     else {
-      const doc = this.tabs.tabs.find(tab => tab.type == TabTypes.DOCUMENT && (tab as DocumentComponent).sheetEditor?.id == id) as DocumentComponent;
+      const doc = this.tabs.tabs.find(tab => tab.type == TabTypes.DOCUMENT &&
+        (typeof id == "number" && (tab as DocumentComponent).sheetEditor?.id == id ||
+          typeof id == "string" && (tab as DocumentComponent).sheetEditor?.tabId == id)) as DocumentComponent;
       this.openedSheetDocId = doc?.tabId;
+      return doc?.sheetEditor;
+    }
+  }
+  /**
+   * Find the current sheet component and put the doc tab id in cache
+   */
+  private getCurrentSheetComponentFromTabId(id: string) {
+    const doc = this.tabs.getTabFromId<DocumentComponent>(this.openedSheetDocId);
+    if (doc && doc.sheetEditor?.tabId == id) {
+      return doc.sheetEditor;
+    }
+    else {
+      console.log(this.tabs.tabs);
+      const doc = this.tabs.tabs.find(tab => tab.type == TabTypes.DOCUMENT && (tab as DocumentComponent).sheetEditor?.tabId == id) as DocumentComponent;
+      this.openedSheetDocId = doc?.tabId;
+      console.log(doc, doc?.sheetEditor);
       return doc?.sheetEditor;
     }
   }

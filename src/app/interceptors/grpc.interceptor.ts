@@ -13,7 +13,6 @@ export class GrpcAuthInterceptor implements GrpcInterceptor {
   ) { }
 
   public intercept<Q extends GrpcMessage, S extends GrpcMessage>(request: GrpcRequest<Q, S>, next: GrpcHandler) {
-    console.log(request.requestMetadata);
     request.requestMetadata.set("authorization", this.api.jwt);
     return next.handle(request);
   }

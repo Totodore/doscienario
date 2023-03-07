@@ -83,6 +83,7 @@ import { TagIoHandler } from './services/sockets/tag-io.handler.service';
 import { GrpcCoreModule, GrpcLoggerModule, GRPC_INTERCEPTORS } from '@ngx-grpc/core';
 import { ImprobableEngGrpcWebClientModule } from '@ngx-grpc/improbable-eng-grpc-web-client';
 import { GrpcAuthInterceptor } from './interceptors/grpc.interceptor';
+import { GrpcLoggerInterceptor } from './interceptors/grpc-logger.interceptor';
 @NgModule({
   declarations: [
     AddOptionsComponent,
@@ -131,7 +132,7 @@ import { GrpcAuthInterceptor } from './interceptors/grpc.interceptor';
     NgxIndexedDBModule.forRoot(dbConfig),
     GrpcCoreModule.forRoot(),
     ImprobableEngGrpcWebClientModule.forRoot(grpcConfig),
-    GrpcLoggerModule.forRoot({ settings: { enabled: true } }),
+    GrpcLoggerModule.forRoot({ settings: { enabled: false } }),
     ReactiveFormsModule,
     BrowserModule,
     AppRoutingModule,
@@ -162,11 +163,12 @@ import { GrpcAuthInterceptor } from './interceptors/grpc.interceptor';
     { provide: MAT_COLOR_FORMATS, useValue: NGX_MAT_COLOR_FORMATS },
     { provide: HTTP_INTERCEPTORS, useClass: DateHttpInterceptor, multi: true },
     { provide: GRPC_INTERCEPTORS, useClass: GrpcAuthInterceptor, multi: true },
+    { provide: GRPC_INTERCEPTORS, useClass: GrpcLoggerInterceptor, multi: true },
     { provide: TOKEN_LOGGER_MAPPER_SERVICE, useClass: MapperLoggerService },
     { provide: TOKEN_LOGGER_WRITER_SERVICE, useClass: WriterLoggerService },
     {
       provide: APP_INITIALIZER,
-      deps: [NGXLogger, SocketService, DocIoHandler, SheetIoHandler, IoHandler, TagIoHandler, TreeIoHandler], 
+      deps: [NGXLogger, SocketService, DocIoHandler, SheetIoHandler, IoHandler, TagIoHandler, TreeIoHandler],
       useFactory: (logger: NGXLogger) => logger.log("Initializing socket IO"),
     },
     DatePipe
@@ -174,8 +176,8 @@ import { GrpcAuthInterceptor } from './interceptors/grpc.interceptor';
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  
-  constructor(private readonly db: DbService) { 
+
+  constructor(private readonly db: DbService) {
     this.clearLogs();
   }
 

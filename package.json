@@ -33,7 +33,7 @@
     "@angular/router": "^14.2.0",
     "@ckeditor/ckeditor5-angular": "^4.0.0",
     "@tauri-apps/api": "^1.1.0",
-    "axios": "^0.27.2",
+    "axios": "^0.28.0",
     "crc": "^4.1.1",
     "diff": "^5.1.0",
     "fast-array-diff": "^1.0.1",

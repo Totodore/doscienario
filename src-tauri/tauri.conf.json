@@ -1,58 +1,60 @@
 {
-  "package": {
-    "productName": "Doscienario",
-    "version": "../package.json"
-  },
-  "build": {
-    "distDir": "../dist/app",
-    "devPath": "http://localhost:4200",
-    "beforeDevCommand": "yarn start",
-    "beforeBuildCommand": ""
-  },
-  "tauri": {
-    "bundle": {
-      "active": true,
-      "targets": "all",
-      "identifier": "fr.scriptis.doscienario",
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
-      "resources": [],
-      "externalBin": [],
-      "copyright": "",
-      "category": "Productivity",
-      "shortDescription": "",
-      "longDescription": "",
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": ""
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "resources": [],
+    "externalBin": [],
+    "copyright": "",
+    "category": "Productivity",
+    "shortDescription": "",
+    "longDescription": "",
+    "macOS": {
+      "frameworks": [],
+      "exceptionDomain": "",
+      "signingIdentity": null,
+      "providerShortName": null,
+      "entitlements": null
+    },
+    "linux": {
       "deb": {
         "depends": []
-      },
-      "macOS": {
-        "frameworks": [],
-        "exceptionDomain": "",
-        "signingIdentity": null,
-        "providerShortName": null,
-        "entitlements": null
-      },
-      "windows": {
-        "certificateThumbprint": null,
-        "digestAlgorithm": "sha256",
-        "timestampUrl": ""
       }
     },
+    "createUpdaterArtifacts": "v1Compatible"
+  },
+  "build": {
+    "beforeBuildCommand": "",
+    "frontendDist": "../dist/app",
+    "beforeDevCommand": "yarn start",
+    "devUrl": "http://localhost:4200"
+  },
+  "productName": "Doscienario",
+  "mainBinaryName": "Doscienario",
+  "version": "../package.json",
+  "identifier": "fr.scriptis.doscienario",
+  "plugins": {
     "updater": {
-      "active": true,
-      "dialog": true,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDlGOTBFNTFDRDMxMzJCNzgKUldSNEt4UFRIT1dRbnpjamJJQ05nZG04ODF0Sy95YzlsUHN5Uk9YWllFcXhDNjk2ZUNSRjJSV0sK",
       "endpoints": [
         "https://doscenario.scriptis.fr/system/tauri-update/{{target}}/{{current_version}}"
       ]
-    },
-    "allowlist": {
-      "all": true
+    }
+  },
+  "app": {
+    "security": {
+      "csp": null
     },
     "windows": [
       {
@@ -63,7 +65,8 @@
         "resizable": true,
         "fullscreen": false,
         "visible": false,
-        "label": "main"
+        "label": "main",
+        "useHttpsScheme": true
       },
       {
         "width": 300,
@@ -75,11 +78,9 @@
         "url": "splashscreen.html",
         "label": "splashscreen",
         "skipTaskbar": true,
-        "alwaysOnTop": true
+        "alwaysOnTop": true,
+        "useHttpsScheme": true
       }
-    ],
-    "security": {
-      "csp": null
-    }
+    ]
   }
 }

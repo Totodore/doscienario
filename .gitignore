@@ -54,3 +54,5 @@ package-lock.json
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+src-tauri/gen
